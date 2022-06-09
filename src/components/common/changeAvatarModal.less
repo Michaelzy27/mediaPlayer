@@ -1,0 +1,27 @@
+.ant-upload.ant-upload-drag.sound-rig-profile-photo-upload {
+  --upload-circle-diameter: 150px;
+  width: var(--upload-circle-diameter);
+  height: var(--upload-circle-diameter);
+  border-radius: 50%;
+  margin-left: calc(50% - var(--upload-circle-diameter) / 2);
+
+  &.image-selected {
+    border-style: solid;
+    background-color: #ffffff;
+  }
+
+  .ant-upload-drag-icon {
+    margin-bottom: 0px;
+    svg {
+      width: 1.2rem;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+  .ant-upload.ant-upload-btn {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  .ant-upload-hint {
+    font-size: 1rem;
+  }
+}

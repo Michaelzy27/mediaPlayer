@@ -1,0 +1,47 @@
+@modal-padding: 24px;
+@footer-height: 64px;
+.ant-modal.edit-modal {
+  .ant-modal-close {
+    z-index: 1002;
+  }
+  .ant-modal-header {
+    position: absolute;
+    z-index: 1001;
+    width: 100%;
+  }
+  .ant-modal-body {
+    max-height: calc(100vh - 200px);
+    overflow: scroll;
+    padding: 64px 0 @footer-height 0;
+    > .ant-row {
+      padding: 0 @modal-padding;
+    }
+    > .ant-form {
+      > .ant-row,
+      > .form-group {
+        padding: 0 @modal-padding;
+        .ant-card {
+          width: 100%;
+        }
+      }
+    }
+    .edit-modal--footer {
+      position: absolute;
+      bottom: 0px;
+      width: 100%;
+      height: @footer-height;
+      z-index: 1001;
+      .ant-divider {
+        margin: 0;
+      }
+      > .ant-row {
+        height: calc(@footer-height - 1px);
+        margin: 0 @modal-padding;
+        background: #ffffff;
+        .ant-col {
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

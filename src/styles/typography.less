@@ -1,0 +1,79 @@
+@import '~antd/dist/antd.less';
+@import './theme.less';
+
+// declare a rem variable to cast final result to rem
+@rem: 1rem / @font-size-base;
+
+.heading {
+  font-size: (@rem * 48px);
+  line-height: (@rem * 57px);
+  font-weight: 500;
+}
+
+.heading-2 {
+  font-size: (@rem * 32px);
+  line-height: (@rem * 40px);
+  font-weight: 500;
+}
+
+.heading-3 {
+  font-size: (@rem * 24px);
+  line-height: (@rem * 32px);
+  font-weight: 500;
+}
+
+.heading-4 {
+  font-size: (@rem * 12px);
+  line-height: (@rem * 20px);
+  font-weight: 500;
+  color: #888888;
+  text-transform: uppercase;
+}
+
+.subheading {
+  font-size: (@rem * 16px);
+  line-height: (@rem * 24px);
+  font-weight: 500;
+  color: @primary-color;
+}
+
+.footnote {
+  font-size: (@rem * 12px);
+  line-height: (@rem * 20px);
+  color: @text-color-secondary;
+}
+
+.statistic {
+  font-size: (@rem * 32px);
+  font-weight: 500;
+}
+
+.label {
+  font-size: (@rem * 14px) !important;
+  font-weight: 500;
+  line-height: (@rem * 24px);
+}
+
+.value {
+  font-size: (@rem * 14px) !important;
+}
+
+.text--primary {
+  color: @primary-color;
+}
+
+.text--secondary {
+  color: @text-color-secondary;
+}
+
+.text--neutral {
+  color: #777777;
+}
+
+.text--black {
+  color: #000000;
+}
+
+.text--85 {
+  color: rgba(0, 0, 0, 0.85) !important;
+}

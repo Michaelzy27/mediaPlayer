@@ -1,0 +1,275 @@
+@import './theme.less';
+@import './modal.less';
+@import './mixins.less';
+
+@sound-rig-border-colour: #d9d9d9;
+@sound-rig-info-colour: #1890ff;
+@sound-rig-danger-colour: #d4380d;
+
+// links
+a {
+  color: @primary-color;
+}
+
+.danger {
+  color: @sound-rig-danger-colour !important;
+}
+
+.ant-card-bordered {
+  border: 1px solid @sound-rig-border-colour;
+  border-radius: 4px;
+}
+
+.ant-card-head {
+  border-bottom: 2px solid @sound-rig-border-colour;
+}
+
+textarea {
+  padding: 10px;
+  &.ant-input {
+    resize: vertical !important;
+  }
+  &.code {
+    font-family: monospace;
+  }
+}
+
+.info {
+  color: @sound-rig-info-colour;
+}
+
+.ant-btn-text {
+  color: @primary-color;
+}
+
+// app header
+header.ant-layout-header {
+  padding: 0px;
+  .user-menu--button {
+    background-color: #ad6800;
+    &.avatar {
+      background: none;
+    }
+    color: #ffffff;
+    &:focus {
+      outline-width: 5px;
+    }
+  }
+  .user-menu--dropdown .user-menu--dropdown-button {
+    color: #000000;
+  }
+  ul.ant-menu {
+    background: none;
+    border: none;
+  }
+}
+
+footer.ant-layout-footer {
+  padding: 0px;
+  .app-footer {
+    color: #ffffff;
+    a {
+      color: #ffffff;
+    }
+  }
+}
+
+// nav slider
+.ant-layout-sider {
+  .ant-menu.ant-menu-dark {
+    font-weight: 500;
+    .ant-menu-item:not(.ant-menu-item-selected):hover {
+      color: @text-color-dark;
+      opacity: 0.8;
+      a:hover {
+        color: @text-color-dark;
+        opacity: 0.8;
+      }
+    }
+
+    .ant-menu-item::after {
+      // default dark menu removes the border
+      border-right: 3px solid @menu-highlight-color;
+    }
+  }
+  .ant-menu-item-group .ant-menu-item-group-title {
+    padding-top: 24px;
+    padding-left: 23px;
+  }
+
+  // accessibility
+  li.ant-menu-item {
+    &:focus-within {
+      .accessibility--outline-mixin();
+      a:focus {
+        outline: none;
+      }
+    }
+    a:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+// buttons
+.ant-btn {
+  &.ant-btn-link:hover {
+    .ant-btn-link--hover-underline {
+      text-decoration: underline;
+    }
+  }
+}
+
+// collapsed menu styling
+.ant-tooltip.ant-menu-inline-collapsed-tooltip {
+  color: @menu-background;
+  .ant-tooltip-inner {
+    background-color: @menu-background;
+    a {
+      color: white;
+    }
+  }
+}
+
+// cards
+.ant-card {
+  &.ant-card--short-header {
+    .ant-card-head-title {
+      padding: 11px 0 10px 0;
+    }
+  }
+  .ant-card-actions > li > span {
+    cursor: default;
+  }
+}
+
+// tags
+.sound-rig-tag {
+  background: @primary-color;
+  color: @text-color-dark;
+  padding: 2px 0px 0px 8px;
+  border-radius: 3px;
+  border-color: @primary-color;
+  .anticon {
+    color: @text-color-dark;
+  }
+}
+
+// Steps
+.ant-steps {
+  .ant-steps-item {
+    .ant-steps-item-icon .ant-avatar.ant-avatar-circle {
+      background: rgba(0, 0, 0, 0);
+      color: @text-color-secondary;
+      border: 1px solid @text-color-secondary;
+      font-size: 1rem;
+      &.success {
+        color: @primary-color;
+        border: 1px solid @primary-color;
+      }
+    }
+    .ant-steps-item-title {
+      color: @text-color-secondary;
+    }
+    &.ant-steps-item-active {
+      .ant-steps-item-icon .ant-avatar.ant-avatar-circle {
+        background: @primary-color;
+        color: @text-color-dark;
+        border: 1px solid @primary-color;
+      }
+    }
+  }
+}
+
+// file upload
+.ant-upload-list .ant-upload-list-text-container {
+  padding: 16px 8px;
+  border: 1px solid @sound-rig-border-colour;
+  border-radius: 3px;
+  .ant-upload-list-item {
+    margin-top: 0px;
+    &:hover .ant-upload-list-item-info {
+      background-color: initial;
+    }
+  }
+  .ant-upload-list-item-name {
+    color: @primary-color;
+  }
+  .ant-upload-list-item-card-actions button.ant-btn {
+    opacity: 1;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+// accessibility
+a:focus {
+  .accessibility--outline-mixin();
+  outline-offset: 0.2rem;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+a.ant-btn:focus,
+button.ant-btn:focus {
+  .accessibility--outline-mixin();
+  &.ant-btn-primary {
+    outline-color: Highlight;
+  }
+  &.ant-btn-link {
+    outline-offset: 0.2rem;
+  }
+}
+
+.ant-modal .ant-modal-content button.ant-modal-close:focus {
+  .accessibility--outline-mixin();
+}
+
+div.ant-tabs-nav-list .ant-tabs-tab {
+  padding: 12px 5px;
+  &:focus-within {
+    .accessibility--outline-mixin();
+    outline-offset: -1px;
+  }
+}
+
+.ant-dropdown-menu-item {
+  &:focus-within {
+    .accessibility--outline-mixin();
+    button.ant-btn {
+      outline: none;
+      background: none;
+    }
+  }
+  button.ant-btn:hover {
+    background: none;
+  }
+}
+
+.ant-upload.ant-upload-drag:focus-within {
+  .accessibility--outline-mixin();
+  outline-style: dashed;
+}
+
+textarea.ant-input,
+input.ant-input,
+div.ant-select,
+.ant-picker input {
+  // iOS zooms any inputs with font-size < 16px
+  font-size: 1rem;
+}
+
+.ant-checkbox-wrapper:focus-within {
+  .accessibility--outline-mixin();
+  outline-offset: 0.2rem;
+}
+
+.ant-alert button.ant-alert-close-icon:focus {
+  .accessibility--outline-mixin();
+  outline-offset: 0.2rem;
+}
+
+.ant-collapse .ant-collapse-item .ant-collapse-header:focus {
+  .accessibility--outline-mixin();
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="apple-touch-icon" href="/images/sound-rig-logo-sm.svg" />
+  <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="about.css">
+  <!--
+      Notice the use of  in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+  <title>Privacy and legal - Sound Rig</title>
+</head>
+
+<body style="background-color: #ffffff">
+  <div class="flex flex-col justify-between" style="min-height: 100vh;">
+    <header class="flex items-center justify-between flex-wrap px-4 md:px-8 py-4"
+      style="top: 0px; width: 100vw; height: 64px; background: #f7f8fa">
+      <div><a href="/" aria-label="home"><img src="/images/sound-rig-logo.svg" alt="sound-rig logo"></a></div>
+    </header>
+    <main class="my-6 px-4 flex-1">
+      <div class="grid grid-cols-12">
+        <div class="col-start-1 col-span-12 xl:col-start-2 xl:col-span-10 2xl:col-start-3 2xl:col-span-8">
+          <button onclick="window.history.back();">&lt; Back</button>
+          <h1>Privacy and Legal</h1>
+          <h2>Disclaimer</h2>
+          <p>By using Sound Rig you agree to the following:</p>
+        </div>
+      </div>
+    </main>
+    <footer class="ant-layout-footer" style="width: 100vw">
+      <div class="app-footer flex items-center justify-between flex-wrap px-4 md:px-8 py-4">
+        <div class="flex py-4"><img src="/images/sound-rig-logo-white.svg" alt="Sound Rig logo" class="mr-8">
+          <div>© 2021 Sound Rig</div>
+        </div>
+        <div>
+          <div class="flex gap-x-5"><a href="faq.html">FAQ</a><a href="privacy-legal.html">Privacy and legal</a><a
+              href="contact.html">Contact us</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>
