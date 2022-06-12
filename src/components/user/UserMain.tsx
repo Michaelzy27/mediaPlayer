@@ -5,6 +5,7 @@ import { Auth } from 'aws-amplify';
 import BackLink from 'components/common/BackLink';
 import EditableAvatar from 'components/common/EditableAvatar';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
+import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
 import useUser from 'hooks/useUser';
 import { useCallback, useMemo, useState } from 'react';
 import { deriveFirstLastName, getInitials } from 'utils/name';
@@ -83,11 +84,42 @@ const UserMain = () => {
     [updateUserAttributes]
   );
 
+  const cardano = useCardano();
+
+  const handleConnectWallet = async () => {
+    const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
+    const payload = 'from sound-rig with love';
+
+    await cardano.enable(walletProvider);
+    const usedAddresses = await cardano.getUsedAddresses(walletProvider);
+    console.log('used', usedAddresses);
+    const addressHex = usedAddresses[0];
+    const sig = await cardano.signData(walletProvider, addressHex, payload);
+    console.log('sig', sig);
+  };
+
   return (
     <>
       <ResponsiveContainer className="my-6">
         <BackLink text="Back" />
         <h2>Account settings</h2>
+        <Card title="Test Wallet Connect">
+          <div>
+            <h3>Connect your wallet</h3>
+            <Button
+              type="text"
+              className="px-1 -ml-1"
+              onClick={handleConnectWallet}
+            >
+              Connect wallet
+            </Button>
+            <ChangePasswordModal
+              showModal={showChangePassword}
+              onCancel={() => setShowChangePassword(false)}
+              onSaved={() => setShowChangePassword(false)}
+            />
+          </div>
+        </Card>
         <Card title="Personal" className="mb-6">
           <h3>Profile picture</h3>
           <EditableAvatar
@@ -173,20 +205,6 @@ const UserMain = () => {
               onSaved={() => setShowChangePassword(false)}
             />
           </div>
-
-          {/* {mfaStatus === 'NOMFA' && (
-            <div className="mt-6">
-              <h3>Two-factor authentication</h3>
-              <p className="footnote mb-0">
-                For added security, enable two-factor verification. Whenever you
-                sign in to your account, you'll enter your password and an
-                authentication code sent to your phone number.
-              </p>
-              <Button type="text" className="px-1 -ml-1" onClick={enableSmsMfa}>
-                Enable
-              </Button>
-            </div>
-          )} */}
         </Card>
       </ResponsiveContainer>
     </>
