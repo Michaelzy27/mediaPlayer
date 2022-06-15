@@ -23,10 +23,23 @@ const pingAuth = () => {
   return handleAPIPromise(axios.get('/ping-auth'));
 };
 
+// add by Chau 2022-06-14 start
+const getStakeAddress = (walletAddressHex: string) => {
+  return handleAPIPromise(
+    axios.post('/get-stakeAddress', {
+      address: walletAddressHex,
+    })
+  );
+}
+// add by Chau 2022-06-14 end
+
 const UserApi = {
   getAuth,
   sendAuth,
   pingAuth,
+  // add by Chau 2022-06-14 start
+  getStakeAddress
+  // add by Chau 2022-06-14 end
 };
 
 export default UserApi;

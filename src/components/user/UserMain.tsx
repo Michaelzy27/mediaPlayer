@@ -74,6 +74,14 @@ const UserMain = () => {
     await sendAuth(addressHex, signature, key);
   };
 
+  // add by Chau 2022-06-14 start
+  const getAsset = async () => {
+    const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
+    await cardano.enable(walletProvider);
+    const usedAddresses = await cardano.getUsedAddresses(walletProvider);
+  };
+  // add by Chau 2022-06-14 end
+
   return (
     <>
       <ResponsiveContainer className="my-6">

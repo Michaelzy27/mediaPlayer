@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import API from 'api';
 
 export enum CARDANO_WALLET_PROVIDER {
   NAMI = 'NAMI',
@@ -23,6 +24,9 @@ interface ICardanoPlugin {
   enable: Function;
   getUsedAddresses: Function;
   signData: Function;
+  // add by Chau 2022-06-14 start
+  getStakeAddress: Function;
+  // add by Chau 2022-06-14 end
 }
 
 declare global {
@@ -31,6 +35,20 @@ declare global {
     __nami: INamiPlugin;
   }
 }
+// add by Chau 2022-06-14 start
+interface Asset {
+  policyId: string;
+  assetId: string;
+  name: string;
+}
+
+interface GetStakeAddressResponse {
+  stakeAddress: string;
+  error: string;
+}
+
+const _stakeAddressByWalletAddressHex = new Map<string, string>();
+// add by Chau 2022-06-14 end
 
 function toHexString(str: string) {
   const byteArray = new TextEncoder().encode(str);
@@ -75,10 +93,34 @@ const useCardano = (): ICardanoPlugin => {
     },
     []
   );
+  // add by Chau 2022-06-14 start
+  const getStakeAddress = useCallback(
+    async (
+      walletAddressHex: string
+    ) => {
+      if (_stakeAddressByWalletAddressHex.has(walletAddressHex)) {
+        return _stakeAddressByWalletAddressHex.get(walletAddressHex)!;
+      }
+      const  [stake, error] = await API.User.getStakeAddress(walletAddressHex);
+      if (error) {
+        return error;
+      }
+      if (stake.stakeAddress) {
+        return _stakeAddressByWalletAddressHex.set(walletAddressHex, stake.stakeAddress);
+      }
+      return '';
+    },
+    []
+  );
+  
+  // add by Chau 2022-06-14 end
   return {
     enable,
     getUsedAddresses,
     signData,
+     // add by Chau 2022-06-14 start
+    getStakeAddress
+     // add by Chau 2022-06-14 end
   };
 };
 
