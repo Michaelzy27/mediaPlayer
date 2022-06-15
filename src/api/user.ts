@@ -1,31 +1,32 @@
 import axios from 'axios';
 import { handleAPIPromise } from './utils';
 
-const updateUser = (field: string, value: string) => {
-  return handleAPIPromise(axios.post('/holder/update', { [field]: value }));
-};
-
-const uploadPicture = async (pictureBase64String: string) => {
+const getAuth = (walletAddress: string) => {
   return handleAPIPromise(
-    axios.post(`/holder/upload`, {
-      data: pictureBase64String,
+    axios.post('/get-auth', {
+      address: walletAddress,
     })
   );
 };
 
-const changePassword = (currentPass: string, newPass: string) => {
+const sendAuth = (walletAddress: string, signature: string, key?: string) => {
   return handleAPIPromise(
-    axios.post('/holder/change-password', {
-      oldPassword: currentPass,
-      newPassword: newPass,
+    axios.post('/send-auth', {
+      signature,
+      address: walletAddress,
+      key,
     })
   );
+};
+
+const pingAuth = () => {
+  return handleAPIPromise(axios.get('/ping-auth'));
 };
 
 const UserApi = {
-  updateUser,
-  uploadPicture,
-  changePassword,
+  getAuth,
+  sendAuth,
+  pingAuth,
 };
 
 export default UserApi;
