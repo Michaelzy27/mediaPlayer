@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { WalletFunds } from './useCardano';
 interface IUser {
   email: 'minh.tuan@m1studio.co';
   picture?: string;
@@ -6,6 +7,7 @@ interface IUser {
   displayName?: string;
   givenName?: string;
   familyName?: string;
+  walletFunds?: WalletFunds;
 }
 
 const useUser = (): {

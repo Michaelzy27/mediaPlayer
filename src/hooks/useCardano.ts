@@ -14,6 +14,9 @@ interface INamiConfigPlugin {
 interface INamiPlugin {
   signData: Function;
   getUsedAddresses: Function;
+  // add by Chau 2022-06-14 start
+  getUtxos: Function;
+  // add by Chau 2022-06-14 end
 }
 
 interface ICardanoConfigPlugin {
@@ -36,15 +39,22 @@ declare global {
   }
 }
 // add by Chau 2022-06-14 start
-interface Asset {
+
+interface GetStakeAddressResponse {
+  stakeAddress: string;
+  error: string;
+}
+
+export interface Asset {
   policyId: string;
   assetId: string;
   name: string;
 }
 
-interface GetStakeAddressResponse {
+export interface WalletFunds {
   stakeAddress: string;
-  error: string;
+  assets: Asset[];
+  lovelace: number;
 }
 
 const _stakeAddressByWalletAddressHex = new Map<string, string>();
@@ -109,6 +119,17 @@ const useCardano = (): ICardanoPlugin => {
         return _stakeAddressByWalletAddressHex.set(walletAddressHex, stake.stakeAddress);
       }
       return '';
+    },
+    []
+  );
+
+  const getUtxos = useCallback(
+    (
+      walletProvider: CARDANO_WALLET_PROVIDER
+    ) => {
+      const fn = {
+        'NAMI': window.__nami.getUtxos
+      }
     },
     []
   );
