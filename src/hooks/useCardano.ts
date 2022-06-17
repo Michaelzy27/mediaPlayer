@@ -45,18 +45,6 @@ interface GetStakeAddressResponse {
   error: string;
 }
 
-export interface Asset {
-  policyId: string;
-  assetId: string;
-  name: string;
-}
-
-export interface WalletFunds {
-  stakeAddress: string;
-  assets: Asset[];
-  lovelace: number;
-}
-
 const _stakeAddressByWalletAddressHex = new Map<string, string>();
 // add by Chau 2022-06-14 end
 

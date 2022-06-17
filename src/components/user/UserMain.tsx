@@ -1,18 +1,33 @@
-import { Button, Card, notification } from 'antd';
+import { Button, Card, notification, Table } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, {
   CARDANO_WALLET_PROVIDER,
-  WalletFunds,
-  Asset,
 } from 'hooks/useCardano';
-import useUser from 'hooks/useUser';
+import useUser, {WalletFunds, Asset} from 'hooks/useUser';
 import { useCallback, useState } from 'react';
 import { getErrorMessageObj } from 'utils/response';
 
 const UserMain = () => {
+  const columns = [
+    {
+      title: 'Asset Id',
+      dataIndex: 'assetId',
+      key: 'assetId',
+    },
+    {
+      title: 'Policy Id',
+      dataIndex: 'policyId',
+      key: 'policyId',
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+  ];
   const { user, setWalletFunds } = useUser();
 
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
@@ -60,11 +75,6 @@ const UserMain = () => {
     const usedAddresses = await cardano.getUsedAddresses(walletProvider);
     console.log('used', usedAddresses);
     const addressHex = usedAddresses[0];
-    // add by Chau 2022-06-14 start
-    user.walletFunds = await getAsset();
-    console.log('walletFunds', user.walletFunds);
-    setWalletFunds(user.walletFunds);
-    //  add by Chau 2022-06-14 end
 
     const [data, error] = await API.User.getAuth(addressHex);
     if (error) {
@@ -81,6 +91,11 @@ const UserMain = () => {
     );
     console.log('sig', signature);
     await sendAuth(addressHex, signature, key);
+    // add by Chau 2022-06-14 start
+    user.walletFunds = await getAsset();
+    console.log('walletFunds', user.walletFunds);
+    setWalletFunds(user.walletFunds);
+    //  add by Chau 2022-06-14 end
   };
 
   // add by Chau 2022-06-14 start
@@ -140,26 +155,12 @@ const UserMain = () => {
             </Button>
           </div>
         </Card>
-        <Card title="List assest">
-          <table>
-            <thead>
-              <tr>
-                <th>Asset Id</th>
-                <th>Name</th>
-                <th>Policy Id</th>
-              </tr>
-            </thead>
-            <tbody>
-              {user.walletFunds?.assets.map((asset) => (
-                <tr>
-                  <td>{asset.assetId}</td>
-                  <td>{asset.name}</td>
-                  <td>{asset.policyId}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        { user.walletFunds != null &&
+        <Card title="List assest" >
+          <Table dataSource={user.walletFunds?.assets} columns={columns}>
+          </Table>
         </Card>
+        }
       </ResponsiveContainer>
     </>
   );

@@ -1,5 +1,17 @@
 import { useState } from 'react';
-import { WalletFunds } from './useCardano';
+
+export interface Asset {
+  policyId: string;
+  assetId: string;
+  name: string;
+}
+
+export interface WalletFunds {
+  stakeAddress: string;
+  assets: Asset[];
+  lovelace: number;
+}
+
 interface IUser {
   email: 'minh.tuan@m1studio.co';
   picture?: string;
@@ -16,7 +28,6 @@ const useUser = (): {
 } => {
   const [walletFunds, _setWalletFunds] = useState<WalletFunds>();
   const setWalletFunds = (walletFunds: WalletFunds) => {
-    // blabla
     _setWalletFunds(walletFunds);
   };
   return {
