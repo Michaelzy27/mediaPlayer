@@ -4,6 +4,7 @@ export interface Asset {
   policyId: string;
   assetId: string;
   name: string;
+  onchain_metadata: any;
 }
 
 export interface WalletFunds {

@@ -1,4 +1,4 @@
-import { Button, Card, notification, Table } from 'antd';
+import { Button, Card, notification, Table, Image } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
@@ -11,22 +11,46 @@ import { useCallback, useState } from 'react';
 import { getErrorMessageObj } from 'utils/response';
 
 const UserMain = () => {
+  const createIpfsURL = (srcStr: string) => {
+    const ipfsURL = "https://ipfs.blockfrost.dev/ipfs/";
+    const ipfsPrefix = "ipfs://";
+    return ipfsURL + srcStr.replace(ipfsPrefix, "");
+  }
   const columns = [
     {
       title: 'Asset Id',
       dataIndex: 'assetId',
-      key: 'assetId',
+      key: 'assetId'
     },
     {
       title: 'Policy Id',
       dataIndex: 'policyId',
-      key: 'policyId',
+      key: 'policyId'
     },
     {
       title: 'Name',
       dataIndex: 'name',
-      key: 'name',
+      key: 'name'
     },
+    {
+      title: 'Image',
+      dataIndex: 'onchain_metadata',
+      key: 'image',
+      render:  (onchain_metadata: any) => {
+        return <Image src={createIpfsURL(onchain_metadata['image'])} />
+      }
+    },
+    {
+      title: 'File',
+      dataIndex: 'onchain_metadata',
+      key: 'File',
+      render:  (onchain_metadata: any) => {
+        return <video controls>
+          <source src={createIpfsURL(onchain_metadata['files'][0]['src'])} type="audio/mpeg">
+          </source>
+          </video>
+      }
+    }
   ];
   const { user, setWalletFunds } = useUser();
 
@@ -104,10 +128,34 @@ const UserMain = () => {
     const usedAddresses = await cardano.getUsedAddresses(walletProvider);
     const assets: Asset[] = [
       {
-        policyId: 'test',
-        assetId: 'test',
-        name: 'test',
-      },
+        policyId: 'test policyId',
+        assetId: 'test assetId',
+        name: 'test name',
+        onchain_metadata: {
+        "name": "KYD JU$E - Lucci #240",
+        "image": "ipfs://Qmd5eRve64Kq6AvCivSAZqD5uQXSZmish7KMR95SYSEKpQ",
+        "Title": "Lucci by KYD JU$E",
+        "files": [
+            {
+                "src": "ipfs://QmP4FyS1AUuNDv67vQxS71PC6dKa5YWX3t41Pe8KYjouWW",
+                "name": "KYD JU$E - Lucci #240",
+                "mediaType": "audio/mpeg"
+            }
+        ],
+        "Artist": "KYD JU$E",
+        "Twitter": "https://twitter.com/kydjuse",
+        "Quantity": "250",
+        "Copyright": "JU$E Music ©",
+        "Publisher": "JU$E Music",
+        "Royalties": "5%",
+        "mediaType": "image/png",
+        "Use Rights": "This NFT is a non-exclusive license to use in perpetuity.",
+        "Description": "Use the link to unlock private link to stream via Soundcloud",
+        "description": "Lucci is the first single released by KYD JUSE on Cardano.",
+        "Unlock Feature": "https://tinyurl.com/jusedrops",
+        "Publishers Website": "https://www.jusemusic.com"
+        }
+      }
     ];
     const lovelace = 1;
     const walletFunds: WalletFunds = {
