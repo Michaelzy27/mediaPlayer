@@ -9,6 +9,7 @@ if [%2]==[clear-cache] (GOTO:clear-cache)
 
 rm -rf build/
 yarn build:qa
+
 :no-build
 
 echo "Deploying to %S3_DIR%"

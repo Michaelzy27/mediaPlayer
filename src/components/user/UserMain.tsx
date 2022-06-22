@@ -10,26 +10,31 @@ import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
 import useUser from 'hooks/useUser';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
 
+const createIpfsURL = (srcStr: string) => {
+  const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
+  const ipfsPrefix = 'ipfs://';
+  return ipfsURL + srcStr.replace(ipfsPrefix, '');
+};
+
 const ButtonPlay = ({
   onchain_metadata,
-  selectedSrc,
-  setSelectedSrc,
   refVideo,
 }: {
   onchain_metadata: any;
-  selectedSrc?: string;
-  setSelectedSrc: any;
   refVideo: RefObject<HTMLVideoElement>;
 }) => {
-  const src = onchain_metadata?.files?.[0]?.src;
-  const isCurrent = src === selectedSrc;
-  const [count, setCount] = useState<number>(0);
+  const src = createIpfsURL(onchain_metadata?.files?.[0]?.src);
+  const [, updateState] = useState<any>();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
+  const isCurrent = src === refVideo.current?.src;
   const isLoaded = refVideo.current && refVideo.current.readyState === 4;
   const isPlaying = refVideo.current && isLoaded && !refVideo.current.paused;
+
   let icon = <PlayCircleOutlined className="text-2xl" />;
   if (isCurrent) {
     if (isPlaying) {
@@ -43,21 +48,28 @@ const ButtonPlay = ({
       refVideo.current.addEventListener(
         'loadeddata',
         () => {
+          const isCurrent = src === refVideo.current?.src;
+          const isLoaded =
+            refVideo.current && refVideo.current?.readyState === 4;
+          const isPlaying =
+            refVideo.current && isLoaded && !refVideo.current?.paused;
           if (isCurrent && !isPlaying) {
             refVideo.current?.play();
-            setCount(count + 1);
           }
+          forceUpdate();
         },
         false
       );
     }
-  }, [count]);
+  }, [forceUpdate, refVideo, src]);
   return (
     <Button
       icon={icon}
       className="w-12 h-12"
       onClick={() => {
-        setSelectedSrc(src);
+        if (!isCurrent && refVideo.current) {
+          refVideo.current.src = src;
+        }
         setTimeout(() => {
           if (refVideo.current) {
             if (isCurrent && isPlaying) {
@@ -67,7 +79,7 @@ const ButtonPlay = ({
             } else {
               refVideo.current.load();
             }
-            setCount(count + 1); // force reload
+            forceUpdate();
           }
         }, 0);
       }}
@@ -78,17 +90,10 @@ const ButtonPlay = ({
 const UserMain = () => {
   const { user } = useUser();
 
-  const [selectedSrc, setSelectedSrc] = useState<string>();
-
   const cardano = useCardano();
 
   const refVideo = useRef<HTMLVideoElement>(null);
 
-  const createIpfsURL = (srcStr: string) => {
-    const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
-    const ipfsPrefix = 'ipfs://';
-    return ipfsURL + srcStr.replace(ipfsPrefix, '');
-  };
   const columns = [
     {
       title: 'Policy Id',
@@ -125,12 +130,7 @@ const UserMain = () => {
       key: 'actions',
       render: (onchain_metadata: any) => {
         return (
-          <ButtonPlay
-            onchain_metadata={onchain_metadata}
-            selectedSrc={selectedSrc}
-            setSelectedSrc={setSelectedSrc}
-            refVideo={refVideo}
-          />
+          <ButtonPlay onchain_metadata={onchain_metadata} refVideo={refVideo} />
         );
       },
     },
@@ -232,10 +232,7 @@ const UserMain = () => {
           </Card>
         )}
         <video controls ref={refVideo} className="fixed bottom-8 left-8">
-          {/* <video controls ref={refVideo}> */}
-          {selectedSrc && (
-            <source src={createIpfsURL(selectedSrc)} type="audio/mpeg"></source>
-          )}
+          <source type="audio/mpeg"></source>
         </video>
       </ResponsiveContainer>
     </>
