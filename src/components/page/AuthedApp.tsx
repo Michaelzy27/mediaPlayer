@@ -1,4 +1,5 @@
 import { Layout } from 'antd';
+import Auth from 'auth/Auth';
 import AppFooter from 'components/layout/AppFooter';
 import AppHeader from 'components/layout/AppHeader';
 import useIdleTimeout from 'hooks/useIdleTimeout';
@@ -41,6 +42,8 @@ const createRoute = (route: any, index: number) => {
 /// NOTE: this is utilized to prevent wasted re-rendering by the use of useNavigate
 const AuthedAppIdleTimeoutWrapper = (props: { children: React.ReactNode }) => {
   const navigate = useNavigate();
+
+
 
   // TODO
   const user = {

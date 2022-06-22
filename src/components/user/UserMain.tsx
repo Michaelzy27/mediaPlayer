@@ -1,67 +1,139 @@
-import { Button, Card, notification, Table, Image } from 'antd';
+import {
+  LoadingOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
+} from '@ant-design/icons';
+import { Button, Card, Image, notification, Table } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
-import useCardano, {
-  CARDANO_WALLET_PROVIDER,
-} from 'hooks/useCardano';
-import useUser, {WalletFunds, Asset} from 'hooks/useUser';
-import { useCallback, useState } from 'react';
+import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
+import useUser from 'hooks/useUser';
+import { RefObject, useEffect, useRef, useState } from 'react';
 import { getErrorMessageObj } from 'utils/response';
 
-const UserMain = () => {
-  const createIpfsURL = (srcStr: string) => {
-    const ipfsURL = "https://ipfs.blockfrost.dev/ipfs/";
-    const ipfsPrefix = "ipfs://";
-    return ipfsURL + srcStr.replace(ipfsPrefix, "");
-  }
-  const columns = [
-    {
-      title: 'Asset Id',
-      dataIndex: 'assetId',
-      key: 'assetId'
-    },
-    {
-      title: 'Policy Id',
-      dataIndex: 'policyId',
-      key: 'policyId'
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
-    },
-    {
-      title: 'Image',
-      dataIndex: 'onchain_metadata',
-      key: 'image',
-      render:  (onchain_metadata: any) => {
-        return <Image src={createIpfsURL(onchain_metadata['image'])} />
-      }
-    },
-    {
-      title: 'File',
-      dataIndex: 'onchain_metadata',
-      key: 'File',
-      render:  (onchain_metadata: any) => {
-        return <video controls>
-          <source src={createIpfsURL(onchain_metadata['files'][0]['src'])} type="audio/mpeg">
-          </source>
-          </video>
-      }
+const ButtonPlay = ({
+  onchain_metadata,
+  selectedSrc,
+  setSelectedSrc,
+  refVideo,
+}: {
+  onchain_metadata: any;
+  selectedSrc?: string;
+  setSelectedSrc: any;
+  refVideo: RefObject<HTMLVideoElement>;
+}) => {
+  const src = onchain_metadata?.files?.[0]?.src;
+  const isCurrent = src === selectedSrc;
+  const [count, setCount] = useState<number>(0);
+  const isLoaded = refVideo.current && refVideo.current.readyState === 4;
+  const isPlaying = refVideo.current && isLoaded && !refVideo.current.paused;
+  let icon = <PlayCircleOutlined className="text-2xl" />;
+  if (isCurrent) {
+    if (isPlaying) {
+      icon = <PauseCircleOutlined className="text-2xl" />;
+    } else if (!isLoaded) {
+      icon = <LoadingOutlined className="text-2xl" />;
     }
-  ];
-  const { user, setWalletFunds } = useUser();
+  }
+  useEffect(() => {
+    if (refVideo.current) {
+      refVideo.current.addEventListener(
+        'loadeddata',
+        () => {
+          if (isCurrent && !isPlaying) {
+            refVideo.current?.play();
+            setCount(count + 1);
+          }
+        },
+        false
+      );
+    }
+  }, [count]);
+  return (
+    <Button
+      icon={icon}
+      className="w-12 h-12"
+      onClick={() => {
+        setSelectedSrc(src);
+        setTimeout(() => {
+          if (refVideo.current) {
+            if (isCurrent && isPlaying) {
+              refVideo.current.pause();
+            } else if (isCurrent && isLoaded) {
+              refVideo.current.play();
+            } else {
+              refVideo.current.load();
+            }
+            setCount(count + 1); // force reload
+          }
+        }, 0);
+      }}
+    />
+  );
+};
 
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
+const UserMain = () => {
+  const { user } = useUser();
 
-  const setUser = useCallback((_user: any) => {
-    /// TODO: action set user
-  }, []);
+  const [selectedSrc, setSelectedSrc] = useState<string>();
 
   const cardano = useCardano();
 
+  const refVideo = useRef<HTMLVideoElement>(null);
+
+  const createIpfsURL = (srcStr: string) => {
+    const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
+    const ipfsPrefix = 'ipfs://';
+    return ipfsURL + srcStr.replace(ipfsPrefix, '');
+  };
+  const columns = [
+    {
+      title: 'Policy Id',
+      dataIndex: 'policy_id',
+      key: 'policy_id',
+      className: 'break-all',
+    },
+    {
+      title: 'Asset Id',
+      dataIndex: 'asset_name',
+      key: 'asset_name',
+      className: 'break-all',
+    },
+    {
+      className: 'font-bold',
+      width: '30%',
+      title: 'Name',
+      dataIndex: ['onchain_metadata', 'name'],
+      key: 'name'
+    },
+    {
+      width: '20%',
+      title: 'Thumbnail',
+      dataIndex: 'onchain_metadata',
+      key: 'thumbnail',
+      render: (onchain_metadata: any) => {
+        return <Image src={createIpfsURL(onchain_metadata['image'])} />;
+      },
+    },
+    {
+      width: '10%',
+      title: 'Actions',
+      dataIndex: 'onchain_metadata',
+      key: 'actions',
+      render: (onchain_metadata: any) => {
+        return (
+          <ButtonPlay
+            onchain_metadata={onchain_metadata}
+            selectedSrc={selectedSrc}
+            setSelectedSrc={setSelectedSrc}
+            refVideo={refVideo}
+          />
+        );
+      },
+    },
+  ];
   const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
 
   const pingAuth = async () => {
@@ -113,74 +185,8 @@ const UserMain = () => {
       addressHex,
       payload
     );
-    console.log('sig', signature);
     await sendAuth(addressHex, signature, key);
-    // add by Chau 2022-06-14 start
-    user.walletFunds = await getAsset();
-    console.log('walletFunds', user.walletFunds);
-    setWalletFunds(user.walletFunds);
-    //  add by Chau 2022-06-14 end
   };
-
-  // add by Chau 2022-06-14 start
-  const getAsset = async () => {
-    await cardano.enable(walletProvider);
-    const usedAddresses = await cardano.getUsedAddresses(walletProvider);
-    const assets: Asset[] = [
-      {
-        policyId: 'test policyId',
-        assetId: 'test assetId',
-        name: 'test name',
-        onchain_metadata: {
-        "name": "KYD JU$E - Lucci #240",
-        "image": "ipfs://Qmd5eRve64Kq6AvCivSAZqD5uQXSZmish7KMR95SYSEKpQ",
-        "Title": "Lucci by KYD JU$E",
-        "files": [
-            {
-                "src": "ipfs://QmP4FyS1AUuNDv67vQxS71PC6dKa5YWX3t41Pe8KYjouWW",
-                "name": "KYD JU$E - Lucci #240",
-                "mediaType": "audio/mpeg"
-            }
-        ],
-        "Artist": "KYD JU$E",
-        "Twitter": "https://twitter.com/kydjuse",
-        "Quantity": "250",
-        "Copyright": "JU$E Music ©",
-        "Publisher": "JU$E Music",
-        "Royalties": "5%",
-        "mediaType": "image/png",
-        "Use Rights": "This NFT is a non-exclusive license to use in perpetuity.",
-        "Description": "Use the link to unlock private link to stream via Soundcloud",
-        "description": "Lucci is the first single released by KYD JUSE on Cardano.",
-        "Unlock Feature": "https://tinyurl.com/jusedrops",
-        "Publishers Website": "https://www.jusemusic.com"
-        }
-      }
-    ];
-    const lovelace = 1;
-    const walletFunds: WalletFunds = {
-      stakeAddress: 'stakeAddress',
-      lovelace: lovelace,
-      assets: assets,
-    };
-    return walletFunds;
-    // const stakeAddress = await cardano.getStakeAddress(usedAddresses);
-    // const assets: Asset[] = [
-    //   {
-    //     policyId: "test",
-    //     assetId:  "test",
-    //     name:  "test",
-    //   }
-    // ];
-    // const lovelace = 1;
-    // const walletFunds: WalletFunds = {
-    //   stakeAddress: stakeAddress,
-    //   lovelace: lovelace,
-    //   assets: assets
-    // }
-    // return walletFunds;
-  };
-  // add by Chau 2022-06-14 end
 
   return (
     <>
@@ -203,12 +209,21 @@ const UserMain = () => {
             </Button>
           </div>
         </Card>
-        { user.walletFunds != null &&
-        <Card title="List assest" >
-          <Table dataSource={user.walletFunds?.assets} columns={columns}>
-          </Table>
-        </Card>
-        }
+        {user.walletFunds != null && (
+          <Card title="List assest">
+            <Table
+              rowKey="asset"
+              dataSource={user.walletFunds?.assets}
+              columns={columns}
+            ></Table>
+          </Card>
+        )}
+        <video controls ref={refVideo} className="fixed bottom-8 left-8">
+          {/* <video controls ref={refVideo}> */}
+          {selectedSrc && (
+            <source src={createIpfsURL(selectedSrc)} type="audio/mpeg"></source>
+          )}
+        </video>
       </ResponsiveContainer>
     </>
   );
