@@ -209,19 +209,23 @@ export interface WalletFunds {
 }
 
 interface IUser {
-  email: 'minh.tuan@m1studio.co';
+  email?: string;
   picture?: string;
   name?: string;
   displayName?: string;
   givenName?: string;
   familyName?: string;
+
+  walletAddress?: string;
   walletFunds?: WalletFunds;
 }
 
 const useUser = (): {
   user: IUser;
-  setWalletFunds: Function;
 } => {
+  const [walletAddress, setWalletAddress] = useState<string>();
+  const [walletFunds, setWalletFunds] = useState<WalletFunds>();
+
   const cardano = useCardano();
 
   const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
@@ -238,17 +242,14 @@ const useUser = (): {
     return walletFunds;
   }, [cardano, walletProvider]);
 
-  const [walletFunds, _setWalletFunds] = useState<WalletFunds>();
-  const setWalletFunds = (walletFunds: WalletFunds) => {
-    _setWalletFunds(walletFunds);
-  };
   useEffect(() => {
-    Auth.onAuthStateChanged(async (authState: AuthState) => {
+    Auth.onAuthStateChanged(async (authState, authData) => {
+      setWalletAddress(authData.address);
       if (authState === AuthState.SignedIn) {
         const walletFunds = await getAsset();
-        _setWalletFunds(walletFunds);
+        setWalletFunds(walletFunds);
       } else if (authState === AuthState.SignedOut) {
-        _setWalletFunds(undefined);
+        setWalletFunds(undefined);
       }
     }, 'user');
     return () => {
@@ -257,11 +258,10 @@ const useUser = (): {
   }, []);
   return {
     user: {
-      displayName: 'Tuan Pham',
-      email: 'minh.tuan@m1studio.co',
+      displayName: walletAddress ? walletAddress.slice(0, 5) + '...' + walletAddress.slice(-5) : '',
+      walletAddress,
       walletFunds,
     },
-    setWalletFunds,
   };
 };
 

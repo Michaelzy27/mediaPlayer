@@ -11,6 +11,7 @@ import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
 import useUser from 'hooks/useUser';
 import { RefObject, useEffect, useRef, useState } from 'react';
+import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
 
 const ButtonPlay = ({
@@ -106,7 +107,7 @@ const UserMain = () => {
       width: '30%',
       title: 'Name',
       dataIndex: ['onchain_metadata', 'name'],
-      key: 'name'
+      key: 'name',
     },
     {
       width: '20%',
@@ -195,14 +196,26 @@ const UserMain = () => {
         <h2>Account settings</h2>
         <Card title="Test Wallet Connect">
           <div>
-            <h3>Connect your wallet</h3>
-            <Button
-              type="text"
-              className="px-1 -ml-1"
-              onClick={handleConnectWallet}
-            >
-              Connect wallet
-            </Button>
+            {!user.walletAddress && (
+              <>
+                <h3>Connect your wallet</h3>
+                <Button
+                  type="text"
+                  className="px-1 -ml-1"
+                  onClick={handleConnectWallet}
+                >
+                  Connect wallet
+                </Button>
+              </>
+            )}
+            {user.walletAddress && (
+              <>
+                <h3>{`Connected to address hex ${user.displayName}`}</h3>
+                <Button type="text" className="px-1 -ml-1" onClick={signOut}>
+                  Sign out
+                </Button>
+              </>
+            )}
             <br />
             <Button type="text" className="px-1 -ml-1" onClick={pingAuth}>
               Ping

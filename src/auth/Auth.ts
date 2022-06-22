@@ -12,22 +12,34 @@ export enum AuthState {
   SignedOut = 'SignedOut',
 }
 
+export interface AuthData {
+  address?: string;
+  jwtToken?: string;
+  authState: AuthState;
+}
+
 const authStateChangedCallbacks: {
-  [k: string]: (authState: AuthState) => void;
+  [k: string]: (authState: AuthState, authData: AuthData) => void;
 } = {};
 
-function getCurrentAuthState() {
+function getCurrentAuthData(): AuthData {
   const address = localStorage.getItem(addressIdentifier);
   const jwtToken = localStorage.getItem(tokenIdentifier);
   if (address && jwtToken) {
-    return AuthState.SignedIn;
+    return {
+      address,
+      jwtToken,
+      authState: AuthState.SignedIn,
+    };
   }
-  return AuthState.SignedOut;
+  return {
+    authState: AuthState.SignedOut,
+  };
 }
 function authStateChangedLoop() {
-  const current = getCurrentAuthState();
+  const current = getCurrentAuthData();
   Object.values(authStateChangedCallbacks).forEach((fn) => {
-    fn(current);
+    fn(current.authState, current);
   });
 }
 
@@ -60,8 +72,12 @@ function signOut() {
   authStateChangedLoop();
 }
 
-function onAuthStateChanged(fn: (authState: AuthState) => void, k?: string) {
-  fn(getCurrentAuthState());
+function onAuthStateChanged(
+  fn: (authState: AuthState, authData: AuthData) => void,
+  k?: string
+) {
+  const authData = getCurrentAuthData();
+  fn(authData.authState, authData);
   if (k) {
     authStateChangedCallbacks[k] = fn;
   } else {
