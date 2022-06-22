@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
 import { ROUTES } from 'routes';
-import { signOut } from 'utils/auth';
 
 const INACTIVITY_TIMEOUT = parseInt(
   process.env.REACT_APP_INACTIVITY_TIMEOUT_MS || '3600000'
@@ -48,17 +47,17 @@ const AuthedAppIdleTimeoutWrapper = (props: { children: React.ReactNode }) => {
     userId: 'TODO',
   };
 
-  useIdleTimeout(
-    INACTIVITY_TIMEOUT,
-    ['mousedown', 'keydown', 'touchstart'],
-    () => {
-      signOut().then(() => {
-        // TODO: signout action
-        navigate('/');
-      });
-    },
-    user?.userId
-  );
+  // useIdleTimeout(
+  //   INACTIVITY_TIMEOUT,
+  //   ['mousedown', 'keydown', 'touchstart'],
+  //   () => {
+  //     signOut().then(() => {
+  //       // TODO: signout action
+  //       navigate('/');
+  //     });
+  //   },
+  //   user?.userId
+  // );
   return <>{props.children}</>;
 };
 

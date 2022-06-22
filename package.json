@@ -3,11 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-react": "^1.2.8",
     "@craco/craco": "^6.2.0",
     "@stablelib/ed25519": "^1.0.2",
     "antd": "^4.21.0",
-    "aws-amplify": "3.3.17",
     "axios": "0.21.1",
     "dayjs": "^1.10.7",
     "env-cmd": "^10.1.0",
