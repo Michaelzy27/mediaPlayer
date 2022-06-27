@@ -43,6 +43,12 @@ const UserMenu = ({ firstName, lastName }: IUserMenuProps) => {
     return user ? user.picture : null;
   }, [user]);
 
+  if (!user.walletAddress) {
+    return null;
+  }
+
+  const displayName = user.displayName;
+
   const menu = (
     <Menu
       id="userMenu"
@@ -52,7 +58,7 @@ const UserMenu = ({ firstName, lastName }: IUserMenuProps) => {
     >
       <div className="px-7 py-2">
         <div className="subheading text--85">
-          {user?.displayName || user?.name}
+          <abbr title={user.walletAddress}>{displayName}</abbr>
         </div>
         <div className="text--secondary">{user?.email}</div>
       </div>
