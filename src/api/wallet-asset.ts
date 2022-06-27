@@ -20,13 +20,17 @@ interface GetResponse {
 
 export abstract class WalletAssetAPI {
   static async get(wallet: string) : Promise<GetResponse | null> {
-    const response = await axios.get(`wallet-asset/${wallet}?showInfo=1`, {
-      validateStatus: (status) => status === 200 || status === 400
+    const response = await axiosInstance.get(`wallet-asset/${wallet}?showInfo=1`, {
+      validateStatus: (status) => status === 200 || status === 404
     });
-    if (response.status === 400){
+    if (response.status === 404){
       return null
     }
 
     return response.data;
+  }
+
+  static async resync(wallet: string) {
+     await axiosInstance.post(`wallet-asset/${wallet}`, null, {});
   }
 }

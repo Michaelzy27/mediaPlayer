@@ -7,9 +7,7 @@ import useCardano, {
   CARDANO_WALLET_PROVIDER,
 } from 'hooks/useCardano';
 import useUser, {WalletFunds, IAsset} from 'hooks/useUser';
-import { useCallback, useState } from 'react';
 import { getErrorMessageObj } from 'utils/response';
-import { AssetsList } from './AssetsList';
 
 const UserMain = () => {
   const { user, setWalletFunds } = useUser();

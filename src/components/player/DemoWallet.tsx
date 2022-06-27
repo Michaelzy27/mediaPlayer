@@ -1,6 +1,5 @@
 import ResponsiveContainer from '../common/ResponsiveContainer';
-import BackLink from '../common/BackLink';
-import { Button, Card } from 'antd';
+import { Card } from 'antd';
 import { AssetsList } from './AssetsList';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -12,9 +11,17 @@ export const DemoWallet = () => {
 
   useEffect(() => {
     if (wallet != null){
-      WalletAssetAPI.get(wallet).then((r) => {
+      WalletAssetAPI.get(wallet).then(async (r) => {
+        console.log(r)
         if (r != null){
           setAssets(r.assets);
+        }
+        else {
+          await WalletAssetAPI.resync(wallet);
+          const r2 = await WalletAssetAPI.get(wallet);
+          if (r2 != null){
+            setAssets(r2.assets);
+          }
         }
       })
     }
