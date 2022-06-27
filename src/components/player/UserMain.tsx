@@ -6,59 +6,13 @@ import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, {
   CARDANO_WALLET_PROVIDER,
 } from 'hooks/useCardano';
-import useUser, {WalletFunds, Asset} from 'hooks/useUser';
+import useUser, {WalletFunds, IAsset} from 'hooks/useUser';
 import { useCallback, useState } from 'react';
 import { getErrorMessageObj } from 'utils/response';
+import { AssetsList } from './AssetsList';
 
 const UserMain = () => {
-  const createIpfsURL = (srcStr: string) => {
-    const ipfsURL = "https://ipfs.blockfrost.dev/ipfs/";
-    const ipfsPrefix = "ipfs://";
-    return ipfsURL + srcStr.replace(ipfsPrefix, "");
-  }
-  const columns = [
-    {
-      title: 'Asset Id',
-      dataIndex: 'assetId',
-      key: 'assetId'
-    },
-    {
-      title: 'Policy Id',
-      dataIndex: 'policyId',
-      key: 'policyId'
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
-    },
-    {
-      title: 'Image',
-      dataIndex: 'onchain_metadata',
-      key: 'image',
-      render:  (onchain_metadata: any) => {
-        return <Image src={createIpfsURL(onchain_metadata['image'])} />
-      }
-    },
-    {
-      title: 'File',
-      dataIndex: 'onchain_metadata',
-      key: 'File',
-      render:  (onchain_metadata: any) => {
-        return <video controls>
-          <source src={createIpfsURL(onchain_metadata['files'][0]['src'])} type="audio/mpeg">
-          </source>
-          </video>
-      }
-    }
-  ];
   const { user, setWalletFunds } = useUser();
-
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-
-  const setUser = useCallback((_user: any) => {
-    /// TODO: action set user
-  }, []);
 
   const cardano = useCardano();
 
@@ -126,7 +80,7 @@ const UserMain = () => {
   const getAsset = async () => {
     await cardano.enable(walletProvider);
     const usedAddresses = await cardano.getUsedAddresses(walletProvider);
-    const assets: Asset[] = [
+    const assets: IAsset[] = [
       {
         policyId: 'test policyId',
         assetId: 'test assetId',
@@ -205,8 +159,7 @@ const UserMain = () => {
         </Card>
         { user.walletFunds != null &&
         <Card title="List assest" >
-          <Table dataSource={user.walletFunds?.assets} columns={columns}>
-          </Table>
+          {/*<AssetsList assets={user.walletFunds?.assets} />*/}
         </Card>
         }
       </ResponsiveContainer>

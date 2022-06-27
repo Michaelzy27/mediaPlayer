@@ -1,17 +1,16 @@
-import UserMain from 'components/user/UserMain';
+import UserMain from 'components/player/UserMain';
 
 // specific create page for big picture learning
-import NotificationSettings from 'components/user/NotificationSettings';
+import NotificationSettings from 'components/player/NotificationSettings';
+import { DemoWallet } from '../components/player/DemoWallet';
 
 export const ROUTES = [
-  { path: '/', title: 'Home', exact: true, component: UserMain },
-  { path: '/user', title: 'Account', exact: true, component: UserMain },
-  {
-    path: '/settings/notifications',
-    title: 'Notification Settings',
+  { path: '/',
+    title: 'Home',
     exact: true,
-    component: NotificationSettings,
+    component: UserMain
   },
+  { path: '/demo/:wallet', title: 'Demo Wallet', exact: true, component: DemoWallet },
 ];
 
 export const MENU_ITEMS = [
@@ -21,8 +20,8 @@ export const MENU_ITEMS = [
     text: 'Home',
   },
   {
-    key: 'settings',
-    path: '/settings/notifications',
-    text: 'Settings',
+    key: 'demo',
+    path: '/demo/addr1q9hksp2l33ump9zgsx50jzz8kxpa6gg2nkl7a6mylv9dx8rmj9yzruu59zpne7ks62vdhx86dcx9kwujazfq98zwn9kql5nct5',
+    text: 'Demo',
   },
 ];

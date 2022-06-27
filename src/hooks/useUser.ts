@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export interface Asset {
+export interface IAsset {
   policyId: string;
   assetId: string;
   name: string;
@@ -9,7 +9,7 @@ export interface Asset {
 
 export interface WalletFunds {
   stakeAddress: string;
-  assets: Asset[];
+  assets: IAsset[];
   lovelace: number;
 }
 
