@@ -43,7 +43,7 @@ function authStateChangedLoop() {
   });
 }
 
-function currentSession() {
+function currentSession() : Promise<{address: string, jwtToken: string}> {
   return new Promise((res, rej) => {
     const address = localStorage.getItem(addressIdentifier);
     const jwtToken = localStorage.getItem(tokenIdentifier);

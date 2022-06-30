@@ -1,9 +1,9 @@
-import axios from 'axios';
+import axiosInstance from './axiosWithAuthHeader';
 import { handleAPIPromise } from './utils';
 
 const getAuth = (walletAddress: string) => {
   return handleAPIPromise(
-    axios.post('/get-auth', {
+    axiosInstance.post('/get-auth', {
       address: walletAddress,
     })
   );
@@ -11,7 +11,7 @@ const getAuth = (walletAddress: string) => {
 
 const sendAuth = (walletAddress: string, signature: string, key?: string) => {
   return handleAPIPromise(
-    axios.post('/send-auth', {
+    axiosInstance.post('/send-auth', {
       signature,
       address: walletAddress,
       key,
@@ -20,17 +20,17 @@ const sendAuth = (walletAddress: string, signature: string, key?: string) => {
 };
 
 const pingAuth = () => {
-  return handleAPIPromise(axios.get('/ping-auth'));
+  return handleAPIPromise(axiosInstance.get('/ping-auth'));
 };
 
 // add by Chau 2022-06-14 start
 const getStakeAddress = (walletAddressHex: string) => {
   return handleAPIPromise(
-    axios.post('/get-stakeAddress', {
+    axiosInstance.post('/get-stakeAddress', {
       address: walletAddressHex,
     })
   );
-}
+};
 // add by Chau 2022-06-14 end
 
 const UserApi = {
@@ -38,7 +38,7 @@ const UserApi = {
   sendAuth,
   pingAuth,
   // add by Chau 2022-06-14 start
-  getStakeAddress
+  getStakeAddress,
   // add by Chau 2022-06-14 end
 };
 
