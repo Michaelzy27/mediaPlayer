@@ -1,3 +1,5 @@
+import "video-react/dist/video-react.css";
+import { Player, BigPlayButton, ControlBar } from 'video-react';
 import {
   LoadingOutlined,
   PauseCircleOutlined,
@@ -9,7 +11,7 @@ import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
-import useUser from 'hooks/useUser';
+import useUser, { Asset } from 'hooks/useUser';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
@@ -19,6 +21,25 @@ const createIpfsURL = (srcStr: string) => {
   const ipfsPrefix = 'ipfs://';
   return ipfsURL + srcStr.replace(ipfsPrefix, '');
 };
+
+const getArtist = (asset: Asset) => {
+  const artist = '';
+  if(asset.onchain_metadata['Artist']){
+    return asset.onchain_metadata['Artist'];
+  } else if(asset.onchain_metadata['1. Artist Name']){
+    return asset.onchain_metadata['1. Artist Name'];
+  } else {
+    return asset.onchain_metadata['author'];
+  }
+}
+
+const showDot = (item: any) => {
+  item.Text = '...';
+}
+
+const showTime = (item: any) => {
+  item.Text = '5:35';
+}
 
 const ButtonPlay = ({
   onchain_metadata,
@@ -189,69 +210,6 @@ const UserMain = () => {
     await sendAuth(addressHex, signature, key);
   };
 
-  const data = [
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-  ];
-
   return (
     <>
       <ResponsiveContainer className="my-6">
@@ -285,44 +243,46 @@ const UserMain = () => {
             </Button>
           </div>
         </Card>
-        {user.walletFunds != null && (
-          <Card title="List assest">
-            <Table
-              rowKey="asset"
-              dataSource={user.walletFunds?.assets}
-              columns={columns}
-            ></Table>
-          </Card>
-        )}
+        {user.walletFunds != null && ( 
         <Row>
-        <Col span={12}>Video here</Col>
-        <Col span={12}>
-          <div style={{
-            height: 400,
-            overflow: 'auto',
-            padding: '0 16px',
-            border: '1px solid rgba(140, 140, 140, 0.35)',
-          }}>
-            <List
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                title={<a href="https://ant.design">{item.title}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+          <Col span={12}>
+            <Image src={createIpfsURL(user.walletFunds?.assets[0].onchain_metadata['image'])} />
+          </Col>
+          <Col span={12}>
+            <div style={{
+              height: 600,
+              overflow: 'auto',
+              padding: '0 16px',
+              border: '1px solid rgba(140, 140, 140, 0.35)',
+            }}>
+              <List
+              itemLayout="horizontal"
+              dataSource={user.walletFunds?.assets}
+              renderItem={(item) => (
+              <List.Item
+                actions={[<a key="litem-menu" >5:55 ...</a>]}
+              >
+                <ButtonPlay onchain_metadata={item.onchain_metadata} refVideo={refVideo} />
+                <List.Item.Meta
+                  title={item.onchain_metadata['name']}
+                  description={getArtist(item)}
+                  style={{marginLeft: '20px'}}
+                />
+              </List.Item>
+              )}
               />
-            </List.Item>
-            )}
-            />
-          </div>
-        </Col>
-       </Row>
-       
-        <video controls ref={refVideo} className="fixed bottom-8 left-8">
-          <source type="audio/mpeg"></source>
-        </video>
+            </div>
+          </Col>
+        </Row>
+        )}
+      
+        <Player
+          playsInline
+          poster="/assets/poster.png"
+          src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4">
+          <BigPlayButton position="center" />
+          <ControlBar autoHide={false} />
+        </Player>
       </ResponsiveContainer>
     </>
   );
