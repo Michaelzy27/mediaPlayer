@@ -1,16 +1,16 @@
 import UserMain from 'components/player/UserMain';
 
 // specific create page for big picture learning
-import NotificationSettings from 'components/player/NotificationSettings';
 import { DemoWallet } from '../components/player/DemoWallet';
 
 export const ROUTES = [
-  { path: '/',
-    title: 'Home',
+  { path: '/', title: 'Home', exact: true, component: UserMain },
+  {
+    path: '/demo/:wallet',
+    title: 'Demo Wallet',
     exact: true,
-    component: UserMain
+    component: DemoWallet,
   },
-  { path: '/demo/:wallet', title: 'Demo Wallet', exact: true, component: DemoWallet },
 ];
 
 export const MENU_ITEMS = [

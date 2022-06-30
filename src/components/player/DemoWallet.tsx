@@ -3,7 +3,7 @@ import { Card } from 'antd';
 import { AssetsList } from './AssetsList';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { IAssetInfo, WalletAssetAPI } from '../../api/wallet-asset';
+import { IAssetInfo, WalletAssetDemoAPI } from '../../api/wallet-asset';
 
 export const DemoWallet = () => {
   const { wallet } = useParams<{ wallet: string }>();
@@ -11,14 +11,14 @@ export const DemoWallet = () => {
 
   useEffect(() => {
     if (wallet != null){
-      WalletAssetAPI.get(wallet).then(async (r) => {
+      WalletAssetDemoAPI.get(wallet).then(async (r) => {
         console.log(r)
         if (r != null){
           setAssets(r.assets);
         }
         else {
-          await WalletAssetAPI.resync(wallet);
-          const r2 = await WalletAssetAPI.get(wallet);
+          await WalletAssetDemoAPI.resync(wallet);
+          const r2 = await WalletAssetDemoAPI.get(wallet);
           if (r2 != null){
             setAssets(r2.assets);
           }

@@ -21,13 +21,13 @@ const createIpfsURL = (srcStr: string) => {
 };
 
 const ButtonPlay = ({
-  onchain_metadata,
+  file,
   refVideo,
 }: {
-  onchain_metadata: any;
+  file: any;
   refVideo: RefObject<HTMLVideoElement>;
 }) => {
-  const src = createIpfsURL(onchain_metadata?.files?.[0]?.src);
+  const src = createIpfsURL(file.src);
   const [, updateState] = useState<any>();
   const forceUpdate = useCallback(() => updateState({}), []);
 
@@ -96,42 +96,34 @@ const UserMain = () => {
 
   const columns = [
     {
-      title: 'Policy Id',
-      dataIndex: 'policy_id',
-      key: 'policy_id',
-      className: 'break-all',
-    },
-    {
-      title: 'Asset Id',
-      dataIndex: 'asset_name',
-      key: 'asset_name',
+      title: 'Unit',
+      dataIndex: 'unit',
+      key: 'unit',
       className: 'break-all',
     },
     {
       className: 'font-bold',
       width: '30%',
       title: 'Name',
-      dataIndex: ['onchain_metadata', 'name'],
+      dataIndex: ['info', 'name'],
       key: 'name',
     },
     {
       width: '20%',
       title: 'Thumbnail',
-      dataIndex: 'onchain_metadata',
+      dataIndex: ['info', 'image'],
       key: 'thumbnail',
-      render: (onchain_metadata: any) => {
-        return <Image src={createIpfsURL(onchain_metadata['image'])} />;
+      render: (image: any) => {
+        return image && <Image src={createIpfsURL(image)} />;
       },
     },
     {
       width: '10%',
       title: 'Actions',
-      dataIndex: 'onchain_metadata',
+      dataIndex: ['info', 'file'],
       key: 'actions',
-      render: (onchain_metadata: any) => {
-        return (
-          <ButtonPlay onchain_metadata={onchain_metadata} refVideo={refVideo} />
-        );
+      render: (file: any) => {
+        return file && <ButtonPlay file={file} refVideo={refVideo} />;
       },
     },
   ];
@@ -223,7 +215,7 @@ const UserMain = () => {
           </div>
         </Card>
         {user.walletFunds != null && (
-          <Card title="List assest">
+          <Card title="List assets">
             <Table
               rowKey="asset"
               dataSource={user.walletFunds?.assets}
