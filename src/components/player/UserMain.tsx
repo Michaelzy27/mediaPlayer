@@ -3,7 +3,7 @@ import {
   PauseCircleOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Image, notification, Table } from 'antd';
+import { Button, Card, Image, notification, Table, List, Avatar, Row, Col } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
@@ -189,6 +189,69 @@ const UserMain = () => {
     await sendAuth(addressHex, signature, key);
   };
 
+  const data = [
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+    {
+      title: 'Ant Design Title 1',
+    },
+    {
+      title: 'Ant Design Title 2',
+    },
+    {
+      title: 'Ant Design Title 3',
+    },
+    {
+      title: 'Ant Design Title 4',
+    },
+  ];
+
   return (
     <>
       <ResponsiveContainer className="my-6">
@@ -231,6 +294,32 @@ const UserMain = () => {
             ></Table>
           </Card>
         )}
+        <Row>
+        <Col span={12}>Video here</Col>
+        <Col span={12}>
+          <div style={{
+            height: 400,
+            overflow: 'auto',
+            padding: '0 16px',
+            border: '1px solid rgba(140, 140, 140, 0.35)',
+          }}>
+            <List
+            itemLayout="horizontal"
+            dataSource={data}
+            renderItem={(item) => (
+            <List.Item>
+              <List.Item.Meta
+                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+                title={<a href="https://ant.design">{item.title}</a>}
+                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+              />
+            </List.Item>
+            )}
+            />
+          </div>
+        </Col>
+       </Row>
+       
         <video controls ref={refVideo} className="fixed bottom-8 left-8">
           <source type="audio/mpeg"></source>
         </video>
