@@ -834,7 +834,7 @@ const UserMain = () => {
           </Row>
         )}
         {/* Player start */}
-        <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-[color:gray] fixed inset-x-0 bottom-0 z-[100]">
+        <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-[color:black] fixed inset-x-0 bottom-0 z-[100]">
           {/* Player controls start */}
           <div className="grid grid-cols-3 h-full mx-[10vw] z-[-1]">
             <TrackInfo songInfo={songInfo} />

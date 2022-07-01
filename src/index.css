@@ -17,6 +17,18 @@ code {
     monospace;
 }
 
+:root {
+  --color-body-bg: #222;
+  --color-primary-bg: #bbcdff;
+  --color-text: #fff;
+  --color-primary: #335eea;
+  --color-secondary-bg: #323232;
+  --color-secondary-bg-for-transparent: hsla(0,0%,100%,0.08);
+  --color-primary-bg-for-transparent: hsla(0,0%,100%,0.12);
+  --color-navbar-bg: rgba(34,34,34,0.86);
+  --color-player-slider: hsla(0,0%,50.2%,.18);
+}
+
 .style__buttons {
   @apply p-2 flex justify-center items-center bg-transparent rounded-[25%] transition-all duration-200 hover:bg-[color:var(--color-secondary-bg-for-transparent)]
 }
