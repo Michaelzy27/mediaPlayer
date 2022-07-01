@@ -485,6 +485,32 @@ const VolumeSliderControl = ({
   )
 };
 
+const SongSliderControl  = ({
+  currentTime,
+  duration,
+  refVideo,
+}: {
+  currentTime: string,
+  duration: string,
+  refVideo: RefObject<HTMLVideoElement>;
+}) => {
+
+  return(
+    <Slider
+      setWidth={"100%"}
+      setHeight={"2px"}
+      percentSlider={(Number(currentTime)/Number(duration))*100}
+      toogleTooltip={true}
+      currentTimeSongTooltip={Number(currentTime)}
+      getPercentSlider={(value: number) => {
+        if(refVideo.current) {
+          refVideo.current.currentTime = (value / 100) * refVideo.current.duration
+        }
+      }}
+    />
+  )
+};
+
 const Slider = (
 { 
   setWidth, 
@@ -663,6 +689,9 @@ const UserMain = () => {
     title: 'SickCity332-The Holy Binns',
     artistsNames: 'Bob Peace',
   };
+  const currentTime="20";
+  const duration="140";
+  const currentVolume = "50";
   /*Mock data for player end*/
   const { user } = useUser();
 
@@ -836,6 +865,7 @@ const UserMain = () => {
         {/* Player start */}
         <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-[color:black] fixed inset-x-0 bottom-0 z-[100]">
           {/* Player controls start */}
+          <SongSliderControl refVideo={refVideo} currentTime={currentTime} duration={duration} />
           <div className="grid grid-cols-3 h-full mx-[10vw] z-[-1]">
             <div className="flex justify-left items-center">
               <PreviousControl />
@@ -847,7 +877,7 @@ const UserMain = () => {
               <RepeatControl />
               <ShuffleControl />
               <VolumeControl refVideo={refVideo} />
-              <VolumeSliderControl refVideo={refVideo} volume="50" />
+              <VolumeSliderControl refVideo={refVideo} volume={currentVolume} />
             </div>
           </div>
           {/* Player controls end */}
