@@ -8,6 +8,7 @@ export interface IAssetInfo {
     name: string;
     image: string;
     file: any;
+    artist: string;
   };
 }
 

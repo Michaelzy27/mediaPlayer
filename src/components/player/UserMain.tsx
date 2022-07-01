@@ -1,20 +1,20 @@
-import "video-react/dist/video-react.css";
-import { Player, BigPlayButton, ControlBar } from 'video-react';
 import {
   LoadingOutlined,
   PauseCircleOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Card, Image, notification, Table, List, Avatar, Row, Col } from 'antd';
+import { Button, Card, Col, Image, List, notification, Row } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
-import useUser, { Asset } from 'hooks/useUser';
+import useUser from 'hooks/useUser';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
+import { Player } from 'video-react';
+import 'video-react/dist/video-react.css';
 
 const createIpfsURL = (srcStr: string) => {
   const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
@@ -22,30 +22,23 @@ const createIpfsURL = (srcStr: string) => {
   return ipfsURL + srcStr.replace(ipfsPrefix, '');
 };
 
-const getArtist = (asset: Asset) => {
-  const artist = '';
-  if(asset.onchain_metadata['Artist']){
-    return asset.onchain_metadata['Artist'];
-  } else if(asset.onchain_metadata['1. Artist Name']){
-    return asset.onchain_metadata['1. Artist Name'];
-  } else {
-    return asset.onchain_metadata['author'];
-  }
-}
-
 const showDot = (item: any) => {
   item.Text = '...';
-}
+};
 
 const showTime = (item: any) => {
   item.Text = '5:35';
+};
+
+interface IFile extends Record<string, any> {
+  src: string;
 }
 
 const ButtonPlay = ({
   file,
   refVideo,
 }: {
-  file: any;
+  file: IFile;
   refVideo: RefObject<HTMLVideoElement>;
 }) => {
   const src = createIpfsURL(file.src);
@@ -83,6 +76,7 @@ const ButtonPlay = ({
       );
     }
   }, [forceUpdate, refVideo, src]);
+
   return (
     <Button
       icon={icon}
@@ -143,7 +137,7 @@ const UserMain = () => {
       title: 'Actions',
       dataIndex: ['info', 'file'],
       key: 'actions',
-      render: (file: any) => {
+      render: (file: IFile) => {
         return file && <ButtonPlay file={file} refVideo={refVideo} />;
       },
     },
@@ -235,46 +229,54 @@ const UserMain = () => {
             </Button>
           </div>
         </Card>
-        {user.walletFunds != null && ( 
-        <Row>
-          <Col span={12}>
-            <Image src={createIpfsURL(user.walletFunds?.assets[0].onchain_metadata['image'])} />
-          </Col>
-          <Col span={12}>
-            <div style={{
-              height: 600,
-              overflow: 'auto',
-              padding: '0 16px',
-              border: '1px solid rgba(140, 140, 140, 0.35)',
-            }}>
-              <List
-              itemLayout="horizontal"
-              dataSource={user.walletFunds?.assets}
-              renderItem={(item) => (
-              <List.Item
-                actions={[<a key="litem-menu" >5:55 ...</a>]}
-              >
-                <ButtonPlay onchain_metadata={item.onchain_metadata} refVideo={refVideo} />
-                <List.Item.Meta
-                  title={item.onchain_metadata['name']}
-                  description={getArtist(item)}
-                  style={{marginLeft: '20px'}}
-                />
-              </List.Item>
-              )}
+        {user.walletFunds != null && (
+          <Row>
+            <Col span={12}>
+              <Image
+                src={createIpfsURL(user.walletFunds?.assets?.[0]?.info?.image)}
               />
-            </div>
-          </Col>
-        </Row>
+            </Col>
+            <Col span={12}>
+              <div
+                style={{
+                  height: 600,
+                  overflow: 'auto',
+                  padding: '0 16px',
+                  border: '1px solid rgba(140, 140, 140, 0.35)',
+                }}
+              >
+                <List
+                  itemLayout="horizontal"
+                  dataSource={user.walletFunds?.assets}
+                  renderItem={(item) => {
+                    const time = <span>5:55</span>;
+                    const options = <Button>...</Button>;
+                    const showOptions = false;
+                    const action = showOptions ? options : time;
+                    const { info } = item;
+                    return (
+                      <List.Item actions={[action]}>
+                        {info?.file && (
+                          <ButtonPlay file={info.file} refVideo={refVideo} />
+                        )}
+                        <List.Item.Meta
+                          title={info?.name}
+                          description={info?.artist}
+                          style={{ marginLeft: '20px' }}
+                        />
+                      </List.Item>
+                    );
+                  }}
+                />
+              </div>
+            </Col>
+          </Row>
         )}
-      
         <Player
           playsInline
           poster="/assets/poster.png"
-          src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4">
-          <BigPlayButton position="center" />
-          <ControlBar autoHide={false} />
-        </Player>
+          src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+        />
       </ResponsiveContainer>
     </>
   );
