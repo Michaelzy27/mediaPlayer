@@ -837,12 +837,12 @@ const UserMain = () => {
         <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-[color:black] fixed inset-x-0 bottom-0 z-[100]">
           {/* Player controls start */}
           <div className="grid grid-cols-3 h-full mx-[10vw] z-[-1]">
-            <TrackInfo songInfo={songInfo} />
-            <div className="flex justify-center items-center">
+            <div className="flex justify-left items-center">
               <PreviousControl />
               <PlayControl refVideo={refVideo} />
               <NextControl />
             </div>
+            <TrackInfo songInfo={songInfo} />
             <div className="flex justify-center items-center">
               <RepeatControl />
               <ShuffleControl />
