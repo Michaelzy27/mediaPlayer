@@ -13,13 +13,12 @@ import useUser from 'hooks/useUser';
 import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
-import { Player } from 'video-react';
 import 'video-react/dist/video-react.css';
 
 const createIpfsURL = (srcStr: string) => {
   const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
   const ipfsPrefix = 'ipfs://';
-  return ipfsURL + srcStr.replace(ipfsPrefix, '');
+  return srcStr && ipfsURL + srcStr.replace(ipfsPrefix, '');
 };
 
 const showDot = (item: any) => {
@@ -49,11 +48,13 @@ interface SvgAtts {
 const ButtonPlay = ({
   file,
   refVideo,
+  onPlay,
 }: {
   file: IFile;
   refVideo: RefObject<HTMLVideoElement>;
+  onPlay?: Function;
 }) => {
-  const src = createIpfsURL(file.src);
+  const src = createIpfsURL(file?.src);
   const [, updateState] = useState<any>();
   const forceUpdate = useCallback(() => updateState({}), []);
 
@@ -69,25 +70,41 @@ const ButtonPlay = ({
       icon = <LoadingOutlined className="text-2xl" />;
     }
   }
+  const onLoadedData = useCallback(() => {
+    const isCurrent = src === refVideo.current?.src;
+    const isLoaded = refVideo.current && refVideo.current?.readyState === 4;
+    const isPlaying = refVideo.current && isLoaded && !refVideo.current?.paused;
+    if (isCurrent && !isPlaying) {
+      refVideo.current?.play();
+    }
+  }, [src, refVideo]);
+  const onPauseEvent = useCallback(() => {
+    const isCurrent = src === refVideo.current?.src;
+    if (isCurrent) {
+      forceUpdate();
+    }
+  }, [src, refVideo, forceUpdate]);
+  const onPlayEvent = useCallback(() => {
+    const isCurrent = src === refVideo.current?.src;
+    if (isCurrent) {
+      onPlay?.();
+      forceUpdate();
+    }
+  }, [src, refVideo, onPlay, forceUpdate]);
   useEffect(() => {
     if (refVideo.current) {
-      refVideo.current.addEventListener(
-        'loadeddata',
-        () => {
-          const isCurrent = src === refVideo.current?.src;
-          const isLoaded =
-            refVideo.current && refVideo.current?.readyState === 4;
-          const isPlaying =
-            refVideo.current && isLoaded && !refVideo.current?.paused;
-          if (isCurrent && !isPlaying) {
-            refVideo.current?.play();
-          }
-          forceUpdate();
-        },
-        false
-      );
+      refVideo.current.addEventListener('loadeddata', onLoadedData);
+      refVideo.current.addEventListener('play', onPlayEvent);
+      refVideo.current.addEventListener('pause', onPauseEvent);
+      return () => {
+        if (refVideo.current) {
+          refVideo.current.removeEventListener('loadeddata', onLoadedData);
+          refVideo.current.removeEventListener('play', onPlayEvent);
+          refVideo.current.removeEventListener('pause', onPauseEvent);
+        }
+      };
     }
-  }, [forceUpdate, refVideo, src]);
+  }, [refVideo, onPlayEvent, onLoadedData, onPauseEvent]);
 
   return (
     <Button
@@ -134,56 +151,6 @@ const IconPrevious = ({
     >
       <path
         d="M64 468V44c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v176.4l195.5-181C352.1 22.3 384 36.6 384 64v384c0 27.4-31.9 41.7-52.5 24.6L136 292.7V468c0 6.6-5.4 12-12 12H76c-6.6 0-12-5.4-12-12z"
-        fill={color}
-      />
-    </svg>
-  );
-};
-
-const IconPause = ({
-  width,
-  height,
-  color,
-}: {
-  width: string;
-  height: string;
-  color: string;
-}) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 448 512"
-      fill="none"
-      width={width}
-      height={height}
-    >
-      <path
-        d="M144 479H48c-26.5 0-48-21.5-48-48V79c0-26.5 21.5-48 48-48h96c26.5 0 48 21.5 48 48v352c0 26.5-21.5 48-48 48zm304-48V79c0-26.5-21.5-48-48-48h-96c-26.5 0-48 21.5-48 48v352c0 26.5 21.5 48 48 48h96c26.5 0 48-21.5 48-48z"
-        fill={color}
-      />
-    </svg>
-  );
-};
-
-const IconPlay = ({
-  width,
-  height,
-  color,
-}: {
-  width: string;
-  height: string;
-  color: string;
-}) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 448 512"
-      fill="none"
-      width={width}
-      height={height}
-    >
-      <path
-        d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"
         fill={color}
       />
     </svg>
@@ -265,7 +232,7 @@ const IconShuffle = ({
   );
 };
 
-const IconVolumeMute= ({
+const IconVolumeMute = ({
   width,
   height,
   color,
@@ -279,15 +246,15 @@ const IconVolumeMute= ({
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 512 512"
       fill="none"
-      width={ width }
-      height={ height }
+      width={width}
+      height={height}
     >
       <path
         d="M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zM461.64 256l45.64-45.64c6.3-6.3 6.3-16.52 0-22.82l-22.82-22.82c-6.3-6.3-16.52-6.3-22.82 0L416 210.36l-45.64-45.64c-6.3-6.3-16.52-6.3-22.82 0l-22.82 22.82c-6.3 6.3-6.3 16.52 0 22.82L370.36 256l-45.63 45.63c-6.3 6.3-6.3 16.52 0 22.82l22.82 22.82c6.3 6.3 16.52 6.3 22.82 0L416 301.64l45.64 45.64c6.3 6.3 16.52 6.3 22.82 0l22.82-22.82c6.3-6.3 6.3-16.52 0-22.82L461.64 256z"
-        fill={ color }
+        fill={color}
       />
     </svg>
-  )
+  );
 };
 
 const IconVolume = ({
@@ -304,15 +271,15 @@ const IconVolume = ({
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 480 512"
       fill="none"
-      width={ width }
-      height={ height }
+      width={width}
+      height={height}
     >
       <path
         d="M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zM480 256c0-63.53-32.06-121.94-85.77-156.24-11.19-7.14-26.03-3.82-33.12 7.46s-3.78 26.21 7.41 33.36C408.27 165.97 432 209.11 432 256s-23.73 90.03-63.48 115.42c-11.19 7.14-14.5 22.07-7.41 33.36 6.51 10.36 21.12 15.14 33.12 7.46C447.94 377.94 480 319.53 480 256zm-141.77-76.87c-11.58-6.33-26.19-2.16-32.61 9.45-6.39 11.61-2.16 26.2 9.45 32.61C327.98 228.28 336 241.63 336 256c0 14.38-8.02 27.72-20.92 34.81-11.61 6.41-15.84 21-9.45 32.61 6.43 11.66 21.05 15.8 32.61 9.45 28.23-15.55 45.77-45 45.77-76.88s-17.54-61.32-45.78-76.86z"
-        fill={ color }
+        fill={color}
       />
     </svg>
-  )
+  );
 };
 /* Icons end */
 
@@ -352,30 +319,6 @@ const PreviousControl = () => {
       title="Previous Song"
     >
       <IconPrevious color="white" width="16px" height="16px" />
-    </button>
-  );
-};
-
-const PlayControl = ({
-  refVideo,
-}: {
-  refVideo: RefObject<HTMLVideoElement>;
-}) => {
-  const isPlay = false;
-  const handlePlaySong = () => {
-    /* Add play song handling here */
-  };
-  return (
-    <button
-      className={'w-[42px] h-[42px] mx-2 my-0 style__buttons'}
-      title="Play Song"
-      onClick={handlePlaySong}
-    >
-      {isPlay ? (
-        <IconPause color="white" width="24px" height="24px" />
-      ) : (
-        <IconPlay color="white" width="24px" height="24px" />
-      )}
     </button>
   );
 };
@@ -444,107 +387,102 @@ const VolumeControl = ({
     /* Add hanling volume mute here */
   };
   return (
-    <div
-      onClick={handleMuteVolume}
-    >
-      {
-        isMute
-        ?
-          <button className="mx-2 my-0 style__buttons" title="Mute">
-            <IconVolumeMute color="white" width="16px" height="16px" />
-          </button>
-        :
-          <button className="mx-2 my-0 style__buttons" title="Mute">
-            <IconVolume color="white" width="16px" height="16px" />
-          </button>
-      }
+    <div onClick={handleMuteVolume}>
+      {isMute ? (
+        <button className="mx-2 my-0 style__buttons" title="Mute">
+          <IconVolumeMute color="white" width="16px" height="16px" />
+        </button>
+      ) : (
+        <button className="mx-2 my-0 style__buttons" title="Mute">
+          <IconVolume color="white" width="16px" height="16px" />
+        </button>
+      )}
     </div>
-  )
+  );
 };
 
 const VolumeSliderControl = ({
   volume,
   refVideo,
 }: {
-  volume: string
+  volume: string;
   refVideo: RefObject<HTMLVideoElement>;
 }) => {
-
-  return(
+  return (
     <Slider
-      setWidth={"84px"}
-      setHeight={"4px"}
+      setWidth={'84px'}
+      setHeight={'4px'}
       percentSlider={Number(volume) * 100}
       toogleTooltip={false}
       getPercentSlider={(value: number) => {
-        if(refVideo.current) {
-          refVideo.current.volume = value / 100
+        if (refVideo.current) {
+          refVideo.current.volume = value / 100;
         }
       }}
     />
-  )
+  );
 };
 
-const SongSliderControl  = ({
+const SongSliderControl = ({
   currentTime,
   duration,
   refVideo,
 }: {
-  currentTime: string,
-  duration: string,
+  currentTime: string;
+  duration: string;
   refVideo: RefObject<HTMLVideoElement>;
 }) => {
-
-  return(
+  return (
     <Slider
-      setWidth={"100%"}
-      setHeight={"2px"}
-      percentSlider={(Number(currentTime)/Number(duration))*100}
+      setWidth={'100%'}
+      setHeight={'2px'}
+      percentSlider={(Number(currentTime) / Number(duration)) * 100}
       toogleTooltip={true}
       currentTimeSongTooltip={Number(currentTime)}
       getPercentSlider={(value: number) => {
-        if(refVideo.current) {
-          refVideo.current.currentTime = (value / 100) * refVideo.current.duration
+        if (refVideo.current) {
+          refVideo.current.currentTime =
+            (value / 100) * refVideo.current.duration;
         }
       }}
     />
-  )
+  );
 };
 
-const Slider = (
-{ 
-  setWidth, 
+const Slider = ({
+  setWidth,
   setHeight,
   percentSlider,
   getPercentSlider,
   toogleTooltip,
-  currentTimeSongTooltip 
-}:{
-  setWidth: string
-  setHeight: string
-  percentSlider: number
-  getPercentSlider: Function
-  toogleTooltip: boolean
-  currentTimeSongTooltip?: number
+  currentTimeSongTooltip,
+}: {
+  setWidth: string;
+  setHeight: string;
+  percentSlider: number;
+  getPercentSlider: Function;
+  toogleTooltip: boolean;
+  currentTimeSongTooltip?: number;
 }) => {
-
-  const sliderRef = useRef<HTMLDivElement>(null)
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   // Active UI Dot Slider Hover
-  const [isActiveSliderDotHover, setActiveSliderDotHover] = useState<boolean>(false)
+  const [isActiveSliderDotHover, setActiveSliderDotHover] =
+    useState<boolean>(false);
 
   // Active UI Tooltip Dot Hover
-  const [isActiveSliderTooltipHover, setActiveSliderTooltipHover] = useState<boolean>(false)
+  const [isActiveSliderTooltipHover, setActiveSliderTooltipHover] =
+    useState<boolean>(false);
 
   // Handler Active Dot Slider Hover
   const handleActiveSliderDotHover = (handle: boolean) => {
-    setActiveSliderDotHover(handle)
-  }
+    setActiveSliderDotHover(handle);
+  };
 
   // Handler Active Tooltip Dot Hover
   const handleActiveSliderTooltipHover = (handle: boolean) => {
-    setActiveSliderTooltipHover(handle)
-  }
+    setActiveSliderTooltipHover(handle);
+  };
 
   return (
     // Slider Bar
@@ -552,7 +490,7 @@ const Slider = (
     <div
       className="my-[-6px] cursor-pointer"
       style={{
-        width: `${setWidth}`
+        width: `${setWidth}`,
       }}
     >
       {/* Slider Bar Progress */}
@@ -562,94 +500,97 @@ const Slider = (
         onMouseOut={() => handleActiveSliderDotHover(false)}
         ref={sliderRef}
         onMouseDown={(e) => {
-
-          if(sliderRef.current) {
-
-            let percentSliderWidth  = (
-              (e.clientX - sliderRef.current.getBoundingClientRect().left)
-                / sliderRef.current.offsetWidth
-            ) * 100
-            percentSliderWidth = percentSliderWidth < 0
-              ? 0
-              : percentSliderWidth > 100
-              ? 100
-              : percentSliderWidth
-            getPercentSlider(percentSliderWidth)
-          }
-
-          const handleMouseMove = (e: MouseEvent) => {
-            if(sliderRef.current) {
-              let percentSliderWidth  = (
-                  (e.clientX - sliderRef.current.getBoundingClientRect().left)
-                    / sliderRef.current.offsetWidth
-              ) * 100
-
-              percentSliderWidth = percentSliderWidth < 0
+          if (sliderRef.current) {
+            let percentSliderWidth =
+              ((e.clientX - sliderRef.current.getBoundingClientRect().left) /
+                sliderRef.current.offsetWidth) *
+              100;
+            percentSliderWidth =
+              percentSliderWidth < 0
                 ? 0
                 : percentSliderWidth > 100
                 ? 100
-                : percentSliderWidth
-
-              getPercentSlider(percentSliderWidth)
-            }
+                : percentSliderWidth;
+            getPercentSlider(percentSliderWidth);
           }
 
-          window.addEventListener("mousemove", handleMouseMove)
+          const handleMouseMove = (e: MouseEvent) => {
+            if (sliderRef.current) {
+              let percentSliderWidth =
+                ((e.clientX - sliderRef.current.getBoundingClientRect().left) /
+                  sliderRef.current.offsetWidth) *
+                100;
 
-          window.addEventListener(
-            "mouseup",
-            () => {
-              window.removeEventListener("mousemove", handleMouseMove)
+              percentSliderWidth =
+                percentSliderWidth < 0
+                  ? 0
+                  : percentSliderWidth > 100
+                  ? 100
+                  : percentSliderWidth;
+
+              getPercentSlider(percentSliderWidth);
             }
-          )
+          };
+
+          window.addEventListener('mousemove', handleMouseMove);
+
+          window.addEventListener('mouseup', () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+          });
         }}
       >
         {/* Slider Bar Rail */}
         <div
           className="relative w-full transition-[width,left] duration-300 bg-[hsla(0,0%,50.2%,.18)] rounded-[15px]"
           style={{
-            height: `${setHeight}`
+            height: `${setHeight}`,
           }}
         >
           {/* React Slider Progress
-            * Change Slider Progress -> width: 23%
-          */}
+           * Change Slider Progress -> width: 23%
+           */}
           <div
             className="top-0 left-[0%] absolute z-[1] bg-[#335eea] rounded-[15px]"
             style={{
               width: `${percentSlider}%`,
-              height: `${setHeight}`
+              height: `${setHeight}`,
             }}
           ></div>
           {/* End React Slider Process  */}
 
           {/* React Slider Dot
-            * Change Slider Dot -> left: 23%
-          */}
+           * Change Slider Dot -> left: 23%
+           */}
           <div
             className="absolute z-[5] w-3 h-3 top-[50%] translate-x-[-50%] translate-y-[-50%] transition-[left]"
             style={{
-              left: `${percentSlider}%`
+              left: `${percentSlider}%`,
             }}
           >
             {/* Dot Handle */}
             <div
-              className={"cursor-pointer w-full h-full rounded-full bg-[#fff] box-border " +
-                (isActiveSliderDotHover ? "visible": "invisible")
+              className={
+                'cursor-pointer w-full h-full rounded-full bg-[#fff] box-border ' +
+                (isActiveSliderDotHover ? 'visible' : 'invisible')
               }
               onMouseOver={() => handleActiveSliderTooltipHover(true)}
               onMouseOut={() => handleActiveSliderTooltipHover(false)}
-            >
-            </div>
+            ></div>
             {/* End Dot Handle */}
             {
               // Dot Tooltip
-              toogleTooltip &&
-              <div className={"top-[-10px] left-1/2 -translate-x-1/2 -translate-y-full absolute " +(isActiveSliderTooltipHover ? "visible" : "invisible")}>
-                <div className="text-sm font-medium whitespace-nowrap px-[6px] py-[2px] min-w-[20px] text-center text-[#000] rounded-[5px] bg-[#fff] box-content">
-                  <span>{formatTime(currentTimeSongTooltip || 0)}</span>
+              toogleTooltip && (
+                <div
+                  className={
+                    'top-[-10px] left-1/2 -translate-x-1/2 -translate-y-full absolute ' +
+                    (isActiveSliderTooltipHover ? 'visible' : 'invisible')
+                  }
+                >
+                  <div className="text-sm font-medium whitespace-nowrap px-[6px] py-[2px] min-w-[20px] text-center text-[#000] rounded-[5px] bg-[#fff] box-content">
+                    <span>{formatTime(currentTimeSongTooltip || 0)}</span>
+                  </div>
                 </div>
-              </div>
+              )
               // End Dot Tooltip
             }
           </div>
@@ -660,24 +601,26 @@ const Slider = (
       {/* End Slider Bar Progress */}
     </div>
     // End Slider Bar
-  )
+  );
 };
 
-const formatTime = ( sec_num: number ):string => {
+const formatTime = (sec_num: number): string => {
   let hours: number | string = Math.floor(sec_num / 3600);
   let minutes: number | string = Math.floor((sec_num - hours * 3600) / 60);
-  let seconds: number | string = Math.floor(sec_num - hours * 3600 - minutes * 60);
+  let seconds: number | string = Math.floor(
+    sec_num - hours * 3600 - minutes * 60
+  );
 
   hours = hours < 10 ? (hours > 0 ? '0' + hours : 0) : hours;
 
   if (minutes < 10) {
-      minutes = '0' + minutes;
+    minutes = '0' + minutes;
   }
   if (seconds < 10) {
-      seconds = '0' + seconds;
+    seconds = '0' + seconds;
   }
   return (hours !== 0 ? hours + ':' : '') + minutes + ':' + seconds;
-}
+};
 /* Player control end */
 
 const UserMain = () => {
@@ -689,49 +632,17 @@ const UserMain = () => {
     title: 'SickCity332-The Holy Binns',
     artistsNames: 'Bob Peace',
   };
-  const currentTime="20";
-  const duration="140";
-  const currentVolume = "50";
+  const currentTime = '20';
+  const duration = '140';
+  const currentVolume = '50';
   /*Mock data for player end*/
+  const [currentFile, setCurrentFile] = useState<any>();
   const { user } = useUser();
 
   const cardano = useCardano();
 
   const refVideo = useRef<HTMLVideoElement>(null);
 
-  const columns = [
-    {
-      title: 'Unit',
-      dataIndex: 'unit',
-      key: 'unit',
-      className: 'break-all',
-    },
-    {
-      className: 'font-bold',
-      width: '30%',
-      title: 'Name',
-      dataIndex: ['info', 'name'],
-      key: 'name',
-    },
-    {
-      width: '20%',
-      title: 'Thumbnail',
-      dataIndex: ['info', 'image'],
-      key: 'thumbnail',
-      render: (image: any) => {
-        return image && <Image src={createIpfsURL(image)} />;
-      },
-    },
-    {
-      width: '10%',
-      title: 'Actions',
-      dataIndex: ['info', 'file'],
-      key: 'actions',
-      render: (file: IFile) => {
-        return file && <ButtonPlay file={file} refVideo={refVideo} />;
-      },
-    },
-  ];
   const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
 
   const pingAuth = async () => {
@@ -845,9 +756,15 @@ const UserMain = () => {
                     const action = showOptions ? options : time;
                     const { info } = item;
                     return (
-                      <List.Item actions={[action]}>
+                      <List.Item key={item.unit} actions={[action]}>
                         {info?.file && (
-                          <ButtonPlay file={info.file} refVideo={refVideo} />
+                          <ButtonPlay
+                            file={info.file}
+                            refVideo={refVideo}
+                            onPlay={() => {
+                              setCurrentFile(info.file);
+                            }}
+                          />
                         )}
                         <List.Item.Meta
                           title={info?.name}
@@ -863,13 +780,17 @@ const UserMain = () => {
           </Row>
         )}
         {/* Player start */}
-        <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-[color:black] fixed inset-x-0 bottom-0 z-[100]">
+        <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-black fixed inset-x-0 bottom-0 z-[100]">
           {/* Player controls start */}
-          <SongSliderControl refVideo={refVideo} currentTime={currentTime} duration={duration} />
+          <SongSliderControl
+            refVideo={refVideo}
+            currentTime={currentTime}
+            duration={duration}
+          />
           <div className="grid grid-cols-3 h-full mx-[10vw] z-[-1]">
             <div className="flex justify-left items-center">
               <PreviousControl />
-              <PlayControl refVideo={refVideo} />
+              <ButtonPlay file={currentFile} refVideo={refVideo} />
               <NextControl />
             </div>
             <TrackInfo songInfo={songInfo} />
@@ -883,6 +804,9 @@ const UserMain = () => {
           {/* Player controls end */}
         </div>
         {/* Player end */}
+        <video controls ref={refVideo} className="fixed bottom-8 left-8 hidden">
+          <source type="audio/mpeg"></source>
+        </video>
       </ResponsiveContainer>
     </>
   );
