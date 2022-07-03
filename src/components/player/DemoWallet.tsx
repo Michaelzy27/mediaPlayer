@@ -35,7 +35,7 @@ export const DemoWallet = () => {
         {/*  <h3>Wallet ${wallet}</h3>*/}
         {/*</div>*/}
       </Card>
-      <Card title="List assest" >
+      <Card title="List assets" >
         <AssetsList assets={assets} />
       </Card>
     </ResponsiveContainer>
