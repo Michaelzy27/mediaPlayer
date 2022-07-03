@@ -3,23 +3,34 @@
 // https://github.com/ant-design/ant-design/blob/master/components/style/themes/default.less
 
 // colours
-@primary-color: #057623;
-@text-color-secondary: #6d7175;
+@primary-color: #0f88fa;
+@primary-color-hover: fade(@primary-color, 50%);
+@item-hover-bg: fade(@primary-color, 50%);
+@text-color: #fff;
+@text-color-secondary: fade(#fff, 90%);
+
+@heading-color: fade(#fff, 85%);
 
 @success-color: #389e0d;
 
 @error-color: #d72c0d;
 
-@body-background: #f7f8fa;
-@layout-footer-background: #003318;
-@text-color-dark: #ffffff;
-@text-color-secondary-dark: #ffffff;
+@body-background: #000;
+@component-background: fade(#000, 90%);
+
+@btn-default-ghost-color: fade(#fff, 50%);
+@btn-default-ghost-bg: transparent;
+@btn-default-ghost-border: fade(#fff, 50%);
+
+@layout-footer-background: rgb(9, 0, 48);
+@text-color-dark: #000;
+@text-color-secondary-dark: #000;
 
 @disabled-color: fade(#000, 60%);
 
 @divider-color: rgba(0, 0, 0, 15%);
 
-@info-color: #1890ff;
+@info-color: #61b3ff;
 
 // button
 @btn-font-weight: 500;
@@ -31,10 +42,10 @@
 // borders
 @border-radius-base: 3px;
 
-@menu-background: #051e34;
+@menu-background: rgb(9, 0, 48);
 // layout
-@layout-body-background: #ffffff;
-@layout-header-background: #f7f8fa;
+@layout-body-background: #000;
+@layout-header-background: rgb(9, 0, 48);
 @layout-sider-background: @menu-background;
 @menu-dark-bg: @menu-background;
 @menu-dark-inline-submenu-bg: @menu-background;
@@ -45,7 +56,7 @@
 
 // table
 @table-selected-row-bg: fade(@primary-color, 10%);
-@table-expanded-row-bg: #ffffff;
+@table-expanded-row-bg: #000;
 
 // expand panel
 @collapse-panel-border-radius: 8px;
