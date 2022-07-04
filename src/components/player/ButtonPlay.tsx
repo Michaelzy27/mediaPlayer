@@ -46,10 +46,13 @@ const ButtonPlay = ({
     const current = src === refVideo.current?.src;
     const loaded = current && refVideo.current?.readyState === 4;
     const playing = current && loaded && !refVideo.current?.paused;
-    if (current && !playing && wantToPlay) {
-      refVideo.current?.play();
+    if (current && !playing) {
+      if (wantToPlay) {
+        refVideo.current?.play();
+      }
+      forceUpdate();
     }
-  }, [wantToPlay, src, refVideo]);
+  }, [wantToPlay, src, refVideo, forceUpdate]);
   const onPauseEvent = useCallback(() => {
     const current = src === refVideo.current?.src;
     const loaded = current && refVideo.current?.readyState === 4;
