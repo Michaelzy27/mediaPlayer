@@ -30,7 +30,7 @@ const ResponsiveContainer: React.FC<IResponsiveContainerProps> = ({
   };
 
   return (
-    <Row className={`px-4 sm:px-8 ${props.className || ''}`}>
+    <Row className={`px-2 sm:px-4 ${props.className || ''}`}>
       <Col
         xs={offsets.xs}
         lg={offsets.lg}

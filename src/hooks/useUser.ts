@@ -236,7 +236,9 @@ const mapToAssetInfo = (asset: Asset) => {
   } as IAssetInfo;
 };
 
-const useUser = (): {
+const useUser = (
+  k?: string
+): {
   user: IUser;
 } => {
   const [walletAddress, setWalletAddress] = useState<string>();
@@ -253,10 +255,16 @@ const useUser = (): {
       const r = await API.WalletAssetAPI.get(bech32Addr);
       if (r != null) {
         assets = assets.concat(r.assets);
+        assets = assets.concat(r.assets);
+        assets = assets.concat(r.assets);
+        assets = assets.concat(r.assets);
       } else {
         await API.WalletAssetAPI.resync(bech32Addr);
         const r2 = await API.WalletAssetAPI.get(bech32Addr);
         if (r2 != null) {
+          assets = assets.concat(r2.assets);
+          assets = assets.concat(r2.assets);
+          assets = assets.concat(r2.assets);
           assets = assets.concat(r2.assets);
         }
       }
@@ -272,6 +280,7 @@ const useUser = (): {
 
   useEffect(() => {
     Auth.onAuthStateChanged(async (authState, authData) => {
+      console.log('auth', authState, authData);
       setWalletAddress(authData.address);
       if (authState === AuthState.SignedIn) {
         const walletFunds = await getAsset(authData.address);
@@ -279,11 +288,12 @@ const useUser = (): {
       } else if (authState === AuthState.SignedOut) {
         setWalletFunds(undefined);
       }
-    }, 'user');
+    }, k ?? 'user');
     return () => {
-      Auth.removeOnAuthStateChanged('user');
+      Auth.removeOnAuthStateChanged(k ?? 'user');
     };
   }, []);
+  console.log('ua', walletAddress);
   return {
     user: {
       displayName: walletAddress

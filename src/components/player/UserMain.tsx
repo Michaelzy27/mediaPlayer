@@ -1,26 +1,12 @@
 import {
+  MoreOutlined,
   StepBackwardOutlined,
   StepForwardOutlined,
-  MoreOutlined,
 } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Col,
-  Image,
-  List,
-  notification,
-  Popover,
-  Row,
-  Spin,
-} from 'antd';
-import API from 'api';
+import { Button, Col, Image, List, Popover, Row, Spin, Tabs } from 'antd';
 import { IAssetInfo } from 'api/wallet-asset';
-import Auth from 'auth/Auth';
-import BackLink from 'components/common/BackLink';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import Slider, { formatTime } from 'components/player/Slider';
-import useCardano, { CARDANO_WALLET_PROVIDER } from 'hooks/useCardano';
 import useUser from 'hooks/useUser';
 import {
   RefObject,
@@ -30,10 +16,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { signOut } from 'utils/auth';
-import { getErrorMessageObj } from 'utils/response';
 import 'video-react/dist/video-react.css';
-import ButtonPlay, { createIpfsURL, IFile } from './ButtonPlay';
+import ButtonPlay, { createIpfsURL } from './ButtonPlay';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -286,72 +270,14 @@ const ListItem = ({
 
 const UserMain = () => {
   const [currentItem, setCurrentItem] = useState<IAssetInfo>();
-  /*Mock data for player start */
   const songInfo: SongInfo = {
     thumbnail: createIpfsURL(currentItem?.info?.image) ?? '',
     title: currentItem?.info?.name ?? '',
     artistsNames: currentItem?.info?.artist ?? '',
   };
-  /*Mock data for player end*/
-  const { user } = useUser();
-
-  const cardano = useCardano();
+  const { user } = useUser('user-main');
 
   const refVideo = useRef<HTMLVideoElement>(null);
-
-  const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
-
-  const pingAuth = async () => {
-    const [data, error] = await API.User.pingAuth();
-    if (error) {
-      notification['error'](getErrorMessageObj(error));
-      return;
-    }
-
-    notification['success']({
-      message: 'ping successfully',
-    });
-  };
-
-  const sendAuth = async (
-    addressHex: string,
-    signature: string,
-    key?: string
-  ) => {
-    const [data, error] = await API.User.sendAuth(addressHex, signature, key);
-    if (error) {
-      notification['error'](getErrorMessageObj(error));
-      return;
-    }
-
-    const token = data.token;
-    Auth.initSession(addressHex, token);
-
-    /// try pinging
-    await pingAuth();
-  };
-
-  const handleConnectWallet = async () => {
-    await cardano.enable(walletProvider);
-    const usedAddresses = await cardano.getUsedAddresses(walletProvider);
-    console.log('used', usedAddresses);
-    const addressHex = usedAddresses[0];
-
-    const [data, error] = await API.User.getAuth(addressHex);
-    if (error) {
-      notification['error'](getErrorMessageObj(error));
-      return;
-    }
-
-    const payload = data.message;
-
-    const { signature, key } = await cardano.signData(
-      walletProvider,
-      addressHex,
-      payload
-    );
-    await sendAuth(addressHex, signature, key);
-  };
 
   const filteredAssets = useMemo(() => {
     return (
@@ -392,65 +318,46 @@ const UserMain = () => {
 
   return (
     <>
-      <ResponsiveContainer className="my-6">
-        <BackLink text="Back" />
-        <Card title="Wallet Connect" className="mb-4">
-          <div>
-            {!user.walletAddress && (
-              <>
-                <h3>Connect your wallet</h3>
-                <Button
-                  type="text"
-                  className="px-1 -ml-1"
-                  onClick={handleConnectWallet}
-                >
-                  Connect wallet
-                </Button>
-              </>
-            )}
-            {user.walletAddress && (
-              <>
-                <h3>{`Connected to address hex ${user.displayName}`}</h3>
-                <Button type="text" className="px-1 -ml-1" onClick={signOut}>
-                  Sign out
-                </Button>
-              </>
-            )}
-            <br />
-            <Button type="text" className="px-1 -ml-1" onClick={pingAuth}>
-              Ping
-            </Button>
-          </div>
-        </Card>
+      <ResponsiveContainer wide className="mt-24 mb-12">
         {user.walletFunds != null && (
-          <Row>
-            <Col span={12}>
-              <Image src={songInfo.thumbnail} />
+          <Row className="h-full">
+            <Col span={15}>
+              <Image style={{ height: '70vh' }} src={songInfo.thumbnail} />
             </Col>
-            <Col span={12}>
+            <Col span={9}>
               <div
                 style={{
-                  height: 600,
-                  overflow: 'auto',
-                  padding: '0 16px',
+                  height: '70vh',
                   border: '1px solid rgba(140, 140, 140, 0.35)',
                 }}
               >
-                <List
-                  itemLayout="horizontal"
-                  dataSource={user.walletFunds?.assets}
-                  renderItem={(item) => {
-                    return (
-                      <ListItem
-                        item={item}
-                        refVideo={refVideo}
-                        onPlay={() => {
-                          setCurrentItem(item);
+                <Tabs defaultActiveKey="inv" className="h-full px-4">
+                  <Tabs.TabPane tab="Inventory" tabKey="inv" className="h-full">
+                    <div
+                      style={{
+                        height: '100%',
+                        overflow: 'auto',
+                      }}
+                      className="-mx-4 px-4"
+                    >
+                      <List
+                        itemLayout="horizontal"
+                        dataSource={user.walletFunds?.assets}
+                        renderItem={(item) => {
+                          return (
+                            <ListItem
+                              item={item}
+                              refVideo={refVideo}
+                              onPlay={() => {
+                                setCurrentItem(item);
+                              }}
+                            />
+                          );
                         }}
                       />
-                    );
-                  }}
-                />
+                    </div>
+                  </Tabs.TabPane>
+                </Tabs>
               </div>
             </Col>
           </Row>

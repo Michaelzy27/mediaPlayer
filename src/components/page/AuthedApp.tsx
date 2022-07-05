@@ -43,8 +43,6 @@ const createRoute = (route: any, index: number) => {
 const AuthedAppIdleTimeoutWrapper = (props: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
-
-
   // TODO
   const user = {
     userId: 'TODO',
@@ -69,15 +67,15 @@ const AuthedApp = () => {
     <div className="App">
       <AuthedAppIdleTimeoutWrapper>
         <Layout>
-          <Layout.Header>
+          <Layout.Header className="pl-0 pr-4">
             <AppHeader />
           </Layout.Header>
           <Layout.Content>
             <Routes>{ROUTES.map(createRoute)}</Routes>
           </Layout.Content>
-          <Layout.Footer>
+          {/* <Layout.Footer>
             <AppFooter />
-          </Layout.Footer>
+          </Layout.Footer> */}
         </Layout>
       </AuthedAppIdleTimeoutWrapper>
     </div>
