@@ -193,6 +193,44 @@ const SongSliderControl = ({
   );
 };
 
+const RightGroupControl = 
+({
+  refVideo
+}: {
+  refVideo: RefObject<HTMLVideoElement>
+}) => {
+  const [isPopoverVisible, setPopoverVisible] = useState<boolean>(false);
+
+  const content = (
+    <div className="justify-center items-center flex">
+    <RepeatControl refVideo={refVideo} />
+    <ShuffleControl />
+    <VolumeControl refVideo={refVideo} />
+    <VolumeSliderControl refVideo={refVideo} />
+   </div>
+  )
+
+  return (
+    <div className='justify-center items-center ml-4 flex'>
+      <div className='justify-center items-center hidden sm:flex'>
+        <RepeatControl refVideo={refVideo} />
+        <ShuffleControl />
+        <VolumeControl refVideo={refVideo} />
+        <VolumeSliderControl refVideo={refVideo} />
+      </div>
+      <Popover
+      placement="right"
+      onVisibleChange={(visible) => {
+        setPopoverVisible(visible);
+      }}
+      content={content}
+       >
+        <Button className="sm:hidden" icon={<i className="ri-arrow-left-s-fill text-lg"></i>} />
+      </Popover>
+   </div>
+  );
+};
+
 const ListItem = ({
   item,
   refVideo,
@@ -392,12 +430,7 @@ const UserMain = () => {
               />
             </div>
             <TrackInfo songInfo={songInfo} />
-            <div className="justify-center items-center ml-4 hidden sm:flex">
-              <RepeatControl refVideo={refVideo} />
-              <ShuffleControl />
-              <VolumeControl refVideo={refVideo} />
-              <VolumeSliderControl refVideo={refVideo} />
-            </div>
+            <RightGroupControl refVideo={refVideo} />
           </div>
           {/* Player controls end */}
         </div>
