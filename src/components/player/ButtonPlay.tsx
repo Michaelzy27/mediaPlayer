@@ -50,8 +50,8 @@ const ButtonPlay = ({
       if (wantToPlay) {
         refVideo.current?.play();
       }
-      forceUpdate();
     }
+    forceUpdate();
   }, [wantToPlay, src, refVideo, forceUpdate]);
   const onPauseEvent = useCallback(() => {
     const current = src === refVideo.current?.src;

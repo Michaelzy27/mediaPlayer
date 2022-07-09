@@ -32,17 +32,14 @@ interface SongInfo {
 /* Player control start */
 const TrackInfo = ({ songInfo }: { songInfo: SongInfo }) => {
   return (
-    <div className="flex items-center">
-      {/* Thumbnail */}
+    <div className="flex items-center justify-center">
       <img
         src={songInfo.thumbnail}
         alt={songInfo.title}
         className="h-[46px] rounded-[5px]"
       />
-      {/* End Thumbnail */}
 
-      {/* Info */}
-      <div className="flex flex-col justify-center h-[46px] ml-3">
+      <div className="flex md:flex flex-col justify-center h-[46px] ml-3">
         <div className="font-semibold text-base text-[color:var(--color-text)] opacity-90 mb-1 truncate">
           {songInfo.title}
         </div>
@@ -50,7 +47,6 @@ const TrackInfo = ({ songInfo }: { songInfo: SongInfo }) => {
           {songInfo.artistsNames}
         </div>
       </div>
-      {/* End Info */}
     </div>
   );
 };
@@ -305,14 +301,25 @@ const UserMain = () => {
 
   useEffect(() => {
     if (refVideo.current) {
-      refVideo.current.src = createIpfsURL(currentItem?.info?.file?.src) ?? '';
-      refVideo.current.load();
+      const lastSrc = refVideo.current.src;
+      const src = createIpfsURL(currentItem?.info?.file?.src) ?? '';
+      if (src) {
+        refVideo.current.src = src;
+        refVideo.current.load();
+        setTimeout(() => {
+          if (lastSrc) {
+            refVideo.current?.play();
+          }
+        }, 0);
+      }
     }
   }, [currentItem]);
 
   useEffect(() => {
     if (filteredAssets.length > 0 && currentItem == null) {
       setCurrentItem(filteredAssets[0]);
+    } else if (filteredAssets.length === 0) {
+      setCurrentItem(undefined);
     }
   }, [filteredAssets, currentItem]);
 
@@ -321,15 +328,19 @@ const UserMain = () => {
       <ResponsiveContainer wide className="mt-24 mb-12">
         {user.walletFunds != null && (
           <Row className="h-full">
-            <Col span={15}>
-              <Image style={{ height: '70vh' }} src={songInfo.thumbnail} />
+            <Col span={24} lg={15}>
+              <Image
+                wrapperClassName="h-[40vh] lg:h-[70vh] w-full"
+                style={{ height: '100%', objectFit: 'contain' }}
+                src={songInfo.thumbnail}
+              />
             </Col>
-            <Col span={9}>
+            <Col span={24} lg={9}>
               <div
                 style={{
-                  height: '70vh',
                   border: '1px solid rgba(140, 140, 140, 0.35)',
                 }}
+                className="h-[40vh] lg:h-[70vh]"
               >
                 <Tabs defaultActiveKey="inv" className="h-full px-4">
                   <Tabs.TabPane tab="Inventory" tabKey="inv" className="h-full">
@@ -366,7 +377,7 @@ const UserMain = () => {
         <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-black fixed inset-x-0 bottom-0 z-[100]">
           {/* Player controls start */}
           <SongSliderControl refVideo={refVideo} />
-          <div className="grid grid-cols-3 h-full mx-[10vw] z-[-1]">
+          <div className="flex flex-row h-full px-4 z-[-1] w-full justify-between">
             <div className="flex justify-left items-center">
               <Button
                 onClick={handlePrevSong}
@@ -381,7 +392,7 @@ const UserMain = () => {
               />
             </div>
             <TrackInfo songInfo={songInfo} />
-            <div className="flex justify-center items-center">
+            <div className="justify-center items-center ml-4 hidden sm:flex">
               <RepeatControl refVideo={refVideo} />
               <ShuffleControl />
               <VolumeControl refVideo={refVideo} />

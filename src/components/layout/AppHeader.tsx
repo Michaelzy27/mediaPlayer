@@ -97,7 +97,7 @@ const AppHeader = () => {
 
   return (
     <Row align="middle" justify="space-between" className="px-0">
-      <Col>
+      <Col className='hidden sm:flex'>
         <Link to="/" aria-label="Home">
           <img
             src={`/images/${logoSrc}`}

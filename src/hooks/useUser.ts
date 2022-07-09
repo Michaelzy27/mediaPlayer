@@ -293,7 +293,6 @@ const useUser = (
       Auth.removeOnAuthStateChanged(k ?? 'user');
     };
   }, []);
-  console.log('ua', walletAddress);
   return {
     user: {
       displayName: walletAddress

@@ -22,5 +22,5 @@ aws s3 --profile=%AWS_PROFILE% cp build/ %S3_DIR% --recursive --exclude "*.map"
 
 :clear-cache
 echo "Invalidate CDN"
-The charge to submit an invalidation path is the same regardless of the number of files, so it's better to invalidate everything for the peace of mind
+@REM The charge to submit an invalidation path is the same regardless of the number of files, so it's better to invalidate everything for the peace of mind
 aws cloudfront --profile=%AWS_PROFILE% create-invalidation --distribution-id=%CLOUDFRONT_DIST_ID% --paths "/*"
