@@ -1,11 +1,13 @@
 import { Image, Table } from 'antd';
-import { IAsset } from '../../hooks/useUser';
 import { IAssetInfo } from '../../api/wallet-asset';
 
 const createIpfsURL = (srcStr: string) => {
   const ipfsURL = "https://ipfs.blockfrost.dev/ipfs/";
   const ipfsPrefix = "ipfs://";
-  return ipfsURL + srcStr.replace(ipfsPrefix, "");
+  if (typeof srcStr === 'string'){
+    return ipfsURL + srcStr.replace(ipfsPrefix, "");
+  }
+  return '';
 }
 
 export const AssetsList = (props: {

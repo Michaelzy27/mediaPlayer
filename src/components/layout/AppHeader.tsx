@@ -91,9 +91,10 @@ const AppHeader = () => {
   const { breakpoints } = useBreakpoints();
   const { navMenuKey } = useRouteParams();
 
-  const logoSrc = breakpoints.xs
-    ? 'sound-rig-logo-sm.svg'
-    : 'sound-rig-logo.png';
+  // const logoSrc = breakpoints.xs
+  //   ? 'sound-rig-logo-sm.svg'
+  //   : 'sound-rig-logo.png';
+  const logoSrc = 'SoundRig-logo-2.png';
 
   return (
     <Row align="middle" justify="space-between" className="px-0">
