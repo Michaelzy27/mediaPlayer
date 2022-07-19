@@ -1,4 +1,4 @@
-import { Button, Col, Menu, notification, Row } from 'antd';
+import { Button, Col, notification, Row } from 'antd';
 import API from 'api';
 import Auth from 'auth/Auth';
 import useBreakpoints from 'hooks/useBreakpoints';
@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { MENU_ITEMS } from 'routes';
 import { signOut } from 'utils/auth';
 import { getErrorMessageObj } from 'utils/response';
+import { Menu } from '../common/Menu';
 
 const UserLogin = () => {
   const { user } = useUser('header');
@@ -87,7 +88,7 @@ const UserLogin = () => {
   );
 };
 
-const AppHeader = () => {
+export const AppHeader = () => {
   const { breakpoints } = useBreakpoints();
   const { navMenuKey } = useRouteParams();
 
@@ -103,24 +104,21 @@ const AppHeader = () => {
           <img
             src={`/images/${logoSrc}`}
             alt="sound-rig logo"
-            className="app-logo"
+            className="app-logo h-10 pl-2"
           />
         </Link>
       </Col>
       <Col className="pl-4" style={{ paddingTop: '2px' }}>
         <Menu
-          mode="horizontal"
-          selectedKeys={navMenuKey ? [navMenuKey] : []}
-          disabledOverflow
-        >
-          {MENU_ITEMS.map((m) => {
-            return (
-              <Menu.Item key={m.key}>
-                <Link to={m.path}>{m.text}</Link>
-              </Menu.Item>
-            );
+          selectedKey={navMenuKey}
+          items={MENU_ITEMS.map((i) => {
+            return {
+              label: i.text,
+              key: i.key,
+              path: i.path,
+            }
           })}
-        </Menu>
+        />
       </Col>
       <Col>
         <UserLogin />
@@ -128,5 +126,3 @@ const AppHeader = () => {
     </Row>
   );
 };
-
-export default AppHeader;

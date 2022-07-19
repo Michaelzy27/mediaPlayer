@@ -1,12 +1,9 @@
 import { Layout } from 'antd';
-import Auth from 'auth/Auth';
-import AppFooter from 'components/layout/AppFooter';
-import AppHeader from 'components/layout/AppHeader';
-import useIdleTimeout from 'hooks/useIdleTimeout';
 import { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
 import { ROUTES } from 'routes';
+import { AppHeader } from 'components/layout/AppHeader';
 
 const INACTIVITY_TIMEOUT = parseInt(
   process.env.REACT_APP_INACTIVITY_TIMEOUT_MS || '3600000'

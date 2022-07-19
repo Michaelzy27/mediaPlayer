@@ -1,4 +1,4 @@
-import UserMain from 'components/player/UserMain';
+import { UserMain } from 'components/player/UserMain';
 
 // specific create page for big picture learning
 import { DemoWallet } from '../components/player/DemoWallet';

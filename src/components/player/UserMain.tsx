@@ -302,7 +302,7 @@ const ListItem = ({
   );
 };
 
-const UserMain = () => {
+export const UserMain = () => {
   const [currentItem, setCurrentItem] = useState<IAssetInfo>();
   const songInfo: SongInfo = {
     thumbnail: createIpfsURL(currentItem?.info?.image) ?? '',
@@ -443,4 +443,3 @@ const UserMain = () => {
   );
 };
 
-export default UserMain;

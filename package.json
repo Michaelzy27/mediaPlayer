@@ -1,4 +1,12 @@
 {
+  "scripts": {
+    "start": "env-cmd -f .env.dev craco start",
+    "start:node17": "export NODE_OPTIONS=--openssl-legacy-provider && env-cmd -f .env.dev craco start",
+    "start:qa": "env-cmd -f .env.qa craco start",
+    "test": "craco test",
+    "build:qa": "env-cmd -f .env.qa craco build",
+    "build:prod": "env-cmd -f .env.prod craco build"
+  },
   "name": "sound-rig-frontend",
   "version": "0.1.0",
   "private": true,
@@ -8,6 +16,7 @@
     "antd": "^4.21.0",
     "axios": "0.21.1",
     "bech32": "^2.0.0",
+    "classnames": "^2.3.1",
     "dayjs": "^1.10.7",
     "env-cmd": "^10.1.0",
     "html-react-parser": "^1.4.0",
@@ -18,7 +27,6 @@
     "react-scripts": "4.0.3",
     "react-simple-oauth2-login": "^0.5.1",
     "recaptcha-v3": "^1.10.0",
-    "redux": "^4.2.0",
     "remixicon": "^2.5.0",
     "video-react": "^0.15.0"
   },
@@ -40,14 +48,6 @@
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "typescript": "^4.1.2",
     "webpack-bundle-analyzer": "^4.5.0"
-  },
-  "scripts": {
-    "start": "env-cmd -f .env.dev craco start",
-    "start:node17": "export NODE_OPTIONS=--openssl-legacy-provider && env-cmd -f .env.dev craco start",
-    "start:qa": "env-cmd -f .env.qa craco start",
-    "test": "craco test",
-    "build:qa": "env-cmd -f .env.qa craco build",
-    "build:prod": "env-cmd -f .env.prod craco build"
   },
   "eslintConfig": {
     "extends": [

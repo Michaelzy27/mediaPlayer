@@ -254,19 +254,19 @@ const useUser = (
       let assets: IAssetInfo[] = tempAssets.map(mapToAssetInfo);
       const r = await API.WalletAssetAPI.get(bech32Addr);
       if (r != null) {
-        assets = assets.concat(r.assets);
-        assets = assets.concat(r.assets);
-        assets = assets.concat(r.assets);
-        assets = assets.concat(r.assets);
+        // assets = assets.concat(r.assets);
+        // assets = assets.concat(r.assets);
+        // assets = assets.concat(r.assets);
+        // assets = assets.concat(r.assets);
       } else {
         await API.WalletAssetAPI.resync(bech32Addr);
         const r2 = await API.WalletAssetAPI.get(bech32Addr);
-        if (r2 != null) {
-          assets = assets.concat(r2.assets);
-          assets = assets.concat(r2.assets);
-          assets = assets.concat(r2.assets);
-          assets = assets.concat(r2.assets);
-        }
+        // if (r2 != null) {
+        //   assets = assets.concat(r2.assets);
+        //   assets = assets.concat(r2.assets);
+        //   assets = assets.concat(r2.assets);
+        //   assets = assets.concat(r2.assets);
+        // }
       }
       const lovelace = 1;
       const walletFunds: WalletFunds = {
