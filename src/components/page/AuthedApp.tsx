@@ -64,7 +64,7 @@ const AuthedApp = () => {
     <div className="App">
       <AuthedAppIdleTimeoutWrapper>
         <Layout>
-          <Layout.Header className="pl-0 pr-4">
+          <Layout.Header className="">
             <AppHeader />
           </Layout.Header>
           <Layout.Content>

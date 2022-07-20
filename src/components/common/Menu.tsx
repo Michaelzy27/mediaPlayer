@@ -25,7 +25,7 @@ export const Menu = ({items, selectedKey}: IMenuProps) => {
 }
 
 const MenuItem = ({label, selected, path}: IMenuItemProps) => {
-  return <div className={'py-1'}>
+  return <div className={''}>
     <Link to={path} className={classNames('px-8 py-3 text-lg font-bold rounded transition-all duration-300', {
       'text-white bg-black': !selected,
       'text--primary bg-blue-200': selected
