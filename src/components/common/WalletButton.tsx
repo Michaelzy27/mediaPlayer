@@ -79,7 +79,7 @@ const ConnectButton = () => {
          className={`
                 px-8 py-3
                 text-lg font-bold rounded
-                text--primary bg-blue-200
+                text--primary bg-red-300
                 cursor-pointer`}
       >
         {'Connect Wallet'}
