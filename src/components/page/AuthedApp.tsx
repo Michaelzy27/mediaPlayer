@@ -5,10 +5,6 @@ import 'remixicon/fonts/remixicon.css';
 import { ROUTES } from 'routes';
 import { AppHeader } from 'components/layout/AppHeader';
 
-const INACTIVITY_TIMEOUT = parseInt(
-  process.env.REACT_APP_INACTIVITY_TIMEOUT_MS || '3600000'
-);
-
 const RouteComponentWithTitle = (props: {
   title: string;
   element: () => JSX.Element;
@@ -38,24 +34,9 @@ const createRoute = (route: any, index: number) => {
 
 /// NOTE: this is utilized to prevent wasted re-rendering by the use of useNavigate
 const AuthedAppIdleTimeoutWrapper = (props: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-
-  // TODO
   const user = {
     userId: 'TODO',
   };
-
-  // useIdleTimeout(
-  //   INACTIVITY_TIMEOUT,
-  //   ['mousedown', 'keydown', 'touchstart'],
-  //   () => {
-  //     signOut().then(() => {
-  //       // TODO: signout action
-  //       navigate('/');
-  //     });
-  //   },
-  //   user?.userId
-  // );
   return <>{props.children}</>;
 };
 

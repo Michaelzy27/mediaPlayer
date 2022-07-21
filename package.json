@@ -1,11 +1,8 @@
 {
   "scripts": {
-    "start": "env-cmd -f .env.dev craco start",
-    "start:node17": "export NODE_OPTIONS=--openssl-legacy-provider && env-cmd -f .env.dev craco start",
-    "start:qa": "env-cmd -f .env.qa craco start",
-    "test": "craco test",
-    "build:qa": "env-cmd -f .env.qa craco build",
-    "build:prod": "env-cmd -f .env.prod craco build"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "name": "sound-rig-frontend",
   "version": "0.1.0",
@@ -21,13 +18,14 @@
     "env-cmd": "^10.1.0",
     "html-react-parser": "^1.4.0",
     "lodash": "^4.17.21",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "4.0.3",
     "react-simple-oauth2-login": "^0.5.1",
     "recaptcha-v3": "^1.10.0",
     "remixicon": "^2.5.0",
+    "uuid": "^8.3.2",
     "video-react": "^0.15.0"
   },
   "devDependencies": {
@@ -37,16 +35,20 @@
     "@types/jest": "^27.0.2",
     "@types/lodash": "^4.14.176",
     "@types/node": "^16.10.3",
-    "@types/react": "^17.0.27",
-    "@types/react-dom": "^17.0.9",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
+    "@types/uuid": "^8.3.4",
     "@types/video-react": "^0.15.0",
+    "@vitejs/plugin-react": "^2.0.0",
     "antd-dayjs-webpack-plugin": "^1.0.6",
     "autoprefixer": "^9",
     "craco-less": "^1.18.0",
     "postcss": "^7",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
-    "typescript": "^4.1.2",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.1",
+    "vite-tsconfig-paths": "^3.5.0",
     "webpack-bundle-analyzer": "^4.5.0"
   },
   "eslintConfig": {
