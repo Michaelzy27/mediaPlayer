@@ -78,8 +78,8 @@ const ConnectButton = () => {
       <a onClick={handleConnectWallet}
          className={`
                 px-8 py-3
+                bg-primary text-primary-contrast
                 text-lg font-bold rounded
-                text--primary bg-red-300
                 cursor-pointer`}
       >
         {'Connect Wallet'}
@@ -94,7 +94,7 @@ const SignOutButton = () => {
          className={`
                 px-8 py-3
                 text-lg font-bold rounded
-                text--primary bg-blue-200
+                bg-primary text-primary-contrast
                 cursor-pointer`}
       >{'Sign Out'}</a>
     </div>

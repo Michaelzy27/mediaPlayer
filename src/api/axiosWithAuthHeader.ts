@@ -2,9 +2,10 @@ import axios from 'axios';
 import Auth from 'auth/Auth';
 import { signOut } from '../utils/auth';
 
-console.log(import.meta)
+console.log(import.meta.env)
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 axiosInstance.interceptors.request.use(
