@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/*@import url('https://fonts.googleapis.com/css2?family=Lato&family=Poiret+One&display=swap');*/
+
 body {
   margin: 0;
   padding: 0;
@@ -30,5 +32,5 @@ code {
 }
 
 .style__buttons {
-  @apply p-2 flex justify-center items-center bg-transparent rounded-[25%] transition-all duration-200 hover:bg-[color:var(--color-secondary-bg-for-transparent)]
+  @apply p-2 flex justify-center items-center bg-transparent transition-all duration-200
 }
