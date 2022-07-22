@@ -12,6 +12,7 @@ module.exports = {
         primary: '#0BC8F7',
         'primary-contrast': 'white',
         secondary: '#1DA57A',
+        link: '#8ab4f8',
       }
     }
   },

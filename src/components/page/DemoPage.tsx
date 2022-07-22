@@ -32,8 +32,8 @@ export const DemoPage = () => {
   if (assets == null){
     return <div className={ 'flex-1 grid items-center justify-center' }>
       <div className={'text-center grid gap-2'}>
-        <div className={'text-6xl font-bold'}> Demo </div>
-        <div className={'text-xl font-bold'}> Loading wallet... </div>
+        {/*<div className={'text-6xl font-bold'}> Demo </div>*/}
+        <div className={'text-xl font-bold'}> Loading demo wallet... </div>
       </div>
     </div>
   }

@@ -12,6 +12,7 @@ import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
 import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
+import { Link } from 'react-router-dom';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -52,8 +53,8 @@ const VIDEO_MEDIA_TYPE = {
 
 const EXCLUDE = [
   'af2e27f580f7f08e93190a81f72462f153026d06450924726645891b44524950',
-  'eebf7f0deadaf8bbf24f032012f46311a0c77da84ad9ceb624e52d48',
-]
+  'eebf7f0deadaf8bbf24f032012f46311a0c77da84ad9ceb624e52d48'
+];
 
 export interface IPlayFunctions {
   load: (file: string | undefined) => void,
@@ -63,40 +64,50 @@ export interface IPlayFunctions {
 }
 
 export const Player = (props: PlayerProps) => {
-  const refVideo = useRef<HTMLVideoElement>(null);
 
   const assets = props.assets.filter((asset) => {
     if (asset.unit === 'lovelace') return false;
     const file = asset?.info?.file;
-    const policy  = getPolicyId(asset.unit);
+    const policy = getPolicyId(asset.unit);
     return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType)
       && !EXCLUDE.includes(asset.unit)
       && !EXCLUDE.includes(policy);
   }) ?? [];
 
+  if (assets.length === 0) {
+    return <div className={'flex-1 grid items-center justify-center'}>
+      <div className={'text-center grid gap-2'}>
+        <div className={'text-6xl font-bold'}> No music found :(</div>
+        <div className={'text-xl font-bold'}> Get some TUN3Z <Link to={'/mint'} className={'text-link'}>here</Link>
+        </div>
+      </div>
+    </div>;
+  }
+
+  const refVideo = useRef<HTMLVideoElement>(null);
   const [currentItem, setCurrentItem] = useState<IAssetInfo | undefined>();
   const [hoverItem, setHoverItem] = useState<IAssetInfo | null>(null);
   const [playFunctions, setPlayFunctions] = useState<IPlayFunctions | undefined>();
   const [isPlaying, setPlaying] = useState<boolean>(false);
 
   const selectPlayAsset = (asset: IAssetInfo) => {
-    console.log('SELECT and PLAY')
+    console.log('SELECT and PLAY');
     setCurrentItem(asset);
     playFunctions?.load(asset.info.file?.src);
-  }
+  };
 
   useEffect(() => {
     const el = refVideo.current;
-    if (el){
+    if (el) {
       el.onpause = () => {
         setPlaying(false);
-      }
+      };
       el.onended = () => {
         handleNextSong();
-      }
+      };
       el.onplay = () => {
         setPlaying(true);
-      }
+      };
       setPlayFunctions({
         load: (file) => {
           const src = fromIPFS(file);
@@ -104,12 +115,12 @@ export const Player = (props: PlayerProps) => {
             el.onloadeddata = () => {
               console.log('LOADED');
               el.play();
-            }
+            };
             el.src = src;
           }
         },
         play: () => {
-          el.play()
+          el.play();
         },
         pause: () => {
           el.pause();
@@ -120,9 +131,9 @@ export const Player = (props: PlayerProps) => {
       });
       return () => {
         setPlayFunctions(undefined);
-      }
+      };
     }
-  }, [refVideo, setPlaying, currentItem])
+  }, [refVideo, setPlaying, currentItem]);
 
   const handlePrevSong = useCallback(() => {
     const currentIndex = assets.findIndex(
@@ -138,7 +149,7 @@ export const Player = (props: PlayerProps) => {
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex >= 0 && currentIndex < assets.length - 1) {
-      console.log('Play next song')
+      console.log('Play next song');
       selectPlayAsset(assets[currentIndex + 1]);
     }
   }, [currentItem, selectPlayAsset, assets]);
@@ -154,18 +165,24 @@ export const Player = (props: PlayerProps) => {
     setHoverItem(asset);
   };
 
+  const hasImage = currentItem || hoverItem;
   return (
     <div className={'flex-1 grid items-center mb-[40px]'}>
       <div className={'flex w-full lg:justify-between'}>
         <div />
         <div className={'ml-4 lg:ml-0'}>
           <div className={classNames('w-[calc(100vh-220px)] h-[calc(100vh-220px)] rounded-xl', {
-            'border border-slate-800': !currentItem && !hoverItem
+            'border border-slate-800 grid items-center justify-center': !hasImage
           })}>
-            {(currentItem || hoverItem)
-              && <img alt={'album image'}
+            {hasImage &&
+              <img alt={'album image'}
                       className={'object-contain h-full w-full rounded-xl'}
                       src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
+            {!hasImage &&
+              <div>
+                <div className={'font-bold text-3xl'}>Choose a TUN3!</div>
+              </div>
+            }
           </div>
         </div>
         <div>
@@ -191,8 +208,8 @@ export const Player = (props: PlayerProps) => {
                        file={currentItem?.info?.file} songInfo={songInfo} />
       }
 
-      <video controls ref={refVideo} className="fixed bottom-8 left-8 hidden">
-        <source type="audio/mpeg"></source>
+      <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'>
+        <source type='audio/mpeg'></source>
       </video>
     </div>
   );
