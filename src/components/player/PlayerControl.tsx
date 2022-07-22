@@ -159,6 +159,7 @@ const RepeatControl = ({ refVideo }: {
 
   return isLoop ? (
     <Button
+      disabled
       type='primary'
       onClick={handleRepeat}
       className='mx-2 my-0'
@@ -166,6 +167,7 @@ const RepeatControl = ({ refVideo }: {
     />
   ) : (
     <Button
+      disabled
       onClick={handleRepeat}
       className='mx-2 my-0'
       icon={<i className='ri-repeat-2-line text-lg'></i>}

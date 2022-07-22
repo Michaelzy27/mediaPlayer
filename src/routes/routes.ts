@@ -20,6 +20,12 @@ export const ROUTES = [
     component: DemoPage
   },
   {
+    path: '/demo',
+    title: 'Demo Wallet',
+    exact: true,
+    component: DemoPage
+  },
+  {
     path: '/mint',
     title: 'Mint ur own song',
     exact: true,
@@ -41,7 +47,7 @@ export const MENU_ITEMS = [
   },
   {
     key: 'demo',
-    path: '/demo/addr1q9hksp2l33ump9zgsx50jzz8kxpa6gg2nkl7a6mylv9dx8rmj9yzruu59zpne7ks62vdhx86dcx9kwujazfq98zwn9kql5nct5',
+    path: '/demo',
     text: 'Demo'
   },
   {

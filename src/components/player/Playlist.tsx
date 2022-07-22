@@ -129,7 +129,7 @@ const PlaylistItem = (props : {
     >
       <img src={fromIPFS(asset.info.image)} className={'w-12 h-12 object-contain'}/>
       <div className={'flex-1 grid'}>
-        <div className={'font-bold'}>{asset.info.name}</div>
+        <div className={'font-bold'}>{asset.info.file?.name ?? asset.info.name}</div>
         <div className={'text-gray-400'}>{asset.info.artist}</div>
       </div>
       <div className={'mr-2'}>

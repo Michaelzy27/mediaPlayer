@@ -54,7 +54,7 @@ export const App = () => {
             <Routes>{ROUTES.map(createRoute)}</Routes>
           </Layout.Content>
           <Layout.Footer>
-            <div className={'bg-slate-800 text-center'}>
+            <div className={'bg-slate-800 text-center py-1'}>
               © 2022 SoundRig
             </div>
           </Layout.Footer>
