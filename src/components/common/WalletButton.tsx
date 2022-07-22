@@ -137,7 +137,7 @@ const ConnectButton = () => {
              onMouseEnter={hover.handleMouseEnter}
              onMouseLeave={hover.handleMouseLeave}
       >
-        <div className={'border-2 rounded-lg p-1'}>
+        <div className={'border-2 rounded-lg p-1 bg-black'}>
           {WALLETS.map((i) => {
             return <WalletItem key={i.key} item={i} onClick={handleConnectWallet}/>
           })}

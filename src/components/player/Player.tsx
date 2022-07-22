@@ -6,13 +6,10 @@ import {
 import { Button, Col, Image, List, Popover, Row, Spin, Tabs } from 'antd';
 import { IAssetInfo } from 'api/wallet-asset';
 import ResponsiveContainer from 'components/common/ResponsiveContainer';
-import Slider, { formatTime } from 'components/player/Slider';
-import useUser from 'hooks/useUser';
 import {
   RefObject,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState
 } from 'react';
@@ -22,6 +19,7 @@ import * as React from 'react';
 import { PlayerControl } from './PlayerControl';
 import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
+import { formatTime } from '../../utils/formatTime';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -313,7 +311,7 @@ export const Player = (props: PlayerProps) => {
           <div className={'w-[calc(100vh-220px)] h-[calc(100vh-220px)]'}>
             {(currentItem || hoverItem)
               && <img alt={'album image'}
-                      className={'object-cover '}
+                      className={'object-contain h-full w-full'}
                       src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
           </div>
         </div>
