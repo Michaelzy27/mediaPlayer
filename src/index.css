@@ -35,3 +35,7 @@ code {
 .style__buttons {
   @apply p-2 flex justify-center items-center bg-transparent transition-all duration-200
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+     display: none;
+}

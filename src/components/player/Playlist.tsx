@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 
 export const Playlist = (props: {
+  className?: string
   assets: IAssetInfo[]
   onItemHover?: (asset: IAssetInfo | null) => void,
   onItemClick?: (asset: IAssetInfo) => void,
@@ -19,7 +20,7 @@ export const Playlist = (props: {
   const [observer, setObserver] = useState(null);
 
   return (
-    <div ref={ref} className={'h-[calc(100vh-200px)] overflow-auto'}>
+    <div ref={ref} className={classNames(props.className,' overflow-auto hide-scrollbar')}>
       {assets.map((i) => {
         return <PlaylistItem key={i.unit} asset={i}
                              container={ref}

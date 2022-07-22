@@ -28,7 +28,7 @@ const MenuItem = ({label, selected, path}: IMenuItemProps) => {
   return <div className={''}>
     <Link to={path} className={classNames('px-8 py-3 text-lg font-bold rounded transition-all duration-300', {
       'text-white': !selected,
-      'text-primary': selected
+      'text-primary bg-slate-900': selected
     })}>{label}</Link>
   </div>
 }

@@ -20,6 +20,7 @@ import { PlayerControl } from './PlayerControl';
 import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
 import { formatTime } from '../../utils/formatTime';
+import classNames from 'classnames';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -102,9 +103,9 @@ export const Player = (props: PlayerProps) => {
 
   return (
     <div className={'flex-1 grid items-center mb-[40px]'}>
-      <div className={'flex w-full justify-between'}>
-        <div/>
-        <div className={''}>
+      <div className={'flex w-full lg:justify-between'}>
+        <div />
+        <div className={'ml-4 lg:ml-0'}>
           <div className={'w-[calc(100vh-220px)] h-[calc(100vh-220px)]'}>
             {(currentItem || hoverItem)
               && <img alt={'album image'}
@@ -114,12 +115,14 @@ export const Player = (props: PlayerProps) => {
         </div>
         <div>
           <Playlist assets={assets} onItemHover={handleItemHover}
+                    className={classNames('lg:relative lg:mt-0 lg:w-auto lg:h-[calc(100vh-220px)] ',
+                      'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => setCurrentItem(asset)}
                     hoveredItem={hoverItem?.unit}
                     selectedItem={currentItem?.unit}
           />
         </div>
-        <div/>
+        <div />
       </div>
 
       {/* Absolute */}
