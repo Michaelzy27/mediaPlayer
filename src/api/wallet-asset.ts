@@ -7,7 +7,11 @@ export interface IAssetInfo {
   info: {
     name: string;
     image: string;
-    file: any;
+    file?: {
+      mediaType: string;
+      name: string;
+      src: string;
+    };
     artist: string;
   };
 }

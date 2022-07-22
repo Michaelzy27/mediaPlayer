@@ -5,11 +5,6 @@ import { IAssetInfo } from '../../api/wallet-asset';
 
 export const HomePage = () => {
   const { user } = useUser('user-main');
-  const filteredAssets: IAssetInfo[] = useMemo(() => {
-    return (
-      user.walletFunds?.assets.filter((asset) => asset?.info?.file?.src) ?? []
-    );
-  }, [user]);
 
   if (user == null || user.walletFunds == null){
     return <div className={ 'flex-1 grid items-center justify-center' }>
@@ -20,5 +15,5 @@ export const HomePage = () => {
     </div>
   }
 
-  return <Player assets={filteredAssets}/>
+  return <Player assets={user.walletFunds.assets}/>
 }

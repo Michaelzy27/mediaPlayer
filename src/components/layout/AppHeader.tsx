@@ -12,7 +12,7 @@ export const AppHeader = () => {
 
   return (
     <div className={'flex'}>
-      <div className={'pl-2'}>
+      <div className={'pl-2 min-w-[260px]'}>
         <Link to='/' aria-label='Home'>
           <img
             src={`/images/${logoSrc}`}
@@ -33,7 +33,7 @@ export const AppHeader = () => {
           })}
         />
       </div>
-      <div className={'pr-4'}>
+      <div className={'pr-4 min-w-[260px] flex justify-end'}>
         <WalletButton />
       </div>
     </div>

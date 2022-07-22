@@ -10,7 +10,8 @@ export interface IFile extends Record<string, any> {
   src: string;
 }
 
-export const createIpfsURL = (srcStr?: string) => {
+export const createIpfsURL = (srcStr?: string) : string | undefined => {
+  if (typeof srcStr !== 'string') return;
   const ipfsURL = 'https://ipfs.blockfrost.dev/ipfs/';
   const ipfsPrefix = 'ipfs://';
   return srcStr && ipfsURL + srcStr.replace(ipfsPrefix, '');

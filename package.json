@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "vite",
+    "start": "vite",
     "build": "tsc && vite build",
     "build-raw": "vite build",
     "preview": "vite preview"
