@@ -1,9 +1,11 @@
 echo "Building with yarn"
 
 BUILD_DIR=dist/
-AWS_PROFILE=$1
+AWS_PROFILE=${1:-sound-rig}
 S3_DIR="s3://sound-rig-web" 
 CLOUDFRONT_DIST_ID="EW6DUEBWUWNY2"
+
+echo AWS_PROFILE=$AWS_PROFILE
 
 rm -rf $BUILD_DIR
 yarn build-raw
