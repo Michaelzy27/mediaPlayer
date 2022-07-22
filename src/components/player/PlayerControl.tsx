@@ -14,7 +14,6 @@ interface PlayerControlProps {
   songInfo: SongInfo;
 }
 
-
 export const PlayerControl = ({ refVideo, onPrevSong, onNextSong, file, songInfo }: PlayerControlProps) => {
   if (file == null){
     return <></>

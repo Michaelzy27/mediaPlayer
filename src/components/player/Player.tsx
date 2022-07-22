@@ -102,40 +102,38 @@ const ListItem = ({
   );
 };
 
-export const Player = () => {
+interface PlayerProps {
+  assets: IAssetInfo[]
+}
+
+export const Player = ({assets} : PlayerProps) => {
   const [currentItem, setCurrentItem] = useState<IAssetInfo>();
   const songInfo: SongInfo = {
     thumbnail: createIpfsURL(currentItem?.info?.image) ?? '',
     title: currentItem?.info?.name ?? '',
     artistsNames: currentItem?.info?.artist ?? '',
   };
-  const { user } = useUser('user-main');
 
   const refVideo = useRef<HTMLVideoElement>(null);
 
-  const filteredAssets = useMemo(() => {
-    return (
-      user.walletFunds?.assets.filter((asset) => asset?.info?.file?.src) ?? []
-    );
-  }, [user]);
 
   const handlePrevSong = useCallback(() => {
-    const currentIndex = filteredAssets.findIndex(
+    const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      setCurrentItem(filteredAssets[currentIndex - 1]);
+      setCurrentItem(assets[currentIndex - 1]);
     }
-  }, [currentItem, setCurrentItem, filteredAssets]);
+  }, [currentItem, setCurrentItem, assets]);
 
   const handleNextSong = useCallback(() => {
-    const currentIndex = filteredAssets.findIndex(
+    const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
-    if (currentIndex >= 0 && currentIndex < filteredAssets.length - 1) {
-      setCurrentItem(filteredAssets[currentIndex + 1]);
+    if (currentIndex >= 0 && currentIndex < assets.length - 1) {
+      setCurrentItem(assets[currentIndex + 1]);
     }
-  }, [currentItem, setCurrentItem, filteredAssets]);
+  }, [currentItem, setCurrentItem, assets]);
 
   useEffect(() => {
     if (refVideo.current) {
@@ -154,17 +152,17 @@ export const Player = () => {
   }, [currentItem]);
 
   useEffect(() => {
-    if (filteredAssets.length > 0 && currentItem == null) {
-      setCurrentItem(filteredAssets[0]);
-    } else if (filteredAssets.length === 0) {
+    if (assets.length > 0 && currentItem == null) {
+      setCurrentItem(assets[0]);
+    } else if (assets.length === 0) {
       setCurrentItem(undefined);
     }
-  }, [filteredAssets, currentItem]);
+  }, [assets, currentItem]);
 
   return (
     <>
       <ResponsiveContainer wide className="mt-24 mb-12">
-        {user.walletFunds != null && (
+        {assets != null && (
           <Row className="h-full">
             <Col span={24} lg={15}>
               <Image
@@ -191,7 +189,7 @@ export const Player = () => {
                     >
                       <List
                         itemLayout="horizontal"
-                        dataSource={user.walletFunds?.assets}
+                        dataSource={assets}
                         renderItem={(item) => {
                           return (
                             <ListItem
@@ -220,3 +218,4 @@ export const Player = () => {
     </>
   );
 };
+
