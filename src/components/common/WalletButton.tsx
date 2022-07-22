@@ -76,7 +76,7 @@ const ConnectButton = () => {
   return (
     <div>
       <a onClick={handleConnectWallet}
-         className={`
+         className={`hover:bg-white hover:no-underline
                 px-8 py-3
                 bg-primary text-primary-contrast
                 text-lg font-bold rounded

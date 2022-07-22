@@ -17,7 +17,8 @@ import {
   useState,
 } from 'react';
 import 'video-react/dist/video-react.css';
-import ButtonPlay, { createIpfsURL } from './ButtonPlay';
+import ButtonPlay, { createIpfsURL, IFile } from './ButtonPlay';
+import * as React from 'react';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -302,7 +303,7 @@ const ListItem = ({
   );
 };
 
-export const UserMain = () => {
+export const Player = () => {
   const [currentItem, setCurrentItem] = useState<IAssetInfo>();
   const songInfo: SongInfo = {
     thumbnail: createIpfsURL(currentItem?.info?.image) ?? '',
@@ -411,30 +412,8 @@ export const UserMain = () => {
             </Col>
           </Row>
         )}
-        {/* Player start */}
-        <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-black fixed inset-x-0 bottom-0 z-[100]">
-          {/* Player controls start */}
-          <SongSliderControl refVideo={refVideo} />
-          <div className="flex flex-row h-full px-4 z-[-1] w-full justify-between">
-            <div className="flex justify-left items-center">
-              <Button
-                onClick={handlePrevSong}
-                className="mx-2 my-0"
-                icon={<StepBackwardOutlined className="text-2xl" />}
-              />
-              <ButtonPlay file={currentItem?.info?.file} refVideo={refVideo} />
-              <Button
-                onClick={handleNextSong}
-                className="mx-2 my-0"
-                icon={<StepForwardOutlined className="text-2xl" />}
-              />
-            </div>
-            <TrackInfo songInfo={songInfo} />
-            <RightGroupControl refVideo={refVideo} />
-          </div>
-          {/* Player controls end */}
-        </div>
-        {/* Player end */}
+        <PlayerControl refVideo={refVideo} onPrevSong={handlePrevSong} onNextSong={handleNextSong}
+                       file={currentItem?.info.file}  songInfo={songInfo}/>
         <video controls ref={refVideo} className="fixed bottom-8 left-8 hidden">
           <source type="audio/mpeg"></source>
         </video>
@@ -443,3 +422,33 @@ export const UserMain = () => {
   );
 };
 
+interface PlayerControlProps {
+  refVideo: RefObject<HTMLVideoElement>;
+  onPrevSong: React.MouseEventHandler<HTMLElement>;
+  onNextSong: React.MouseEventHandler<HTMLElement>;
+  file: IFile;
+  songInfo: SongInfo;
+}
+const PlayerControl = ({refVideo, onPrevSong, onNextSong, file, songInfo}: PlayerControlProps) => {
+  return <div className="flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-black fixed inset-x-0 bottom-0 z-[100]">
+    <SongSliderControl refVideo={refVideo} />
+    <div className="flex flex-row h-full px-4 z-[-1] w-full justify-between">
+      <div className="flex justify-left items-center">
+        <Button
+          onClick={onPrevSong}
+          className="mx-2 my-0"
+          icon={<StepBackwardOutlined className="text-2xl" />}
+        />
+        <ButtonPlay file={file} refVideo={refVideo} />
+        <Button
+          onClick={onNextSong}
+          className="mx-2 my-0"
+          icon={<StepForwardOutlined className="text-2xl" />}
+        />
+      </div>
+      <TrackInfo songInfo={songInfo} />
+      <RightGroupControl refVideo={refVideo} />
+    </div>
+    {/* Player controls end */}
+  </div>
+}

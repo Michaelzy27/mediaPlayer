@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Poiret+One&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*@import url('https://fonts.googleapis.com/css2?family=Lato&family=Poiret+One&display=swap');*/
 
 body {
   margin: 0;

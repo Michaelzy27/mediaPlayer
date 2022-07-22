@@ -40,7 +40,7 @@ const AuthedAppIdleTimeoutWrapper = (props: { children: React.ReactNode }) => {
   return <>{props.children}</>;
 };
 
-const AuthedApp = () => {
+export const AuthedApp = () => {
   return (
     <div className="App">
       <AuthedAppIdleTimeoutWrapper>
@@ -60,4 +60,3 @@ const AuthedApp = () => {
   );
 };
 
-export default AuthedApp;

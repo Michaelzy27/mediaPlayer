@@ -1,10 +1,11 @@
-import { UserMain } from 'components/player/UserMain';
+import { Player } from 'components/player/Player';
 
 // specific create page for big picture learning
 import { DemoWallet } from '../components/player/DemoWallet';
+import { HomePage } from '../components/page/HomePage';
 
 export const ROUTES = [
-  { path: '/', title: 'Home', exact: true, component: UserMain },
+  { path: '/', title: 'Home', exact: true, component: HomePage },
   {
     path: '/demo/:wallet',
     title: 'Demo Wallet',
