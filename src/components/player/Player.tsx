@@ -306,10 +306,16 @@ export const Player = (props: PlayerProps) => {
   console.log('SELECT', currentItem);
 
   return (
-    <div className={'flex-1 grid items-center justify-center'}>
-      <div className={'flex'}>
-        <div className={'w-[400px]'}>
-          {(currentItem || hoverItem) && <img src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
+    <div className={'flex-1 grid items-center mb-[40px]'}>
+      <div className={'flex w-full justify-between'}>
+        <div/>
+        <div className={''}>
+          <div className={'w-[calc(100vh-220px)] h-[calc(100vh-220px)]'}>
+            {(currentItem || hoverItem)
+              && <img alt={'album image'}
+                      className={'object-cover '}
+                      src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
+          </div>
         </div>
         <div>
           <Playlist assets={assets} onItemHover={handleItemHover}
@@ -318,7 +324,10 @@ export const Player = (props: PlayerProps) => {
                     selectedItem={currentItem?.unit}
           />
         </div>
+        <div/>
       </div>
+
+      {/* Absolute */}
       {currentItem &&
         <PlayerControl refVideo={refVideo} onPrevSong={handlePrevSong} onNextSong={handleNextSong}
                        file={currentItem?.info?.file} songInfo={songInfo} />

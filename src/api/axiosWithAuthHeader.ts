@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(function(value) {
   return value
 }, async function(error) {
-  if (error.response.status === 403) {
+  if (error.response?.status === 403) {
     await signOut();
   }
   // console.error('ERROR', JSON.stringify(error.response, null, 2))

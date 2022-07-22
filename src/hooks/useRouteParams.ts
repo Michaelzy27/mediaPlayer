@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { MENU_ITEMS } from 'routes';
+import { MENU_ITEMS } from 'routes/routes';
 
 const useRouteParams = () => {
   const [selectedMenuKey, setSelectedMenuKey] = useState<string>();

@@ -84,7 +84,7 @@ export const WalletButton = () => {
 
 const WalletItem = ({item, onClick}: {item: IWallet, onClick?: (i: IWallet) => void}) => {
   return (
-    <div className={'flex items-center w-full cursor-pointer hover:bg-slate-800 px-4 py-2'}
+    <div className={'flex items-center w-full cursor-pointer rounded-lg hover:bg-slate-800 px-4 py-2'}
          onClick={() => onClick?.(item)}
     >
       <img src={item.icon} className={'h-[36px] w-[36px] mr-8'}/>
@@ -132,11 +132,12 @@ const ConnectButton = () => {
       >
         {'Connect Wallet'}
       </a>
+      {/* Dropdown */}
       {hover.isHover && <div className={'absolute top-0 right-0 mt-[46px] pt-[10px] w-full'}
              onMouseEnter={hover.handleMouseEnter}
              onMouseLeave={hover.handleMouseLeave}
       >
-        <div className={'border '}>
+        <div className={'border-2 rounded-lg p-1'}>
           {WALLETS.map((i) => {
             return <WalletItem key={i.key} item={i} onClick={handleConnectWallet}/>
           })}

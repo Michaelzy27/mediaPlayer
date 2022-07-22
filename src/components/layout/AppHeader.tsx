@@ -1,7 +1,7 @@
 import useBreakpoints from 'hooks/useBreakpoints';
 import useRouteParams from 'hooks/useRouteParams';
 import { Link } from 'react-router-dom';
-import { MENU_ITEMS } from 'routes';
+import { MENU_ITEMS } from 'routes/routes';
 import { Menu } from '../common/Menu';
 import { WalletButton } from '../common/WalletButton';
 

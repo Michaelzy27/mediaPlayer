@@ -1,9 +1,5 @@
 import { IAssetInfo } from '../../api/wallet-asset';
 import { RefObject, useEffect, useState } from 'react';
-import ButtonPlay, { createIpfsURL } from './ButtonPlay';
-import { formatTime } from './Slider';
-import { Button, List, Popover, Spin } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
 import * as React from 'react';
 import { useHover } from '../../hooks/useHover';
 import { fromIPFS } from '../../utils/fromIPFS';
@@ -59,7 +55,7 @@ const PlaylistItem = (props : {
   }, [isHover])
 
   return (
-    <div className={classNames('border cursor-pointer flex gap-4', {
+    <div className={classNames('border-b cursor-pointer flex gap-4 p-2', {
       'bg-slate-800 ': props.selected,
       'bg-slate-800': isHover,
     })}

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader } from './components/layout/AppHeader';
-import { ROUTES } from './routes';
+import { ROUTES } from './routes/routes';
 
 
 const RouteComponentWithTitle = (props: {
