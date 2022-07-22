@@ -2,6 +2,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build-raw": "vite build",
     "preview": "vite preview"
   },
   "name": "sound-rig-frontend",
