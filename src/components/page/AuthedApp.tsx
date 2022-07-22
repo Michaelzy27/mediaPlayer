@@ -48,12 +48,14 @@ export const AuthedApp = () => {
           <Layout.Header className="">
             <AppHeader />
           </Layout.Header>
-          <Layout.Content>
+          <Layout.Content className={'flex'}>
             <Routes>{ROUTES.map(createRoute)}</Routes>
           </Layout.Content>
-          {/* <Layout.Footer>
-            <AppFooter />
-          </Layout.Footer> */}
+          <Layout.Footer>
+            <div className={'bg-slate-800 text-center'}>
+              © 2022 SoundRig
+            </div>
+          </Layout.Footer>
         </Layout>
       </AuthedAppIdleTimeoutWrapper>
     </div>
