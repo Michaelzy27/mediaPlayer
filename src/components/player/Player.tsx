@@ -1,6 +1,5 @@
 import { IAssetInfo } from 'api/wallet-asset';
 import {
-  RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -81,6 +80,7 @@ export const Player = (props: PlayerProps) => {
   const [isPlaying, setPlaying] = useState<boolean>(false);
 
   const selectPlayAsset = (asset: IAssetInfo) => {
+    console.log('SELECT and PLAY')
     setCurrentItem(asset);
     playFunctions?.load(asset.info.file?.src);
   }
@@ -88,9 +88,11 @@ export const Player = (props: PlayerProps) => {
   useEffect(() => {
     const el = refVideo.current;
     if (el){
-
       el.onpause = () => {
         setPlaying(false);
+      }
+      el.onended = () => {
+        handleNextSong();
       }
       el.onplay = () => {
         setPlaying(true);
@@ -100,6 +102,7 @@ export const Player = (props: PlayerProps) => {
           const src = fromIPFS(file);
           if (src) {
             el.onloadeddata = () => {
+              console.log('LOADED');
               el.play();
             }
             el.src = src;
@@ -119,7 +122,7 @@ export const Player = (props: PlayerProps) => {
         setPlayFunctions(undefined);
       }
     }
-  }, [refVideo])
+  }, [refVideo, setPlaying, currentItem])
 
   const handlePrevSong = useCallback(() => {
     const currentIndex = assets.findIndex(
@@ -135,6 +138,7 @@ export const Player = (props: PlayerProps) => {
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex >= 0 && currentIndex < assets.length - 1) {
+      console.log('Play next song')
       selectPlayAsset(assets[currentIndex + 1]);
     }
   }, [currentItem, selectPlayAsset, assets]);
@@ -155,16 +159,18 @@ export const Player = (props: PlayerProps) => {
       <div className={'flex w-full lg:justify-between'}>
         <div />
         <div className={'ml-4 lg:ml-0'}>
-          <div className={'w-[calc(100vh-220px)] h-[calc(100vh-220px)]'}>
+          <div className={classNames('w-[calc(100vh-220px)] h-[calc(100vh-220px)] rounded-xl', {
+            'border border-slate-800': !currentItem && !hoverItem
+          })}>
             {(currentItem || hoverItem)
               && <img alt={'album image'}
-                      className={'object-contain h-full w-full'}
+                      className={'object-contain h-full w-full rounded-xl'}
                       src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
           </div>
         </div>
         <div>
           <Playlist assets={assets} onItemHover={handleItemHover}
-                    className={classNames('lg:relative lg:mt-0 lg:w-auto lg:h-[calc(100vh-220px)] ',
+                    className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
                       selectPlayAsset(asset);

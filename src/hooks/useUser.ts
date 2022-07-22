@@ -251,7 +251,8 @@ const useUser = (
   const getAsset = useCallback(async (addressHex?: string) => {
     if (addressHex) {
       const bech32Addr = getBech32EncodedAddress(addressHex);
-      let assets: IAssetInfo[] = tempAssets.map(mapToAssetInfo);
+      // let assets: IAssetInfo[] = tempAssets.map(mapToAssetInfo);
+      let assets: IAssetInfo[] = [];
       const r = await API.WalletAssetAPI.get(bech32Addr);
       if (r != null) {
         assets = assets.concat(r.assets);

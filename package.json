@@ -3,7 +3,8 @@
     "start": "vite",
     "build": "tsc && vite build",
     "build-raw": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "./deploy.sh sound-rig"
   },
   "name": "sound-rig-frontend",
   "version": "0.1.0",
