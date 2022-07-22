@@ -21,6 +21,7 @@ import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
 import { formatTime } from '../../utils/formatTime';
 import classNames from 'classnames';
+import { getPolicyId } from '../../utils/cardano';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -59,12 +60,21 @@ const VIDEO_MEDIA_TYPE = {
   'video/mp4': {}
 };
 
+const EXCLUDE = [
+  'af2e27f580f7f08e93190a81f72462f153026d06450924726645891b44524950',
+  'eebf7f0deadaf8bbf24f032012f46311a0c77da84ad9ceb624e52d48',
+]
+
 export const Player = (props: PlayerProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
 
   const assets = props.assets.filter((asset) => {
+    if (asset.unit === 'lovelace') return false;
     const file = asset?.info?.file;
-    return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType);
+    const policy  = getPolicyId(asset.unit);
+    return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType)
+      && !EXCLUDE.includes(asset.unit)
+      && !EXCLUDE.includes(policy);
   }) ?? [];
 
   const [currentItem, setCurrentItem] = useState<IAssetInfo | undefined>();
@@ -98,8 +108,6 @@ export const Player = (props: PlayerProps) => {
     /// set image
     setHoverItem(asset);
   };
-
-  console.log('SELECT', currentItem);
 
   return (
     <div className={'flex-1 grid items-center mb-[40px]'}>

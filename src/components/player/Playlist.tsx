@@ -64,7 +64,6 @@ const PlaylistItem = (props : {
         const r = e[0].intersectionRatio;
         if (!duration && r > 0.5){
 
-          console.log('INTERSECT', );
           loadTime().then((loaded) => {
             if (loaded){
               observer.unobserve(el_);
@@ -120,12 +119,18 @@ const PlaylistItem = (props : {
     })}
       onMouseEnter={h.handleMouseEnter}
       onMouseLeave={h.handleMouseLeave}
-      onClick={() => props.onItemClick?.(props.asset)}
+      onClick={(e) => {
+        if (e.altKey){
+          console.log(props.asset)
+          window.open(`https://k5ez40j8h4.execute-api.us-east-1.amazonaws.com/api/v1/asset/${asset.unit}`, '__blank')
+        }
+        return props.onItemClick?.(props.asset);
+      }}
     >
       <img src={fromIPFS(asset.info.image)} className={'w-12 h-12 object-contain'}/>
       <div className={'flex-1 grid'}>
-        <div>{asset.info.name}</div>
-        <div>{asset.info.artist}</div>
+        <div className={'font-bold'}>{asset.info.name}</div>
+        <div className={'text-gray-400'}>{asset.info.artist}</div>
       </div>
       <div className={'mr-2'}>
         {duration &&
