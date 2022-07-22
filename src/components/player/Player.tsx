@@ -1,11 +1,4 @@
-import {
-  MoreOutlined,
-  StepBackwardOutlined,
-  StepForwardOutlined
-} from '@ant-design/icons';
-import { Button, Col, Image, List, Popover, Row, Spin, Tabs } from 'antd';
 import { IAssetInfo } from 'api/wallet-asset';
-import ResponsiveContainer from 'components/common/ResponsiveContainer';
 import {
   RefObject,
   useCallback,
@@ -14,12 +7,10 @@ import {
   useState
 } from 'react';
 import 'video-react/dist/video-react.css';
-import ButtonPlay, { createIpfsURL, IFile } from './ButtonPlay';
 import * as React from 'react';
 import { PlayerControl } from './PlayerControl';
 import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
-import { formatTime } from '../../utils/formatTime';
 import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 
@@ -65,6 +56,13 @@ const EXCLUDE = [
   'eebf7f0deadaf8bbf24f032012f46311a0c77da84ad9ceb624e52d48',
 ]
 
+export interface IPlayFunctions {
+  load: (file: string | undefined) => void,
+  play: () => void,
+  pause: () => void,
+  isPlaying: () => boolean,
+}
+
 export const Player = (props: PlayerProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
 
@@ -79,27 +77,70 @@ export const Player = (props: PlayerProps) => {
 
   const [currentItem, setCurrentItem] = useState<IAssetInfo | undefined>();
   const [hoverItem, setHoverItem] = useState<IAssetInfo | null>(null);
+  const [playFunctions, setPlayFunctions] = useState<IPlayFunctions | undefined>();
+  const [isPlaying, setPlaying] = useState<boolean>(false);
+
+  const selectPlayAsset = (asset: IAssetInfo) => {
+    setCurrentItem(asset);
+    playFunctions?.load(asset.info.file?.src);
+  }
+
+  useEffect(() => {
+    const el = refVideo.current;
+    if (el){
+
+      el.onpause = () => {
+        setPlaying(false);
+      }
+      el.onplay = () => {
+        setPlaying(true);
+      }
+      setPlayFunctions({
+        load: (file) => {
+          const src = fromIPFS(file);
+          if (src) {
+            el.onloadeddata = () => {
+              el.play();
+            }
+            el.src = src;
+          }
+        },
+        play: () => {
+          el.play()
+        },
+        pause: () => {
+          el.pause();
+        },
+        isPlaying: () => {
+          return !el.paused;
+        }
+      });
+      return () => {
+        setPlayFunctions(undefined);
+      }
+    }
+  }, [refVideo])
 
   const handlePrevSong = useCallback(() => {
     const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      setCurrentItem(assets[currentIndex - 1]);
+      selectPlayAsset(assets[currentIndex - 1]);
     }
-  }, [currentItem, setCurrentItem, assets]);
+  }, [currentItem, selectPlayAsset, assets]);
 
   const handleNextSong = useCallback(() => {
     const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex >= 0 && currentIndex < assets.length - 1) {
-      setCurrentItem(assets[currentIndex + 1]);
+      selectPlayAsset(assets[currentIndex + 1]);
     }
-  }, [currentItem, setCurrentItem, assets]);
+  }, [currentItem, selectPlayAsset, assets]);
 
   const songInfo: SongInfo = {
-    thumbnail: createIpfsURL(currentItem?.info?.image) ?? '',
+    thumbnail: fromIPFS(currentItem?.info?.image) ?? '',
     title: currentItem?.info?.name ?? '',
     artistsNames: currentItem?.info?.artist ?? ''
   };
@@ -125,7 +166,9 @@ export const Player = (props: PlayerProps) => {
           <Playlist assets={assets} onItemHover={handleItemHover}
                     className={classNames('lg:relative lg:mt-0 lg:w-auto lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
-                    onItemClick={(asset) => setCurrentItem(asset)}
+                    onItemClick={(asset) => {
+                      selectPlayAsset(asset);
+                    }}
                     hoveredItem={hoverItem?.unit}
                     selectedItem={currentItem?.unit}
           />
@@ -136,8 +179,15 @@ export const Player = (props: PlayerProps) => {
       {/* Absolute */}
       {currentItem &&
         <PlayerControl refVideo={refVideo} onPrevSong={handlePrevSong} onNextSong={handleNextSong}
+                       isPlaying={isPlaying}
+                       onPlay={() => playFunctions?.play()}
+                       onPause={() => playFunctions?.pause()}
                        file={currentItem?.info?.file} songInfo={songInfo} />
       }
+
+      <video controls ref={refVideo} className="fixed bottom-8 left-8 hidden">
+        <source type="audio/mpeg"></source>
+      </video>
     </div>
   );
 };

@@ -8,16 +8,22 @@ import { SongInfo } from './Player';
 
 interface PlayerControlProps {
   refVideo: RefObject<HTMLVideoElement>;
-  onPrevSong: React.MouseEventHandler<HTMLElement>;
-  onNextSong: React.MouseEventHandler<HTMLElement>;
+  onPrevSong: () => void;
+  onNextSong: () => void;
+  onPlay: () => void;
+  onPause: () => void;
   file?: IFile;
   songInfo: SongInfo;
+  isPlaying: boolean;
 }
 
-export const PlayerControl = ({ refVideo, onPrevSong, onNextSong, file, songInfo }: PlayerControlProps) => {
-  if (file == null){
+export const PlayerControl = (props: PlayerControlProps) => {
+  const { refVideo, onPrevSong, onNextSong, file, songInfo } = props;
+  const el = refVideo.current
+  if (file == null || el == null){
     return <></>
   }
+
   return <div
     className='flex flex-col justify-around h-16 backdrop-saturate-[180%] backdrop-blur-[30px] bg-black fixed inset-x-0 bottom-0 z-[100]'>
     <SongSliderControl refVideo={refVideo} />
@@ -28,7 +34,7 @@ export const PlayerControl = ({ refVideo, onPrevSong, onNextSong, file, songInfo
           className='mx-2 my-0'
           icon={<StepBackwardOutlined className='text-2xl' />}
         />
-        <ButtonPlay file={file} refVideo={refVideo} />
+        <ButtonPlay isPlaying={props.isPlaying} onClick={() => props.isPlaying ? props.onPause() : props.onPlay()}/>
         <Button
           onClick={onNextSong}
           className='mx-2 my-0'
