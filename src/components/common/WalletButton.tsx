@@ -6,11 +6,13 @@ import Auth from '../../auth/Auth';
 import useUser from '../../hooks/useUser';
 import { signOut } from '../../utils/auth';
 import { useHover } from '../../hooks/useHover';
+import classNames from 'classnames';
 
 interface IWallet {
   key: string,
   icon: string
   name: string
+  disabled?: boolean,
 }
 
 const WALLETS: IWallet[] = [
@@ -25,19 +27,21 @@ const WALLETS: IWallet[] = [
     name: 'Eternl',
   },
   {
-    key: 'typhon',
-    icon: '/images/wallets/typhon.svg',
-    name: 'Typhon',
-  },
-  {
     key: 'gero',
     icon: '/images/wallets/gero.svg',
     name: 'Gero',
   },
   {
+    key: 'typhon',
+    icon: '/images/wallets/typhon.svg',
+    name: 'Typhon',
+    disabled: true,
+  },
+  {
     key: 'flint',
     icon: '/images/wallets/flint.svg',
     name: 'Flint',
+    disabled: true,
   },
 ]
 
@@ -84,16 +88,20 @@ export const WalletButton = () => {
 
 const WalletItem = ({item, onClick}: {item: IWallet, onClick?: (i: IWallet) => void}) => {
   return (
-    <div className={'flex items-center w-full cursor-pointer rounded-lg hover:bg-slate-800 px-4 py-2'}
+    <div className={classNames('flex items-center w-full cursor-pointer rounded-lg hover:bg-slate-800 px-4 py-2', {
+      'pointer-events-none text-gray-500': item.disabled,
+    })}
          onClick={() => onClick?.(item)}
     >
-      <img src={item.icon} className={'h-[36px] w-[36px] mr-8'}/>
+      <img src={item.icon} className={classNames('h-[36px] w-[36px] mr-8', {
+        'grayscale': item.disabled
+      })}/>
       <div className={'text-lg'}>{item.name}</div>
     </div>
     )
 }
 
-const ConnectButton = () => {
+const ConnectButton = (props: { }) => {
   const cardano = useCardano();
   const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
   const hover = useHover();
@@ -124,11 +132,14 @@ const ConnectButton = () => {
     <div className={'relative z-10 select-none'}>
       <a onMouseEnter={hover.handleMouseEnter}
          onMouseLeave={hover.handleMouseLeave}
-         className={`hover:bg-white hover:no-underline
+         className={classNames(`
                 px-8 py-3
-                bg-primary text-primary-contrast
+                bg-primary
                 text-lg font-bold rounded
-                cursor-pointer`}
+                cursor-pointer`, {
+           'bg-slate-700 text-primary': hover.isHover,
+           'text-primary-contrast': !hover.isHover,
+         })}
       >
         {'Connect Wallet'}
       </a>
