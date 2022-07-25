@@ -1,8 +1,76 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import API from 'api';
+import {Buffer} from 'buffer'
+
+globalThis.Buffer = Buffer;
 
 export enum CARDANO_WALLET_PROVIDER {
   NAMI = 'NAMI',
+  ETERNL = 'ETERNL',
+  GERO = 'GERO',
+  TYPHON = 'TYPHON',
+  FLINT = 'FLINT',
+}
+
+interface ICardanoWallet {
+  enable: Function;
+  getUsedAddresses: Function;
+  signData: Function;
+  getStakeAddress: Function;
+}
+
+declare global {
+  interface Window {
+    a: string;
+    cardano: {
+      nami: {
+        enable: Function
+      }
+    };
+    __nami: INamiPlugin;
+  }
+}
+
+const getWalletInstance = async (provider: CARDANO_WALLET_PROVIDER) : Promise<ICardanoWallet | null> => {
+  if (provider === CARDANO_WALLET_PROVIDER.NAMI){
+    return await window.cardano.nami.enable();
+  }
+  return null
+}
+
+const wallets: {[key in CARDANO_WALLET_PROVIDER]?: ICardanoWallet | null | undefined} = {};
+
+export const useWallet = (provider: CARDANO_WALLET_PROVIDER) => {
+  const [wallet, setWallet] = useState(wallets[provider]);
+  const get = async  () => {
+    if (wallet === undefined) {
+      /// try to get wallet
+      const ans = await getWalletInstance(provider)
+      wallets[provider] = ans;
+      setWallet(ans);
+      return ans;
+    }
+    else {
+      return wallet;
+    }
+  }
+
+  return {get};
+}
+
+export const useWallets = () => {
+  const nami = useWallet(CARDANO_WALLET_PROVIDER.NAMI);
+  const eternal = useWallet(CARDANO_WALLET_PROVIDER.ETERNL);
+  const gero = useWallet(CARDANO_WALLET_PROVIDER.GERO);
+  const typhon = useWallet(CARDANO_WALLET_PROVIDER.TYPHON);
+  const flint = useWallet(CARDANO_WALLET_PROVIDER.FLINT);
+  return {
+    [CARDANO_WALLET_PROVIDER.NAMI] : nami,
+      [CARDANO_WALLET_PROVIDER.ETERNL] : eternal,
+    [CARDANO_WALLET_PROVIDER.GERO] : gero,
+    [CARDANO_WALLET_PROVIDER.TYPHON] : typhon,
+    [CARDANO_WALLET_PROVIDER.FLINT] : flint,
+  }
 }
 
 interface INamiConfigPlugin {
@@ -23,21 +91,6 @@ interface ICardanoConfigPlugin {
   nami: INamiConfigPlugin;
 }
 
-interface ICardanoPlugin {
-  enable: Function;
-  getUsedAddresses: Function;
-  signData: Function;
-  // add by Chau 2022-06-14 start
-  getStakeAddress: Function;
-  // add by Chau 2022-06-14 end
-}
-
-declare global {
-  interface Window {
-    cardano: ICardanoConfigPlugin;
-    __nami: INamiPlugin;
-  }
-}
 // add by Chau 2022-06-14 start
 
 interface GetStakeAddressResponse {
@@ -55,7 +108,7 @@ function toHexString(str: string) {
   }).join('');
 }
 
-const useCardano = (): ICardanoPlugin => {
+const useCardanoOld = (): ICardanoWallet => {
   const enable = useCallback(
     async (walletProvider: CARDANO_WALLET_PROVIDER) => {
       if (walletProvider === CARDANO_WALLET_PROVIDER.NAMI) {
@@ -133,4 +186,3 @@ const useCardano = (): ICardanoPlugin => {
   };
 };
 
-export default useCardano;

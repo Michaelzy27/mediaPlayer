@@ -1,15 +1,16 @@
 import { notification } from 'antd';
 import API from 'api';
 import { getErrorMessageObj } from 'utils/response';
-import useCardano, { CARDANO_WALLET_PROVIDER } from '../../hooks/useCardano';
+import { CARDANO_WALLET_PROVIDER, useWallet, useWallets } from '../../hooks/useWallet';
 import Auth from '../../auth/Auth';
 import useUser from '../../hooks/useUser';
 import { signOut } from '../../utils/auth';
 import { useHover } from '../../hooks/useHover';
 import classNames from 'classnames';
 
+
 interface IWallet {
-  key: string,
+  key: CARDANO_WALLET_PROVIDER,
   icon: string
   name: string
   disabled?: boolean,
@@ -17,28 +18,28 @@ interface IWallet {
 
 const WALLETS: IWallet[] = [
   {
-    key: 'nami',
+    key: CARDANO_WALLET_PROVIDER.NAMI,
     icon: '/images/wallets/nami.svg',
     name: 'Nami',
   },
   {
-    key: 'eternl',
+    key: CARDANO_WALLET_PROVIDER.ETERNL,
     icon: '/images/wallets/eternl.webp',
     name: 'Eternl',
   },
   {
-    key: 'gero',
+    key: CARDANO_WALLET_PROVIDER.GERO,
     icon: '/images/wallets/gero.svg',
     name: 'Gero',
   },
   {
-    key: 'typhon',
+    key: CARDANO_WALLET_PROVIDER.TYPHON,
     icon: '/images/wallets/typhon.svg',
     name: 'Typhon',
     disabled: true,
   },
   {
-    key: 'flint',
+    key: CARDANO_WALLET_PROVIDER.FLINT,
     icon: '/images/wallets/flint.svg',
     name: 'Flint',
     disabled: true,
@@ -102,30 +103,55 @@ const WalletItem = ({item, onClick}: {item: IWallet, onClick?: (i: IWallet) => v
 }
 
 const ConnectButton = (props: { }) => {
-  const cardano = useCardano();
-  const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
+  const wallets = useWallets();
   const hover = useHover();
 
-  const handleConnectWallet = async (wallet: IWallet) => {
-    await cardano.enable(walletProvider);
-    const usedAddresses = await cardano.getUsedAddresses(walletProvider);
-    console.log('used', usedAddresses);
-    const addressHex = usedAddresses[0];
+  const handleConnectWallet = async (i: IWallet) => {
+    const wallet = wallets[i.key];
+    const walletInstance = await wallet.get();
+    if (walletInstance == null){
+      notification.error({message: 'Wallet is not available'});
+    }
+    else {
+      const usedAddresses = await walletInstance.getUsedAddresses();
+      console.log('used', usedAddresses);
+      const addressHex = usedAddresses[0];
 
-    const [data, error] = await API.User.getAuth(addressHex);
-    if (error) {
-      notification['error'](getErrorMessageObj(error));
-      return;
+      const [data, error] = await API.User.getAuth(addressHex);
+      if (error) {
+        notification['error'](getErrorMessageObj(error));
+        return;
+      }
+
+      const payload = Buffer.from(data.message, 'utf-8').toString('hex');
+
+      console.log('SIGNING', {addressHex, payload})
+      const { signature, key } = await walletInstance.signData(
+        addressHex,
+        payload
+      );
+      await sendAuth(addressHex, signature, key);
     }
 
-    const payload = data.message;
-
-    const { signature, key } = await cardano.signData(
-      walletProvider,
-      addressHex,
-      payload
-    );
-    await sendAuth(addressHex, signature, key);
+    // await cardano.enable(walletProvider);
+    // const usedAddresses = await cardano.getUsedAddresses(walletProvider);
+    // console.log('used', usedAddresses);
+    // const addressHex = usedAddresses[0];
+    //
+    // const [data, error] = await API.User.getAuth(addressHex);
+    // if (error) {
+    //   notification['error'](getErrorMessageObj(error));
+    //   return;
+    // }
+    //
+    // const payload = data.message;
+    //
+    // const { signature, key } = await cardano.signData(
+    //   walletProvider,
+    //   addressHex,
+    //   payload
+    // );
+    // await sendAuth(addressHex, signature, key);
   };
 
   return (

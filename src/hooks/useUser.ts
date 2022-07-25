@@ -3,7 +3,6 @@ import { getBech32EncodedAddress } from 'api/utils';
 import { IAssetInfo } from 'api/wallet-asset';
 import Auth, { AuthState } from 'auth/Auth';
 import { useCallback, useEffect, useState } from 'react';
-import useCardano, { CARDANO_WALLET_PROVIDER } from './useCardano';
 
 const tempAssets: Asset[] = [
   {
@@ -243,10 +242,6 @@ const useUser = (
 } => {
   const [walletAddress, setWalletAddress] = useState<string>();
   const [walletFunds, setWalletFunds] = useState<WalletFunds>();
-
-  const cardano = useCardano();
-
-  const walletProvider = CARDANO_WALLET_PROVIDER.NAMI;
 
   const getAsset = useCallback(async (addressHex?: string) => {
     if (addressHex) {

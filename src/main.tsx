@@ -15,8 +15,11 @@ const showErrorOverlay = (err: any) => {
   const ErrorOverlay = customElements.get('vite-error-overlay')
   // don't open outside vite environment
   if (!ErrorOverlay) {return}
-  console.log(err)
-  const overlay = new ErrorOverlay(err?.error ?? err)
+  console.error('ERROR', err)
+  const overlay = err.error?.message ? new ErrorOverlay(err.error)
+    : err.message ? new ErrorOverlay(err)
+    : err.info ? new ErrorOverlay({message: err.info})
+    : new ErrorOverlay({message: err.toString()});
   document.body.appendChild(overlay)
 }
 
