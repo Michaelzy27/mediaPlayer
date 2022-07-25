@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 import API from 'api';
 import { getErrorMessageObj } from 'utils/response';
-import { CARDANO_WALLET_PROVIDER, useWallet, useWallets } from '../../hooks/useWallet';
+import { CARDANO_WALLET_PROVIDER, useWallets } from '../../hooks/useWallet';
 import Auth from '../../auth/Auth';
 import useUser from '../../hooks/useUser';
 import { signOut } from '../../utils/auth';
@@ -110,7 +110,7 @@ const ConnectButton = (props: { }) => {
     const wallet = wallets[i.key];
     const walletInstance = await wallet.get();
     if (walletInstance == null){
-      notification.error({message: 'Wallet is not available'});
+      notification.error({message: `${i.name} wallet is not available`});
     }
     else {
       const usedAddresses = await walletInstance.getUsedAddresses();
