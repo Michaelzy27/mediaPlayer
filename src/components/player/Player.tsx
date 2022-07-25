@@ -93,6 +93,35 @@ export const Player = (props: PlayerProps) => {
     playFunctions?.load(asset.info.file?.src);
   };
 
+  const handleNextSong = useCallback(() => {
+    const currentIndex = assets.findIndex(
+      (asset) => asset.unit === currentItem?.unit
+    );
+
+    console.log('NEXT REPEAT', repeatMode)
+
+    let next = currentIndex + 1;
+    if (repeatMode === REPEAT_MODE.ONE) {
+      next = currentIndex
+      selectPlayAsset(assets[next]);
+    }
+    else if (next >= assets.length)  {
+      if (repeatMode === REPEAT_MODE.REPEAT){
+        next = 0;
+        selectPlayAsset(assets[next]);
+      }
+      else {
+        next = 0;
+      }
+    }
+    else {
+      selectPlayAsset(assets[next]);
+    }
+
+    if (currentIndex >= 0 && currentIndex < assets.length - 1) {
+    }
+  }, [currentItem, selectPlayAsset, assets, repeatMode]);
+
   useEffect(() => {
     const el = refVideo.current;
     if (el) {
@@ -130,7 +159,7 @@ export const Player = (props: PlayerProps) => {
         setPlayFunctions(undefined);
       };
     }
-  }, [refVideo, setPlaying, currentItem]);
+  }, [refVideo, setPlaying, currentItem, repeatMode]);
 
   const handlePrevSong = useCallback(() => {
     const currentIndex = assets.findIndex(
@@ -141,15 +170,6 @@ export const Player = (props: PlayerProps) => {
     }
   }, [currentItem, selectPlayAsset, assets]);
 
-  const handleNextSong = useCallback(() => {
-    const currentIndex = assets.findIndex(
-      (asset) => asset.unit === currentItem?.unit
-    );
-    if (currentIndex >= 0 && currentIndex < assets.length - 1) {
-      console.log('Play next song');
-      selectPlayAsset(assets[currentIndex + 1]);
-    }
-  }, [currentItem, selectPlayAsset, assets]);
 
   const songInfo: SongInfo = {
     thumbnail: fromIPFS(currentItem?.info?.image) ?? '',
