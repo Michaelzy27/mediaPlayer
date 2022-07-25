@@ -1,6 +1,6 @@
 import { IAssetInfo } from 'api/wallet-asset';
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import 'video-react/dist/video-react.css';
 import { PlayerControl, REPEAT_MODE } from './PlayerControl';
 import { Playlist } from './Playlist';
@@ -8,6 +8,7 @@ import { fromIPFS } from '../../utils/fromIPFS';
 import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 import { Link } from 'react-router-dom';
+import { notification } from 'antd';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -58,16 +59,19 @@ export interface IPlayFunctions {
   isPlaying: () => boolean,
 }
 
+
 export const Player = (props: PlayerProps) => {
 
-  const assets = props.assets.filter((asset) => {
-    if (asset.unit === 'lovelace') return false;
-    const file = asset?.info?.file;
-    const policy = getPolicyId(asset.unit);
-    return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType)
-      && !EXCLUDE.includes(asset.unit)
-      && !EXCLUDE.includes(policy);
-  }) ?? [];
+  const assets = useMemo(() => {
+    return props.assets.filter((asset) => {
+      if (asset.unit === 'lovelace') return false;
+      const file = asset?.info?.file;
+      const policy = getPolicyId(asset.unit);
+      return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType)
+        && !EXCLUDE.includes(asset.unit)
+        && !EXCLUDE.includes(policy);
+    }) ?? [];
+  }, [props.assets]);
 
   if (assets.length === 0) {
     return <div className={'flex-1 grid items-center justify-center'}>
@@ -86,41 +90,57 @@ export const Player = (props: PlayerProps) => {
   const [isPlaying, setPlaying] = useState<boolean>(false);
   const [repeatMode, setRepeatMode] = useState<REPEAT_MODE>(REPEAT_MODE.REPEAT);
   const [isShuffle, setShuffle] = useState<boolean>(false);
+  const [playedSongs, setPlayedSongs] = useState<IAssetInfo[]>([]);
 
   const selectPlayAsset = (asset: IAssetInfo) => {
-    console.log('SELECT and PLAY');
+    if (currentItem != null){
+      setPlayedSongs([currentItem, ...playedSongs])
+    }
     setCurrentItem(asset);
     playFunctions?.load(asset.info.file?.src);
-  };
+  }
+
+  const selectPlayAssetNoHistory = (asset: IAssetInfo) => {
+    setCurrentItem(asset);
+    playFunctions?.load(asset.info.file?.src);
+  }
 
   const handleNextSong = useCallback(() => {
     const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
 
-    console.log('NEXT REPEAT', repeatMode)
+    console.log('NEXT REPEAT', repeatMode);
 
     let next = currentIndex + 1;
-    if (repeatMode === REPEAT_MODE.ONE) {
+    if (isShuffle && assets.length > 1) {
       next = currentIndex
+      while (next === currentIndex){
+        next = Math.floor(Math.random() * assets.length);
+      }
       selectPlayAsset(assets[next]);
     }
-    else if (next >= assets.length)  {
-      if (repeatMode === REPEAT_MODE.REPEAT){
+    else if (repeatMode === REPEAT_MODE.ONE) {
+      next = currentIndex;
+      selectPlayAsset(assets[next]);
+    } else if (next >= assets.length) {
+      if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
         selectPlayAsset(assets[next]);
-      }
-      else {
+      } else {
         next = 0;
       }
-    }
-    else {
+    } else if (next >= 0) {
+
       selectPlayAsset(assets[next]);
     }
 
-    if (currentIndex >= 0 && currentIndex < assets.length - 1) {
-    }
-  }, [currentItem, selectPlayAsset, assets, repeatMode]);
+  }, [currentItem, selectPlayAsset, assets, repeatMode, isShuffle]);
+
+  useEffect(() => {
+      notification.info({ message: 'Assets change' });
+    },
+    [assets]);
 
   useEffect(() => {
     const el = refVideo.current;
@@ -162,11 +182,18 @@ export const Player = (props: PlayerProps) => {
   }, [refVideo, setPlaying, currentItem, repeatMode]);
 
   const handlePrevSong = useCallback(() => {
+    if (playedSongs.length > 0){
+      const prevSong = playedSongs[0];
+      setPlayedSongs(playedSongs.slice(1));
+      selectPlayAssetNoHistory(prevSong);
+      notification.info({message: `prev song from hist ${playedSongs.length}`});
+      return;
+    }
     const currentIndex = assets.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      selectPlayAsset(assets[currentIndex - 1]);
+      selectPlayAssetNoHistory(assets[currentIndex - 1]);
     }
   }, [currentItem, selectPlayAsset, assets]);
 
@@ -193,8 +220,8 @@ export const Player = (props: PlayerProps) => {
           })}>
             {hasImage &&
               <img alt={'album image'}
-                      className={'object-contain h-full w-full rounded-xl'}
-                      src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
+                   className={'object-contain h-full w-full rounded-xl'}
+                   src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
             {!hasImage &&
               <div>
                 <div className={'font-bold text-3xl'}>Choose a TUN3!</div>
@@ -207,7 +234,7 @@ export const Player = (props: PlayerProps) => {
                     className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
-                      selectPlayAsset(asset);
+                      selectPlayAssetNoHistory(asset);
                     }}
                     hoveredItem={hoverItem?.unit}
                     selectedItem={currentItem?.unit}
@@ -222,9 +249,9 @@ export const Player = (props: PlayerProps) => {
                        repeatMode={repeatMode}
                        isShuffle={isShuffle}
                        onRepeat={() => {
-                         if (repeatMode === REPEAT_MODE.REPEAT) setRepeatMode(REPEAT_MODE.ONE) ;
-                         else if (repeatMode === REPEAT_MODE.ONE) setRepeatMode(REPEAT_MODE.NONE) ;
-                         else if (repeatMode === REPEAT_MODE.NONE) setRepeatMode(REPEAT_MODE.REPEAT) ;
+                         if (repeatMode === REPEAT_MODE.REPEAT) setRepeatMode(REPEAT_MODE.ONE);
+                         else if (repeatMode === REPEAT_MODE.ONE) setRepeatMode(REPEAT_MODE.NONE);
+                         else if (repeatMode === REPEAT_MODE.NONE) setRepeatMode(REPEAT_MODE.REPEAT);
                        }}
                        onShuffle={() => {
                          setShuffle(!isShuffle);
