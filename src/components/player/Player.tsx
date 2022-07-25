@@ -1,13 +1,8 @@
 import { IAssetInfo } from 'api/wallet-asset';
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
-import 'video-react/dist/video-react.css';
 import * as React from 'react';
-import { PlayerControl } from './PlayerControl';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import 'video-react/dist/video-react.css';
+import { PlayerControl, REPEAT_MODE } from './PlayerControl';
 import { Playlist } from './Playlist';
 import { fromIPFS } from '../../utils/fromIPFS';
 import classNames from 'classnames';
@@ -89,6 +84,8 @@ export const Player = (props: PlayerProps) => {
   const [hoverItem, setHoverItem] = useState<IAssetInfo | null>(null);
   const [playFunctions, setPlayFunctions] = useState<IPlayFunctions | undefined>();
   const [isPlaying, setPlaying] = useState<boolean>(false);
+  const [repeatMode, setRepeatMode] = useState<REPEAT_MODE>(REPEAT_MODE.REPEAT);
+  const [isShuffle, setShuffle] = useState<boolean>(false);
 
   const selectPlayAsset = (asset: IAssetInfo) => {
     console.log('SELECT and PLAY');
@@ -202,6 +199,16 @@ export const Player = (props: PlayerProps) => {
       {/* Absolute */}
       {currentItem &&
         <PlayerControl refVideo={refVideo} onPrevSong={handlePrevSong} onNextSong={handleNextSong}
+                       repeatMode={repeatMode}
+                       isShuffle={isShuffle}
+                       onRepeat={() => {
+                         if (repeatMode === REPEAT_MODE.REPEAT) setRepeatMode(REPEAT_MODE.ONE) ;
+                         else if (repeatMode === REPEAT_MODE.ONE) setRepeatMode(REPEAT_MODE.NONE) ;
+                         else if (repeatMode === REPEAT_MODE.NONE) setRepeatMode(REPEAT_MODE.REPEAT) ;
+                       }}
+                       onShuffle={() => {
+                         setShuffle(!isShuffle);
+                       }}
                        isPlaying={isPlaying}
                        onPlay={() => playFunctions?.play()}
                        onPause={() => playFunctions?.pause()}

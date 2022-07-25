@@ -5,13 +5,25 @@ import { Button, Popover } from 'antd';
 import { StepBackwardOutlined, StepForwardOutlined } from '@ant-design/icons';
 import Slider from './Slider';
 import { SongInfo } from './Player';
+import { TbArrowsShuffle2, TbRepeat, TbRepeatOff, TbRepeatOnce, TbVolume, TbVolumeOff } from 'react-icons/all';
+import classNames from 'classnames';
+
+export enum REPEAT_MODE {
+  NONE = 'NONE',
+  REPEAT = 'REPEAT',
+  ONE = 'ONE',
+}
 
 interface PlayerControlProps {
   refVideo: RefObject<HTMLVideoElement>;
+  repeatMode: REPEAT_MODE;
+  isShuffle: boolean,
+  onShuffle: () => void,
   onPrevSong: () => void;
   onNextSong: () => void;
   onPlay: () => void;
   onPause: () => void;
+  onRepeat: () => void;
   file?: IFile;
   songInfo: SongInfo;
   isPlaying: boolean;
@@ -19,9 +31,9 @@ interface PlayerControlProps {
 
 export const PlayerControl = (props: PlayerControlProps) => {
   const { refVideo, onPrevSong, onNextSong, file, songInfo } = props;
-  const el = refVideo.current
-  if (file == null || el == null){
-    return <></>
+  const el = refVideo.current;
+  if (file == null || el == null) {
+    return <></>;
   }
 
   return <div
@@ -34,7 +46,7 @@ export const PlayerControl = (props: PlayerControlProps) => {
           className='mx-2 my-0'
           icon={<StepBackwardOutlined className='text-2xl' />}
         />
-        <ButtonPlay isPlaying={props.isPlaying} onClick={() => props.isPlaying ? props.onPause() : props.onPlay()}/>
+        <ButtonPlay isPlaying={props.isPlaying} onClick={() => props.isPlaying ? props.onPause() : props.onPlay()} />
         <Button
           onClick={onNextSong}
           className='mx-2 my-0'
@@ -42,7 +54,11 @@ export const PlayerControl = (props: PlayerControlProps) => {
         />
       </div>
       <TrackInfo songInfo={songInfo} />
-      <RightGroupControl refVideo={refVideo} />
+      <RightGroupControl repeatMode={props.repeatMode}
+                         isShuffle={props.isShuffle}
+                         onShuffle={props.onShuffle}
+                         onRepeat={props.onRepeat}
+                         refVideo={refVideo} />
     </div>
     {/* Player controls end */}
   </div>;
@@ -109,15 +125,19 @@ const SongSliderControl = ({ refVideo }: {
   );
 };
 
-const RightGroupControl = ({ refVideo }: {
+const RightGroupControl = ({ refVideo, ...props }: {
+  repeatMode: REPEAT_MODE,
+  onRepeat: () => void,
+  isShuffle: boolean,
+  onShuffle: () => void,
   refVideo: RefObject<HTMLVideoElement>
 }) => {
   const [isPopoverVisible, setPopoverVisible] = useState<boolean>(false);
 
   const content = (
-    <div className='justify-center items-center flex'>
-      <RepeatControl refVideo={refVideo} />
-      <ShuffleControl />
+    <div className='justify-center items-center flex gap-2'>
+      <RepeatControl mode={props.repeatMode} onClick={props.onRepeat} />
+      <ShuffleControl isShuffle={props.isShuffle} onClick={props.onShuffle} />
       <VolumeControl refVideo={refVideo} />
       <VolumeSliderControl refVideo={refVideo} />
     </div>
@@ -125,9 +145,9 @@ const RightGroupControl = ({ refVideo }: {
 
   return (
     <div className='justify-center items-center ml-4 flex'>
-      <div className='justify-center items-center hidden sm:flex'>
-        <RepeatControl refVideo={refVideo} />
-        <ShuffleControl />
+      <div className='justify-center items-center hidden sm:flex gap-2'>
+        <RepeatControl mode={props.repeatMode} onClick={props.onRepeat} />
+        <ShuffleControl isShuffle={props.isShuffle} onClick={props.onShuffle} />
         <VolumeControl refVideo={refVideo} />
         <VolumeSliderControl refVideo={refVideo} />
       </div>
@@ -144,51 +164,38 @@ const RightGroupControl = ({ refVideo }: {
   );
 };
 
-const RepeatControl = ({ refVideo }: {
-  refVideo: RefObject<HTMLVideoElement>;
-}) => {
-  const [isLoop, setLoop] = useState<boolean>(refVideo.current?.loop ?? false);
-  const handleRepeat = () => {
-    setLoop(!isLoop);
-  };
-  useEffect(() => {
-    if (refVideo.current) {
-      refVideo.current.loop = isLoop;
-    }
-  }, [isLoop, refVideo]);
+const iconClass = 'h-6 w-6 ';
+const buttonClass = 'p-1.5 border rounded-md hover:bg-slate-700 cursor-pointer';
 
-  return isLoop ? (
-    <Button
-      disabled
-      type='primary'
-      onClick={handleRepeat}
-      className='mx-2 my-0'
-      icon={<i className='ri-repeat-one-line text-lg'></i>}
-    />
-  ) : (
-    <Button
-      disabled
-      onClick={handleRepeat}
-      className='mx-2 my-0'
-      icon={<i className='ri-repeat-2-line text-lg'></i>}
-    />
+const RepeatControl = (props: {
+  mode: REPEAT_MODE,
+  onClick: () => void,
+}) => {
+  return (
+    <div
+      onClick={props.onClick}
+      className={buttonClass}
+    >
+      {props.mode === REPEAT_MODE.REPEAT ? <TbRepeat className={iconClass} /> :
+        props.mode === REPEAT_MODE.NONE ? <TbRepeatOff className={iconClass} /> :
+          <TbRepeatOnce className={iconClass} />}
+    </div>
   );
 };
 
-const ShuffleControl = () => {
-  const [isShuffle, setShuffle] = useState<boolean>(false);
-  const handleShuffle = () => {
-    setShuffle(!isShuffle);
-  };
-
+const ShuffleControl = (props: {
+  isShuffle: boolean,
+  onClick: () => void,
+}) => {
   return (
-    <Button
-      disabled
-      type={isShuffle ? 'primary' : undefined}
-      onClick={handleShuffle}
-      className='mx-2 my-0'
-      icon={<i className='ri-shuffle-line text-lg'></i>}
-    />
+    <div
+      onClick={props.onClick}
+      className={classNames(buttonClass, {
+        'bg-slate-500': props.isShuffle
+      })}
+    >
+      <TbArrowsShuffle2 className={iconClass} />
+    </div>
   );
 };
 
@@ -204,18 +211,15 @@ const VolumeControl = ({ refVideo }: {
       refVideo.current.muted = muted;
     }
   }, [muted, refVideo]);
-  return muted ? (
-    <Button
+  return (
+    <div
       onClick={handleMuteVolume}
-      className='mx-2 my-0'
-      icon={<i className='ri-volume-mute-line text-lg'></i>}
-    />
-  ) : (
-    <Button
-      onClick={handleMuteVolume}
-      className='mx-2 my-0'
-      icon={<i className='ri-volume-up-fill text-lg'></i>}
-    />
+      className={classNames(buttonClass, {
+      })}
+    >
+      {muted ? <TbVolumeOff className={iconClass}/> :
+      <TbVolume className={iconClass} />}
+    </div>
   );
 };
 

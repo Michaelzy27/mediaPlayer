@@ -49,7 +49,7 @@ const getWalletInstance = async (provider: CARDANO_WALLET_PROVIDER): Promise<ICa
     } else if (provider === CARDANO_WALLET_PROVIDER.ETERNL) {
       return await window.cardano.eternl?.enable();
     } else if (provider === CARDANO_WALLET_PROVIDER.GERO) {
-      return await window.cardano.eternl?.enable();
+      return await window.cardano.gerowallet?.enable();
     } else if (provider === CARDANO_WALLET_PROVIDER.TYPHON) {
       return await window.cardano.typhon?.enable();
     } else if (provider === CARDANO_WALLET_PROVIDER.FLINT) {
