@@ -93,17 +93,17 @@ export const Player = (props: PlayerProps) => {
   const [playedSongs, setPlayedSongs] = useState<IAssetInfo[]>([]);
 
   const selectPlayAsset = (asset: IAssetInfo) => {
-    if (currentItem != null){
-      setPlayedSongs([currentItem, ...playedSongs])
+    if (currentItem != null) {
+      setPlayedSongs([currentItem, ...playedSongs]);
     }
     setCurrentItem(asset);
     playFunctions?.load(asset.info.file?.src);
-  }
+  };
 
   const selectPlayAssetNoHistory = (asset: IAssetInfo) => {
     setCurrentItem(asset);
     playFunctions?.load(asset.info.file?.src);
-  }
+  };
 
   const handleNextSong = useCallback(() => {
     const currentIndex = assets.findIndex(
@@ -114,13 +114,12 @@ export const Player = (props: PlayerProps) => {
 
     let next = currentIndex + 1;
     if (isShuffle && assets.length > 1) {
-      next = currentIndex
-      while (next === currentIndex){
+      next = currentIndex;
+      while (next === currentIndex) {
         next = Math.floor(Math.random() * assets.length);
       }
       selectPlayAsset(assets[next]);
-    }
-    else if (repeatMode === REPEAT_MODE.ONE) {
+    } else if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
       selectPlayAsset(assets[next]);
     } else if (next >= assets.length) {
@@ -138,7 +137,7 @@ export const Player = (props: PlayerProps) => {
   }, [currentItem, selectPlayAsset, assets, repeatMode, isShuffle]);
 
   useEffect(() => {
-      notification.info({ message: 'Assets change' });
+    setPlayedSongs([]);
     },
     [assets]);
 
@@ -182,11 +181,11 @@ export const Player = (props: PlayerProps) => {
   }, [refVideo, setPlaying, currentItem, repeatMode]);
 
   const handlePrevSong = useCallback(() => {
-    if (playedSongs.length > 0){
+    if (playedSongs.length > 0) {
       const prevSong = playedSongs[0];
       setPlayedSongs(playedSongs.slice(1));
       selectPlayAssetNoHistory(prevSong);
-      notification.info({message: `prev song from hist ${playedSongs.length}`});
+      notification.info({ message: `prev song from hist ${playedSongs.length}` });
       return;
     }
     const currentIndex = assets.findIndex(
