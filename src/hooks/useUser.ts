@@ -258,7 +258,7 @@ const useUser = (
           assets = assets.concat(r2.assets);
         }
       }
-      const lovelace = 1;
+      const lovelace = parseInt(assets.find((i) => i.unit === 'lovelace')?.quantity ?? '-1');
       const walletFunds: WalletFunds = {
         stakeAddress: 'stakeAddress',
         lovelace: lovelace,
