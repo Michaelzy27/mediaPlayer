@@ -1,5 +1,4 @@
 import { notification } from 'antd';
-import API from 'api';
 import { getErrorMessageObj } from 'utils/response';
 import { CARDANO_WALLET_PROVIDER, useWallets } from '../../hooks/useWallet';
 import Auth from '../../auth/Auth';
@@ -9,6 +8,7 @@ import { useHover } from '../../hooks/useHover';
 import classNames from 'classnames';
 import { ADA_SYMBOL } from '../../utils/constants';
 import { lovelaceToADAString, shortWalletAddress } from '../../utils/string';
+import { UserAPI } from '../../api/user';
 
 
 interface IWallet {
@@ -48,30 +48,16 @@ const WALLETS: IWallet[] = [
   }
 ];
 
-const pingAuth = async () => {
-  const [data, error] = await API.User.pingAuth();
-  if (error) {
-    notification['error'](getErrorMessageObj(error));
-    return;
-  }
-};
 
 const sendAuth = async (
   addressHex: string,
   signature: string,
   key?: string
 ) => {
-  const [data, error] = await API.User.sendAuth(addressHex, signature, key);
-  if (error) {
-    notification['error'](getErrorMessageObj(error));
-    return;
-  }
+  const data = await UserAPI.sendAuth(addressHex, signature, key);
 
   const token = data.token;
   Auth.initSession(addressHex, token);
-
-  /// try pinging
-  await pingAuth();
 };
 
 export const WalletButton = () => {
@@ -134,20 +120,26 @@ const ConnectButton = (props: {}) => {
       console.log('used', usedAddresses);
       const addressHex = usedAddresses[0];
 
-      const [data, error] = await API.User.getAuth(addressHex);
-      if (error) {
-        notification['error'](getErrorMessageObj(error));
-        return;
-      }
+      const data = await UserAPI.getAuth(addressHex);
 
       const payload = Buffer.from(data.message, 'utf-8').toString('hex');
 
-      console.log('SIGNING', { addressHex, payload });
-      const { signature, key } = await walletInstance.signData(
+      console.log('SIGNING...', { addressHex, payload });
+      const signature = await walletInstance.signData(
         addressHex,
         payload
       );
-      await sendAuth(addressHex, signature, key);
+
+      console.log('SIGNATURE...', signature)
+
+      if (typeof signature === 'string' ){
+        await sendAuth(addressHex, signature);
+      }
+      else {
+
+        await sendAuth(addressHex, signature.signature, signature.key);
+      }
+
     }
   };
 

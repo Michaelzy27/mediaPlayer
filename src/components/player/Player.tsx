@@ -158,7 +158,6 @@ export const Player = (props: PlayerProps) => {
           const src = fromIPFS(file);
           if (src) {
             el.onloadeddata = () => {
-              console.log('LOADED');
               el.play();
             };
             el.src = src;
@@ -185,7 +184,7 @@ export const Player = (props: PlayerProps) => {
       const prevSong = playedSongs[0];
       setPlayedSongs(playedSongs.slice(1));
       selectPlayAssetNoHistory(prevSong);
-      notification.info({ message: `prev song from hist ${playedSongs.length}` });
+
       return;
     }
     const currentIndex = assets.findIndex(

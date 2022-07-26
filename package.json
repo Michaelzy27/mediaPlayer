@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "vite",
+    "ngrok": "ngrok http 5173",
     "build": "tsc && vite build",
     "build-raw": "vite build",
     "preview": "vite preview",

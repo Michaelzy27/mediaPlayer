@@ -4,6 +4,8 @@ import {App} from './App'
 import './index.css'
 import { HashRouter } from 'react-router-dom';
 
+console.log('DEBUG')
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <HashRouter>
     <App />

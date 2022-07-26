@@ -1,45 +1,29 @@
-import axiosInstance from './axiosWithAuthHeader';
-import { handleAPIPromise } from './utils';
+import { post } from './axiosWithAuthHeader';
 
-const getAuth = (walletAddress: string) => {
-  return handleAPIPromise(
-    axiosInstance.post('/get-auth', {
-      address: walletAddress,
-    })
-  );
-};
 
-const sendAuth = (walletAddress: string, signature: string, key?: string) => {
-  return handleAPIPromise(
-    axiosInstance.post('/send-auth', {
+export abstract class UserAPI {
+  static async getAuth(walletAddress: string) : Promise<{
+    message: string
+  }> {
+    return post('/get-auth', {
+      address: walletAddress
+    });
+  }
+
+  static async sendAuth(walletAddress: string, signature: string, key?: string) : Promise<{
+    token: string
+  }> {
+    return post('/send-auth', {
       signature,
       address: walletAddress,
-      key,
-    })
-  );
-};
+      key
+    });
+  }
 
-const pingAuth = () => {
-  return handleAPIPromise(axiosInstance.get('/ping-auth'));
-};
+  static async getStakeAddress(walletAddressHex: string) {
+    return post('/get-stakeAddress', {
+      address: walletAddressHex
+    });
+  }
+}
 
-// add by Chau 2022-06-14 start
-const getStakeAddress = (walletAddressHex: string) => {
-  return handleAPIPromise(
-    axiosInstance.post('/get-stakeAddress', {
-      address: walletAddressHex,
-    })
-  );
-};
-// add by Chau 2022-06-14 end
-
-const UserApi = {
-  getAuth,
-  sendAuth,
-  pingAuth,
-  // add by Chau 2022-06-14 start
-  getStakeAddress,
-  // add by Chau 2022-06-14 end
-};
-
-export default UserApi;

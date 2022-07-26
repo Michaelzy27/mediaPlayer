@@ -1,7 +1,7 @@
 import { Player } from '../player/Player';
 import { useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { IAssetInfo, WalletAssetDemoAPI } from '../../api/wallet-asset';
+import { IAssetInfo, WalletAssetAPI } from '../../api/wallet-asset';
 
 export const DemoPage = () => {
   const { wallet = 'addr1q9hksp2l33ump9zgsx50jzz8kxpa6gg2nkl7a6mylv9dx8rmj9yzruu59zpne7ks62vdhx86dcx9kwujazfq98zwn9kql5nct5' } = useParams<{ wallet: string }>();
@@ -11,15 +11,15 @@ export const DemoPage = () => {
   useEffect(() => {
     if (wallet != null){
       const wallet_ = wallet;
-      WalletAssetDemoAPI.get(wallet_).then(async (r) => {
+      WalletAssetAPI.get(wallet_).then(async (r) => {
         if (wallet_ === wallet){
           console.log(r)
           if (r != null){
             setAssets(r.assets);
           }
           else {
-            await WalletAssetDemoAPI.resync(wallet_);
-            const r2 = await WalletAssetDemoAPI.get(wallet_);
+            await WalletAssetAPI.resync(wallet_);
+            const r2 = await WalletAssetAPI.get(wallet_);
             if (r2 != null){
               setAssets(r2.assets);
             }

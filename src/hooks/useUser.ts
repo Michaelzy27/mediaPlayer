@@ -1,6 +1,5 @@
-import API from 'api';
 import { getBech32EncodedAddress } from 'api/utils';
-import { IAssetInfo } from 'api/wallet-asset';
+import { IAssetInfo, WalletAssetAPI } from 'api/wallet-asset';
 import Auth, { AuthState } from 'auth/Auth';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -248,12 +247,12 @@ const useUser = (
       const bech32Addr = getBech32EncodedAddress(addressHex);
       // let assets: IAssetInfo[] = tempAssets.map(mapToAssetInfo);
       let assets: IAssetInfo[] = [];
-      const r = await API.WalletAssetAPI.get(bech32Addr);
+      const r = await WalletAssetAPI.get(bech32Addr);
       if (r != null) {
         assets = assets.concat(r.assets);
       } else {
-        await API.WalletAssetAPI.resync(bech32Addr);
-        const r2 = await API.WalletAssetAPI.get(bech32Addr);
+        await WalletAssetAPI.resync(bech32Addr);
+        const r2 = await WalletAssetAPI.get(bech32Addr);
         if (r2 != null) {
           assets = assets.concat(r2.assets);
         }
