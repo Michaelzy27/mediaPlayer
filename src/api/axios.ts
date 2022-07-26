@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-export async function post<T>(path: string, payload: any) : Promise<T> {
+export async function POST<T>(path: string, payload: any) : Promise<T> {
   const response = await axiosInstance.post(path, payload, {
     validateStatus: (status) => status < 500
   });
@@ -17,7 +17,7 @@ export async function post<T>(path: string, payload: any) : Promise<T> {
   return response.data;
 }
 
-export async function get<T>(path: string): Promise<T | null> {
+export async function GET<T>(path: string): Promise<T | null> {
   const response = await axiosInstance.get(path, {
     validateStatus: (status) => status === 200 || status === 404
   });

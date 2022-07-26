@@ -1,5 +1,4 @@
 import { notification } from 'antd';
-import { getErrorMessageObj } from 'utils/response';
 import { CARDANO_WALLET_PROVIDER, useWallets } from '../../hooks/useWallet';
 import Auth from '../../auth/Auth';
 import useUser from '../../hooks/useUser';

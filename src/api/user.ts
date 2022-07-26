@@ -1,11 +1,11 @@
-import { post } from './axiosWithAuthHeader';
+import { POST } from './axios';
 
 
 export abstract class UserAPI {
   static async getAuth(walletAddress: string) : Promise<{
     message: string
   }> {
-    return post('/get-auth', {
+    return POST('/get-auth', {
       address: walletAddress
     });
   }
@@ -13,7 +13,7 @@ export abstract class UserAPI {
   static async sendAuth(walletAddress: string, signature: string, key?: string) : Promise<{
     token: string
   }> {
-    return post('/send-auth', {
+    return POST('/send-auth', {
       signature,
       address: walletAddress,
       key
@@ -21,7 +21,7 @@ export abstract class UserAPI {
   }
 
   static async getStakeAddress(walletAddressHex: string) {
-    return post('/get-stakeAddress', {
+    return POST('/get-stakeAddress', {
       address: walletAddressHex
     });
   }

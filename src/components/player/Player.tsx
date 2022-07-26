@@ -9,6 +9,8 @@ import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 import { Link } from 'react-router-dom';
 import { notification } from 'antd';
+import { loadAndDecrypt } from '../../utils/encryption';
+import { AssetAPI } from '../../api/asset';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -53,7 +55,10 @@ const EXCLUDE = [
 ];
 
 export interface IPlayFunctions {
-  load: (file: string | undefined) => void,
+  load: (file: {
+    encrypted: boolean,
+    src: string,
+  }) => void,
   play: () => void,
   pause: () => void,
   isPlaying: () => boolean,
@@ -92,17 +97,38 @@ export const Player = (props: PlayerProps) => {
   const [isShuffle, setShuffle] = useState<boolean>(false);
   const [playedSongs, setPlayedSongs] = useState<IAssetInfo[]>([]);
 
-  const selectPlayAsset = (asset: IAssetInfo) => {
+  const selectPlayAsset = async (asset: IAssetInfo) => {
     if (currentItem != null) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
     setCurrentItem(asset);
-    playFunctions?.load(asset.info.file?.src);
+
+    if (asset.info.file != null){
+      const info = await AssetAPI.get(asset.unit);
+      const [metadataFile] = info?.metadata.files;
+      const iv = metadataFile != null && metadataFile.iv;
+
+      playFunctions?.load({
+        src: asset.info.file.src,
+        encrypted: iv != null
+      });
+    }
+
   };
 
-  const selectPlayAssetNoHistory = (asset: IAssetInfo) => {
+  const selectPlayAssetNoHistory = async (asset: IAssetInfo) => {
     setCurrentItem(asset);
-    playFunctions?.load(asset.info.file?.src);
+
+    if (asset.info.file != null){
+      const info = await AssetAPI.get(asset.unit);
+      const [metadataFile] = info?.metadata.files;
+      const iv = metadataFile != null && metadataFile.iv;
+
+      playFunctions?.load({
+        src: asset.info.file.src,
+        encrypted: iv != null
+      });
+    }
   };
 
   const handleNextSong = useCallback(() => {
@@ -155,12 +181,21 @@ export const Player = (props: PlayerProps) => {
       };
       setPlayFunctions({
         load: (file) => {
-          const src = fromIPFS(file);
-          if (src) {
-            el.onloadeddata = () => {
-              el.play();
-            };
-            el.src = src;
+          if (file == null) return;
+          console.log(file)
+          if (file.encrypted){
+            /// load file into buffer
+            // loadAndDecrypt(file);
+            notification.error({message: 'TODO'});
+          }
+          else {
+            const src = fromIPFS(file.src);
+            if (src) {
+              el.onloadeddata = () => {
+                el.play();
+              };
+              el.src = src;
+            }
           }
         },
         play: () => {
