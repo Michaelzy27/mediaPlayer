@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { IAssetInfo, WalletAssetAPI } from '../../api/wallet-asset';
 
 export const DemoPage = () => {
-  const { wallet = 'addr1q9hksp2l33ump9zgsx50jzz8kxpa6gg2nkl7a6mylv9dx8rmj9yzruu59zpne7ks62vdhx86dcx9kwujazfq98zwn9kql5nct5' } = useParams<{ wallet: string }>();
+  const { wallet = 'addr1qxy6uuykhqde8hhdz3tf3wv93qg7ttyjtdk9vtwf30y80sf9pv8yrsxqv0azl2eld95p5zth5gzuejvd9kskndmrhu8slwv3r5' } = useParams<{ wallet: string }>();
 
   const [assets, setAssets] = useState<IAssetInfo[] | null>(null);
 
