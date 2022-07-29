@@ -11,10 +11,15 @@ export const DemoPage = () => {
   useEffect(() => {
     if (wallet != null){
       const wallet_ = wallet;
-      WalletAssetAPI.get(wallet_).then(async (r) => {
+      Promise.all([
+        WalletAssetAPI.get(wallet_, 1),
+        WalletAssetAPI.get(wallet_, 2),
+      ])
+      .then(async ([audio, videos]) => {
         if (wallet_ === wallet){
-          if (r != null){
-            setAssets(r.assets);
+          const assets = [...(audio?.assets ?? []), ...(videos?.assets ?? [])];
+          if (assets.length > 0){
+            setAssets(assets);
           }
           else {
             await WalletAssetAPI.resync(wallet_);

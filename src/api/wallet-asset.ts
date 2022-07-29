@@ -36,8 +36,10 @@ interface GetResponse {
 }
 
 export abstract class WalletAssetAPI {
-  static async get(wallet: string): Promise<GetResponse | null> {
-    return await GET(`wallet-asset/${wallet}?showInfo=1`);
+  static async get(wallet: string, type?: 1 | 2): Promise<GetResponse | null> {
+    let query = 'showInfo=1';
+    if (type != null) query += `&metadataType=${type}`
+    return await GET(`wallet-asset/${wallet}?${query}`);
   }
 
   static async resync(wallet: string) {
