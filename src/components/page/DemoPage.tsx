@@ -13,7 +13,6 @@ export const DemoPage = () => {
       const wallet_ = wallet;
       WalletAssetAPI.get(wallet_).then(async (r) => {
         if (wallet_ === wallet){
-          console.log(r)
           if (r != null){
             setAssets(r.assets);
           }

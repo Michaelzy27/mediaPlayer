@@ -12,7 +12,7 @@ import { notification } from 'antd';
 import { AssetAPI } from '../../api/asset';
 import { HotKeys } from 'react-hotkeys';
 import { getFingerPrint } from '../../services/blockfrost';
-import _ from 'lodash';
+import _, { has } from 'lodash';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -26,12 +26,18 @@ interface PlayerProps {
   assets: IAssetInfo[];
 }
 
+export enum Media {
+  Audio = 'Audio',
+  Video = 'Video',
+}
+
 export interface ISong {
   key: string;
   unit: string;
   image: string;
   name: string;
   artist: string;
+  media: Media,
   file: {
     src: string;
     mediaType: string;
@@ -85,21 +91,33 @@ export const Player = (props: PlayerProps) => {
     const ans = props.assets.filter((asset) => {
       if (asset.unit === 'lovelace') return false;
       const policy = getPolicyId(asset.unit);
-      return asset?.info.isMusic
-        && asset.info.audios
+      const hasMusic = (asset?.info.isMusic && asset.info.audios);
+      const hasVideo = (asset?.info.isVideo && asset.info.videos);
+      return (hasMusic || hasVideo)
         && !EXCLUDE.includes(asset.unit)
         && !EXCLUDE.includes(policy);
     }).map((asset) => {
-      return asset.info.audios!.map((file) => {
+      return [...asset.info.audios!.map((file) => {
         return {
           key: file.src,
+          media: Media.Audio,
           unit: asset.unit,
           image: asset.info.image,
           name: file.name ?? asset.info.name,
           artist: file.artist ?? asset.info.artist,
-          file: file,
-        }
-      })
+          file: file
+        };
+      }), ...asset.info.videos!.map((file) => {
+        return {
+          key: file.src,
+          media: Media.Video,
+          unit: asset.unit,
+          image: asset.info.image,
+          name: file.name ?? asset.info.name,
+          artist: file.artist ?? asset.info.artist,
+          file: file
+        };
+      })];
     }).flat() ?? [];
     return _.uniqBy(ans, 'key');
   }, [props.assets]);
@@ -124,6 +142,7 @@ export const Player = (props: PlayerProps) => {
   const [playedSongs, setPlayedSongs] = useState<ISong[]>([]);
 
   const selectPlayAsset = async (song: ISong) => {
+    if (song.key === currentItem?.key ) return;
     if (currentItem != null) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
@@ -143,6 +162,7 @@ export const Player = (props: PlayerProps) => {
   };
 
   const selectPlayAssetNoHistory = async (song: ISong) => {
+    if (song.key === currentItem?.key ) return;
     setCurrentItem(song);
 
     if (song.file != null) {
@@ -271,16 +291,25 @@ export const Player = (props: PlayerProps) => {
   return (
     <HotKeys
       keyMap={{
-        POOL: 'p'
+        POOL: 'p',
+        PAUSE: 'space'
       }}
       handlers={{
         POOL: async () => {
-          if ( currentItem) {
+          if (currentItem) {
             const fingerprint = await getFingerPrint(currentItem.unit);
             console.log('FINGERPRINT', fingerprint);
             window.open(`https://pool.pm/${fingerprint}`, '__blank');
           }
           notification.info({ message: 'Open pool pm' });
+        },
+        PAUSE: () => {
+          if (playFunctions?.isPlaying()){
+            playFunctions?.pause();
+          }
+          else if (currentItem) {
+            playFunctions?.play();
+          }
         }
       }}
       className={'flex-1 grid items-center mb-[40px]'}>
@@ -302,7 +331,7 @@ export const Player = (props: PlayerProps) => {
           </div>
         </div>
         <div>
-          <Playlist songs={songs} onItemHover={handleItemHover}
+          <Playlist items={songs} onItemHover={handleItemHover}
                     className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {

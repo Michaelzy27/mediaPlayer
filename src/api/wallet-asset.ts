@@ -19,7 +19,14 @@ export interface IAssetInfo {
       src: string;
       artist?: string;
     }[];
+    videos?: {
+      mediaType: string;
+      name?: string;
+      src: string;
+      artist?: string;
+    }[];
     isMusic: boolean;
+    isVideo: boolean;
     artist: string;
   };
 }

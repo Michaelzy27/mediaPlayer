@@ -269,7 +269,6 @@ const useUser = (
 
   useEffect(() => {
     Auth.onAuthStateChanged(async (authState, authData) => {
-      console.log('auth', authState, authData);
       setWalletAddress(authData.address);
       if (authState === AuthState.SignedIn) {
         const walletFunds = await getAsset(authData.address);

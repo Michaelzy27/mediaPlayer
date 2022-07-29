@@ -116,20 +116,16 @@ const ConnectButton = (props: {}) => {
       notification.error({ message: `${i.name} wallet is not available` });
     } else {
       const usedAddresses = await walletInstance.getUsedAddresses();
-      console.log('used', usedAddresses);
       const addressHex = usedAddresses[0];
 
       const data = await UserAPI.getAuth(addressHex);
 
       const payload = Buffer.from(data.message, 'utf-8').toString('hex');
 
-      console.log('SIGNING...', { addressHex, payload });
       const signature = await walletInstance.signData(
         addressHex,
         payload
       );
-
-      console.log('SIGNATURE...', signature)
 
       if (typeof signature === 'string' ){
         await sendAuth(addressHex, signature);
@@ -180,8 +176,6 @@ const SignOutButton = () => {
   const { user } = useUser();
 
   const hover = useHover();
-
-  console.log(user.walletFunds);
 
   return (
     <div className={'relative z-10 select-none grid items-center'}>
