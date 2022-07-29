@@ -5,6 +5,7 @@ import { fromIPFS } from '../../utils/fromIPFS';
 import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 import { ISong, Media } from './Player';
+import _ from 'lodash';
 
 export const Playlist = (props: {
   className?: string
@@ -31,28 +32,60 @@ export const Playlist = (props: {
   }, [items])
 
   const [selectedTab, setTab] = useState<string>(songs.length > 0 ? 'music' : 'video');
+  const [selectedArtist, setArtist] = useState<string | null>(null);
 
-  const selectedItems = selectedTab === 'video' ? videos : songs;
+
+  const artists = useMemo(() => {
+    const ans = _.groupBy(items, 'artist');
+    console.log('ARTIST', ans)
+    return ans;
+  }, [items])
+
+  const selectedItems = selectedTab === 'artists' ? artists[selectedArtist!] : selectedTab === 'video' ? videos : songs;
 
   return (
     <div>
       <div ref={ref} className={classNames(props.className, ' overflow-auto hide-scrollbar')}>
-        <PlaylistTab
-          className={'sticky top-0'}
-          tabs={[
-            {
-              key: 'music',
-              label: `Music (${songs.length})`,
-              disabled: songs.length === 0,
-            },
-            {
-              key: 'video',
-              label: `Videos (${videos.length})`,
-              disabled: videos.length === 0,
-            }
-          ]}
-          selectedTab={selectedTab}
-          onClick={setTab} />
+        <div className={'sticky top-0 grid bg-black'}>
+          <PlaylistTab
+            className={'w-full'}
+            tabs={[
+              {
+                key: 'music',
+                label: `Music (${songs.length})`,
+                disabled: songs.length === 0,
+              },
+              {
+                key: 'video',
+                label: `Videos (${videos.length})`,
+                disabled: videos.length === 0,
+              },
+              {
+                key: 'artists',
+                label: `Artists (${Object.keys(artists).length})`,
+              }
+            ]}
+            selectedTab={selectedTab}
+            onClick={(k) => {
+              if (k === 'artists'){
+                setArtist(Object.keys(artists).sort()[0]);
+              }
+              setTab(k)
+            }} />
+          <PlaylistTab
+            className={classNames('w-full overflow-x-auto', {
+              'hidden': selectedTab !== 'artists',
+            })}
+            tabs={Object.keys(artists).sort().map((key) => {
+              return {
+                key,
+                label: key,
+              }
+            })}
+            selectedTab={selectedArtist}
+            onClick={setArtist} />
+        </div>
+
         {selectedItems.map((i) => {
           return <PlaylistItem key={i.key} asset={i}
                                container={ref}
@@ -82,7 +115,7 @@ interface ITab {
 const PlaylistTab = (props: {
   className?: string,
   tabs: ITab[],
-  selectedTab: string,
+  selectedTab: string | null,
   onClick: (key: string) => void
 }) => {
   return (
@@ -90,7 +123,7 @@ const PlaylistTab = (props: {
       {props.tabs.map((tab) => {
 
         const selected = props.selectedTab === tab.key;
-        return <div key={tab.key} className={classNames('rounded-md cursor-pointer px-2 py-1 transition-all hover:bg-slate-800 select-none', {
+        return <div key={tab.key} className={classNames('rounded-md cursor-pointer px-2 py-1 transition-all hover:bg-slate-800 select-none whitespace-nowrap', {
           'bg-slate-700 font-bold': selected,
           'text-gray-500 pointer-events-none': tab.disabled,
         })} onClick={() => props.onClick(tab.key)}>
