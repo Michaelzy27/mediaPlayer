@@ -5,6 +5,10 @@ export function getPolicyId(fullAssetId: string) {
   return fullAssetId.substr(0, 56);
 }
 
+export function splitPolicyId(fullAssetId: string){
+  return [getPolicyId(fullAssetId), getAssetHex(fullAssetId)];
+}
+
 export function getAssetHex(fullAssetId: string) {
   if (fullAssetId.length < 56) throw 'Invalid assetId length';
   return fullAssetId.substr(56);

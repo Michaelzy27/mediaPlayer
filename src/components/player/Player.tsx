@@ -9,8 +9,10 @@ import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 import { Link } from 'react-router-dom';
 import { notification } from 'antd';
-import { loadAndDecrypt } from '../../utils/encryption';
 import { AssetAPI } from '../../api/asset';
+import { HotKeys } from 'react-hotkeys';
+import { getFingerPrint } from '../../services/blockfrost';
+import _ from 'lodash';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -22,6 +24,18 @@ export interface SongInfo {
 
 interface PlayerProps {
   assets: IAssetInfo[];
+}
+
+export interface ISong {
+  key: string;
+  unit: string;
+  image: string;
+  name: string;
+  artist: string;
+  file: {
+    src: string;
+    mediaType: string;
+  }
 }
 
 const SUPPORT_MEDIA_TYPE = {
@@ -67,18 +81,30 @@ export interface IPlayFunctions {
 
 export const Player = (props: PlayerProps) => {
 
-  const assets = useMemo(() => {
-    return props.assets.filter((asset) => {
+  const songs: ISong[] = useMemo(() => {
+    const ans = props.assets.filter((asset) => {
       if (asset.unit === 'lovelace') return false;
-      const file = asset?.info?.file;
       const policy = getPolicyId(asset.unit);
-      return file?.src && Object.keys(AUDIO_MEDIA_TYPE).includes(file?.mediaType)
+      return asset?.info.isMusic
+        && asset.info.audios
         && !EXCLUDE.includes(asset.unit)
         && !EXCLUDE.includes(policy);
-    }) ?? [];
+    }).map((asset) => {
+      return asset.info.audios!.map((file) => {
+        return {
+          key: file.src,
+          unit: asset.unit,
+          image: asset.info.image,
+          name: file.name ?? asset.info.name,
+          artist: file.artist ?? asset.info.artist,
+          file: file,
+        }
+      })
+    }).flat() ?? [];
+    return _.uniqBy(ans, 'key');
   }, [props.assets]);
 
-  if (assets.length === 0) {
+  if (songs.length === 0) {
     return <div className={'flex-1 grid items-center justify-center'}>
       <div className={'text-center grid gap-2'}>
         <div className={'text-6xl font-bold'}> No music found :(</div>
@@ -89,83 +115,83 @@ export const Player = (props: PlayerProps) => {
   }
 
   const refVideo = useRef<HTMLVideoElement>(null);
-  const [currentItem, setCurrentItem] = useState<IAssetInfo | undefined>();
-  const [hoverItem, setHoverItem] = useState<IAssetInfo | null>(null);
+  const [currentItem, setCurrentItem] = useState<ISong | undefined>();
+  const [hoverItem, setHoverItem] = useState<ISong | null>(null);
   const [playFunctions, setPlayFunctions] = useState<IPlayFunctions | undefined>();
   const [isPlaying, setPlaying] = useState<boolean>(false);
   const [repeatMode, setRepeatMode] = useState<REPEAT_MODE>(REPEAT_MODE.REPEAT);
   const [isShuffle, setShuffle] = useState<boolean>(false);
-  const [playedSongs, setPlayedSongs] = useState<IAssetInfo[]>([]);
+  const [playedSongs, setPlayedSongs] = useState<ISong[]>([]);
 
-  const selectPlayAsset = async (asset: IAssetInfo) => {
+  const selectPlayAsset = async (song: ISong) => {
     if (currentItem != null) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
-    setCurrentItem(asset);
+    setCurrentItem(song);
 
-    if (asset.info.file != null){
-      const info = await AssetAPI.get(asset.unit);
+    if (song.file != null) {
+      const info = await AssetAPI.get(song.unit);
       const [metadataFile] = info?.metadata.files;
       const iv = metadataFile != null && metadataFile.iv;
 
       playFunctions?.load({
-        src: asset.info.file.src,
+        src: song.file.src,
         encrypted: iv != null
       });
     }
 
   };
 
-  const selectPlayAssetNoHistory = async (asset: IAssetInfo) => {
-    setCurrentItem(asset);
+  const selectPlayAssetNoHistory = async (song: ISong) => {
+    setCurrentItem(song);
 
-    if (asset.info.file != null){
-      const info = await AssetAPI.get(asset.unit);
+    if (song.file != null) {
+      const info = await AssetAPI.get(song.unit);
       const [metadataFile] = info?.metadata.files;
       const iv = metadataFile != null && metadataFile.iv;
 
       playFunctions?.load({
-        src: asset.info.file.src,
+        src: song.file.src,
         encrypted: iv != null
       });
     }
   };
 
   const handleNextSong = useCallback(() => {
-    const currentIndex = assets.findIndex(
+    const currentIndex = songs.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
 
     console.log('NEXT REPEAT', repeatMode);
 
     let next = currentIndex + 1;
-    if (isShuffle && assets.length > 1) {
+    if (isShuffle && songs.length > 1) {
       next = currentIndex;
       while (next === currentIndex) {
-        next = Math.floor(Math.random() * assets.length);
+        next = Math.floor(Math.random() * songs.length);
       }
-      selectPlayAsset(assets[next]);
+      selectPlayAsset(songs[next]);
     } else if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
-      selectPlayAsset(assets[next]);
-    } else if (next >= assets.length) {
+      selectPlayAsset(songs[next]);
+    } else if (next >= songs.length) {
       if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
-        selectPlayAsset(assets[next]);
+        selectPlayAsset(songs[next]);
       } else {
         next = 0;
       }
     } else if (next >= 0) {
 
-      selectPlayAsset(assets[next]);
+      selectPlayAsset(songs[next]);
     }
 
-  }, [currentItem, selectPlayAsset, assets, repeatMode, isShuffle]);
+  }, [currentItem, selectPlayAsset, songs, repeatMode, isShuffle]);
 
   useEffect(() => {
-    setPlayedSongs([]);
+      setPlayedSongs([]);
     },
-    [assets]);
+    [songs]);
 
   useEffect(() => {
     const el = refVideo.current;
@@ -182,13 +208,12 @@ export const Player = (props: PlayerProps) => {
       setPlayFunctions({
         load: (file) => {
           if (file == null) return;
-          console.log(file)
-          if (file.encrypted){
+          console.log(file);
+          if (file.encrypted) {
             /// load file into buffer
             // loadAndDecrypt(file);
-            notification.error({message: 'TODO'});
-          }
-          else {
+            notification.error({ message: 'TODO' });
+          } else {
             const src = fromIPFS(file.src);
             if (src) {
               el.onloadeddata = () => {
@@ -222,29 +247,43 @@ export const Player = (props: PlayerProps) => {
 
       return;
     }
-    const currentIndex = assets.findIndex(
+    const currentIndex = songs.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      selectPlayAssetNoHistory(assets[currentIndex - 1]);
+      selectPlayAssetNoHistory(songs[currentIndex - 1]);
     }
-  }, [currentItem, selectPlayAsset, assets]);
+  }, [currentItem, selectPlayAsset, songs]);
 
 
   const songInfo: SongInfo = {
-    thumbnail: fromIPFS(currentItem?.info?.image) ?? '',
-    title: currentItem?.info?.name ?? '',
-    artistsNames: currentItem?.info?.artist ?? ''
+    thumbnail: fromIPFS(currentItem?.image) ?? '',
+    title: currentItem?.name ?? '',
+    artistsNames: currentItem?.artist ?? ''
   };
 
-  const handleItemHover = (asset: IAssetInfo | null) => {
+  const handleItemHover = (asset: ISong | null) => {
     /// set image
     setHoverItem(asset);
   };
 
   const hasImage = currentItem || hoverItem;
   return (
-    <div className={'flex-1 grid items-center mb-[40px]'}>
+    <HotKeys
+      keyMap={{
+        POOL: 'p'
+      }}
+      handlers={{
+        POOL: async () => {
+          if ( currentItem) {
+            const fingerprint = await getFingerPrint(currentItem.unit);
+            console.log('FINGERPRINT', fingerprint);
+            window.open(`https://pool.pm/${fingerprint}`, '__blank');
+          }
+          notification.info({ message: 'Open pool pm' });
+        }
+      }}
+      className={'flex-1 grid items-center mb-[40px]'}>
       <div className={'flex w-full lg:justify-between'}>
         <div />
         <div className={'ml-4 lg:ml-0'}>
@@ -254,7 +293,7 @@ export const Player = (props: PlayerProps) => {
             {hasImage &&
               <img alt={'album image'}
                    className={'object-contain h-full w-full rounded-xl'}
-                   src={fromIPFS((currentItem ?? hoverItem)!.info.image)} />}
+                   src={fromIPFS((currentItem ?? hoverItem)!.image)} />}
             {!hasImage &&
               <div>
                 <div className={'font-bold text-3xl'}>Choose a TUN3!</div>
@@ -263,14 +302,14 @@ export const Player = (props: PlayerProps) => {
           </div>
         </div>
         <div>
-          <Playlist assets={assets} onItemHover={handleItemHover}
+          <Playlist songs={songs} onItemHover={handleItemHover}
                     className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
                       selectPlayAssetNoHistory(asset);
                     }}
-                    hoveredItem={hoverItem?.unit}
-                    selectedItem={currentItem?.unit}
+                    hoveredItem={hoverItem}
+                    selectedItem={currentItem}
           />
         </div>
         <div />
@@ -292,12 +331,12 @@ export const Player = (props: PlayerProps) => {
                        isPlaying={isPlaying}
                        onPlay={() => playFunctions?.play()}
                        onPause={() => playFunctions?.pause()}
-                       file={currentItem?.info?.file} songInfo={songInfo} />
+                       file={currentItem?.file} songInfo={songInfo} />
       }
 
       <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'>
         <source type='audio/mpeg'></source>
       </video>
-    </div>
+    </HotKeys>
   );
 };

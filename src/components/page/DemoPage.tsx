@@ -1,6 +1,6 @@
 import { Player } from '../player/Player';
 import { useParams } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IAssetInfo, WalletAssetAPI } from '../../api/wallet-asset';
 
 export const DemoPage = () => {

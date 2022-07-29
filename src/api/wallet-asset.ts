@@ -13,6 +13,13 @@ export interface IAssetInfo {
       src: string;
       iv: string;
     };
+    audios?: {
+      mediaType: string;
+      name?: string;
+      src: string;
+      artist?: string;
+    }[];
+    isMusic: boolean;
     artist: string;
   };
 }
