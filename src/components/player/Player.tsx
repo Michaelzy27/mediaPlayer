@@ -8,11 +8,9 @@ import { fromIPFS } from '../../utils/fromIPFS';
 import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 import { Link } from 'react-router-dom';
-import { notification } from 'antd';
 import { AssetAPI } from '../../api/asset';
-import { HotKeys } from 'react-hotkeys';
-import { getFingerPrint } from '../../services/blockfrost';
-import _, { has } from 'lodash';
+import _ from 'lodash';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -97,27 +95,29 @@ export const Player = (props: PlayerProps) => {
         && !EXCLUDE.includes(asset.unit)
         && !EXCLUDE.includes(policy);
     }).map((asset) => {
-      return [...asset.info.audios!.map((file) => {
-        return {
-          key: file.src,
-          media: Media.Audio,
-          unit: asset.unit,
-          image: asset.info.image,
-          name: file.name ?? asset.info.name,
-          artist: file.artist ?? asset.info.artist,
-          file: file
-        };
-      }), ...asset.info.videos!.map((file) => {
-        return {
-          key: file.src,
-          media: Media.Video,
-          unit: asset.unit,
-          image: asset.info.image,
-          name: file.name ?? asset.info.name,
-          artist: file.artist ?? asset.info.artist,
-          file: file
-        };
-      })];
+      return [
+        ...asset.info.audios!.map((file) => {
+          return {
+            key: file.src,
+            media: Media.Audio,
+            unit: asset.unit,
+            image: asset.info.image,
+            name: file.name ?? asset.info.name,
+            artist: file.artist ?? asset.info.artist,
+            file: file
+          };
+        }),
+        ...asset.info.videos!.map((file) => {
+          return {
+            key: file.src,
+            media: Media.Video,
+            unit: asset.unit,
+            image: asset.info.image,
+            name: file.name ?? asset.info.name,
+            artist: file.artist ?? asset.info.artist,
+            file: file
+          };
+        })];
     }).flat() ?? [];
     return _.uniqBy(ans, 'key');
   }, [props.assets]);
@@ -135,14 +135,14 @@ export const Player = (props: PlayerProps) => {
   const refVideo = useRef<HTMLVideoElement>(null);
   const [currentItem, setCurrentItem] = useState<ISong | undefined>();
   const [hoverItem, setHoverItem] = useState<ISong | null>(null);
-  const [playFunctions, setPlayFunctions] = useState<IPlayFunctions | undefined>();
   const [isPlaying, setPlaying] = useState<boolean>(false);
   const [repeatMode, setRepeatMode] = useState<REPEAT_MODE>(REPEAT_MODE.REPEAT);
   const [isShuffle, setShuffle] = useState<boolean>(false);
   const [playedSongs, setPlayedSongs] = useState<ISong[]>([]);
+  const [playlist, setPlaylist] = useState<ISong[]>(songs);
 
   const selectPlayAsset = async (song: ISong) => {
-    if (song.key === currentItem?.key ) return;
+    if (song.key === currentItem?.key) return;
     if (currentItem != null) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
@@ -152,107 +152,93 @@ export const Player = (props: PlayerProps) => {
     if (song.file != null) {
       const info = await AssetAPI.get(song.unit);
       const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
-      console.log('FILE2', file2)
 
-      playFunctions?.load({
+      load({
         src: song.file.src,
-        url: file2?.url,
+        url: file2?.url
       });
     }
 
   };
 
   const selectPlayAssetNoHistory = async (song: ISong) => {
-    if (song.key === currentItem?.key ) return;
+    if (song.key === currentItem?.key) return;
     setCurrentItem(song);
 
     if (song.file != null) {
       const info = await AssetAPI.get(song.unit);
       const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
-      console.log('FILE2', file2)
 
 
-      playFunctions?.load({
+      load({
         src: song.file.src,
-        url: file2?.url,
+        url: file2?.url
       });
     }
   };
 
   const handleNextSong = useCallback(() => {
-    const currentIndex = songs.findIndex(
+    const currentIndex = playlist.findIndex(
       (asset) => asset.unit === currentItem?.unit
     );
 
-    console.log('NEXT REPEAT', repeatMode);
+    console.log('NEXT', repeatMode, currentIndex, `l=${playlist.length}`);
 
     let next = currentIndex + 1;
-    if (isShuffle && songs.length > 1) {
+    if (repeatMode === REPEAT_MODE.ONE) {
+      next = currentIndex;
+      console.log('NEXT -> REPEAT ONE', next);
+      selectPlayAsset(playlist[next]);
+    } else if (isShuffle && playlist.length > 1) {
       next = currentIndex;
       while (next === currentIndex) {
-        next = Math.floor(Math.random() * songs.length);
+        next = Math.floor(Math.random() * playlist.length);
       }
-      selectPlayAsset(songs[next]);
-    } else if (repeatMode === REPEAT_MODE.ONE) {
-      next = currentIndex;
-      selectPlayAsset(songs[next]);
-    } else if (next >= songs.length) {
+      console.log('NEXT -> SHUFFLE', next);
+      selectPlayAsset(playlist[next]);
+    } else if (next > playlist.length - 1) {
       if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
-        selectPlayAsset(songs[next]);
+        console.log('NEXT -> REPEAT NEXT', next);
+        selectPlayAsset(playlist[next]);
       } else {
         next = 0;
+        console.log('NEXT -> RETURN STOP', next);
+        setCurrentItem(playlist[next]);
       }
     } else if (next >= 0) {
+      console.log('NEXT -> JUST NEXT', next);
 
-      selectPlayAsset(songs[next]);
+      selectPlayAsset(playlist[next]);
     }
 
-  }, [currentItem, selectPlayAsset, songs, repeatMode, isShuffle]);
+  }, [currentItem, selectPlayAsset, playlist, repeatMode, isShuffle]);
 
   useEffect(() => {
       setPlayedSongs([]);
     },
     [songs]);
 
-  useEffect(() => {
-    const el = refVideo.current;
-    if (el) {
-      el.onpause = () => {
-        setPlaying(false);
+  const el = refVideo.current;
+  const play = useCallback(() => {
+    el?.play();
+  }, [el]);
+  const pause = useCallback(() => {
+    el?.pause();
+  }, [el]);
+  const load = useCallback((file: {
+    src: string,
+    url?: string,
+  }) => {
+    if (file == null) return;
+    const src = file.url ?? fromIPFS(file.src);
+    if (src && el) {
+      el.onloadeddata = () => {
+        el.play();
       };
-      el.onended = () => {
-        handleNextSong();
-      };
-      el.onplay = () => {
-        setPlaying(true);
-      };
-      setPlayFunctions({
-        load: (file) => {
-          if (file == null) return;
-          const src = file.url ?? fromIPFS(file.src);
-          if (src) {
-            el.onloadeddata = () => {
-              el.play();
-            };
-            el.src = src;
-          }
-        },
-        play: () => {
-          el.play();
-        },
-        pause: () => {
-          el.pause();
-        },
-        isPlaying: () => {
-          return !el.paused;
-        }
-      });
-      return () => {
-        setPlayFunctions(undefined);
-      };
+      el.src = src;
     }
-  }, [refVideo, setPlaying, currentItem, repeatMode]);
+  }, [el]);
 
   const handlePrevSong = useCallback(() => {
     if (playedSongs.length > 0) {
@@ -283,31 +269,17 @@ export const Player = (props: PlayerProps) => {
   };
 
   const hasImage = currentItem || hoverItem;
+
+  useHotkeys('space', () => {
+    if (isPlaying) {
+      pause();
+    } else if (currentItem) {
+      play();
+    }
+  }, [isPlaying]);
+
   return (
-    <HotKeys
-      keyMap={{
-        POOL: 'p',
-        PAUSE: 'space'
-      }}
-      handlers={{
-        POOL: async () => {
-          if (currentItem) {
-            const fingerprint = await getFingerPrint(currentItem.unit);
-            console.log('FINGERPRINT', fingerprint);
-            window.open(`https://pool.pm/${fingerprint}`, '__blank');
-          }
-          notification.info({ message: 'Open pool pm' });
-        },
-        PAUSE: () => {
-          if (playFunctions?.isPlaying()){
-            playFunctions?.pause();
-          }
-          else if (currentItem) {
-            playFunctions?.play();
-          }
-        }
-      }}
-      className={'flex-1 grid items-center mb-[40px]'}>
+    <div className={'flex-1 grid items-center mb-[40px]'}>
       <div className={'flex w-full lg:justify-between'}>
         <div />
         <div className={'ml-4 lg:ml-0'}>
@@ -332,6 +304,7 @@ export const Player = (props: PlayerProps) => {
                     onItemClick={(asset) => {
                       selectPlayAssetNoHistory(asset);
                     }}
+                    onPlaylist={setPlaylist}
                     hoveredItem={hoverItem}
                     selectedItem={currentItem}
           />
@@ -353,14 +326,24 @@ export const Player = (props: PlayerProps) => {
                          setShuffle(!isShuffle);
                        }}
                        isPlaying={isPlaying}
-                       onPlay={() => playFunctions?.play()}
-                       onPause={() => playFunctions?.pause()}
+                       onPlay={() => play()}
+                       onPause={() => pause()}
                        file={currentItem?.file} songInfo={songInfo} />
       }
 
-      <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'>
+      <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'
+             onPause={() => {
+               setPlaying(false);
+             }}
+             onPlay={() => {
+               setPlaying(true);
+             }}
+             onEnded={() => {
+               handleNextSong();
+             }}
+      >
         <source type='audio/mpeg'></source>
       </video>
-    </HotKeys>
+    </div>
   );
 };

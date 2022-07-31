@@ -14,11 +14,10 @@ export const Playlist = (props: {
   onItemClick?: (asset: ISong) => void,
   hoveredItem?: ISong | null,
   selectedItem?: ISong | null,
+  onPlaylist?: (list: ISong[]) => void,
 }) => {
   const { items } = props;
-
   const ref = useRef(null);
-  const [observer, setObserver] = useState(null);
 
   const videos = useMemo(() => {
     return items.filter((i) => {
@@ -42,6 +41,11 @@ export const Playlist = (props: {
   }, [items])
 
   const selectedItems = selectedTab === 'artists' ? artists[selectedArtist!] : selectedTab === 'video' ? videos : songs;
+
+  useEffect(() => {
+    props.onPlaylist?.(selectedItems);
+  }, [selectedTab, selectedArtist, songs])
+
 
   return (
     <div>
@@ -225,7 +229,7 @@ const PlaylistItem = (props: {
         <div className={'text-gray-400'}>{asset.artist}</div>
       </div>
       <div className={'mr-2'}>
-        {duration &&
+        {duration > 0 &&
           <div>{formatTime(duration)}</div>}
       </div>
     </div>
