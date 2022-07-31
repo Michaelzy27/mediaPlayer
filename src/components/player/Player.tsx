@@ -33,6 +33,7 @@ export interface ISong {
   key: string;
   unit: string;
   image: string;
+  imageUrl?: string;
   name: string;
   artist: string;
   media: Media,
@@ -102,6 +103,7 @@ export const Player = (props: PlayerProps) => {
             media: Media.Audio,
             unit: asset.unit,
             image: asset.info.image,
+            imageUrl: asset.info.imageUrl,
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
             file: file
@@ -113,6 +115,7 @@ export const Player = (props: PlayerProps) => {
             media: Media.Video,
             unit: asset.unit,
             image: asset.info.image,
+            imageUrl: asset.info.imageUrl,
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
             file: file
@@ -133,6 +136,7 @@ export const Player = (props: PlayerProps) => {
   }
 
   const refVideo = useRef<HTMLVideoElement>(null);
+  const refVideo2 = useRef<HTMLVideoElement>(null);
   const [currentItem, setCurrentItem] = useState<ISong | undefined>();
   const [hoverItem, setHoverItem] = useState<ISong | null>(null);
   const [isPlaying, setPlaying] = useState<boolean>(false);
@@ -140,42 +144,68 @@ export const Player = (props: PlayerProps) => {
   const [isShuffle, setShuffle] = useState<boolean>(false);
   const [playedSongs, setPlayedSongs] = useState<ISong[]>([]);
   const [playlist, setPlaylist] = useState<ISong[]>(songs);
+  const [isVideo, setVideo] = useState<boolean>(false);
 
-  const selectPlayAsset = async (song: ISong) => {
+
+  useEffect(() => {
+    setPlayedSongs([]);
+  }, [songs]);
+
+  const el = refVideo.current;
+  const el2 = refVideo2.current;
+
+  const play = useCallback(() => {
+    (isVideo ? el2 : el)?.play();
+  }, [el, el2, isVideo]);
+  const pause = useCallback(() => {
+    (isVideo ? el2 : el)?.pause();
+  }, [el, el2, isVideo]);
+  const stop = useCallback(() => {
+    const _ = (isVideo ? el2 : el);
+    if (_) {
+      _.pause();
+      _.currentTime = 0;
+    }
+  }, [el, el2, isVideo]);
+  const load = useCallback((file: {
+    src: string,
+    url?: string,
+  }) => {
+    console.log('LOAD', isVideo, file);
+    if (file == null) return;
+    const src = file.url ?? fromIPFS(file.src);
+    if (src && el && !isVideo) {
+      el.onloadeddata = () => {
+        console.log('LOADED');
+        el.play();
+      };
+      el.src = src;
+    } else if (el2 && isVideo && src) {
+      console.log('VIDEO', src);
+      el2.onloadeddata = () => {
+        console.log('LOADED');
+        el2.play();
+      };
+      el2.src = src;
+    }
+  }, [el, el2, isVideo]);
+
+  const selectPlayAsset = useCallback(async (song: ISong, history: boolean) => {
     if (song.key === currentItem?.key) return;
-    if (currentItem != null) {
+    if (currentItem != null && history) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
     setCurrentItem(song);
 
 
-    if (song.file != null) {
-      const info = await AssetAPI.get(song.unit);
-      const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
+    const info = await AssetAPI.get(song.unit);
+    const file2 = (isVideo ? info?.info.videos : info?.info.audios)?.find((i) => i.src === song.file.src);
 
-      load({
-        src: song.file.src,
-        url: file2?.url
-      });
-    }
-
-  };
-
-  const selectPlayAssetNoHistory = async (song: ISong) => {
-    if (song.key === currentItem?.key) return;
-    setCurrentItem(song);
-
-    if (song.file != null) {
-      const info = await AssetAPI.get(song.unit);
-      const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
-
-
-      load({
-        src: song.file.src,
-        url: file2?.url
-      });
-    }
-  };
+    load({
+      src: song.file.src,
+      url: file2?.url
+    });
+  }, [isVideo, currentItem, load]);
 
   const handleNextSong = useCallback(() => {
     const currentIndex = playlist.findIndex(
@@ -188,19 +218,19 @@ export const Player = (props: PlayerProps) => {
     if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
       console.log('NEXT -> REPEAT ONE', next);
-      selectPlayAsset(playlist[next]);
+      selectPlayAsset(playlist[next], true);
     } else if (isShuffle && playlist.length > 1) {
       next = currentIndex;
       while (next === currentIndex) {
         next = Math.floor(Math.random() * playlist.length);
       }
       console.log('NEXT -> SHUFFLE', next);
-      selectPlayAsset(playlist[next]);
+      selectPlayAsset(playlist[next], true);
     } else if (next > playlist.length - 1) {
       if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
         console.log('NEXT -> REPEAT NEXT', next);
-        selectPlayAsset(playlist[next]);
+        selectPlayAsset(playlist[next], true);
       } else {
         next = 0;
         console.log('NEXT -> RETURN STOP', next);
@@ -209,42 +239,17 @@ export const Player = (props: PlayerProps) => {
     } else if (next >= 0) {
       console.log('NEXT -> JUST NEXT', next);
 
-      selectPlayAsset(playlist[next]);
+      selectPlayAsset(playlist[next], true);
     }
 
   }, [currentItem, selectPlayAsset, playlist, repeatMode, isShuffle]);
 
-  useEffect(() => {
-      setPlayedSongs([]);
-    },
-    [songs]);
-
-  const el = refVideo.current;
-  const play = useCallback(() => {
-    el?.play();
-  }, [el]);
-  const pause = useCallback(() => {
-    el?.pause();
-  }, [el]);
-  const load = useCallback((file: {
-    src: string,
-    url?: string,
-  }) => {
-    if (file == null) return;
-    const src = file.url ?? fromIPFS(file.src);
-    if (src && el) {
-      el.onloadeddata = () => {
-        el.play();
-      };
-      el.src = src;
-    }
-  }, [el]);
 
   const handlePrevSong = useCallback(() => {
     if (playedSongs.length > 0) {
       const prevSong = playedSongs[0];
       setPlayedSongs(playedSongs.slice(1));
-      selectPlayAssetNoHistory(prevSong);
+      selectPlayAsset(prevSong, false);
 
       return;
     }
@@ -252,13 +257,13 @@ export const Player = (props: PlayerProps) => {
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      selectPlayAssetNoHistory(songs[currentIndex - 1]);
+      selectPlayAsset(songs[currentIndex - 1], false);
     }
   }, [currentItem, selectPlayAsset, songs]);
 
 
   const songInfo: SongInfo = {
-    thumbnail: fromIPFS(currentItem?.image) ?? '',
+    thumbnail: currentItem?.imageUrl ?? fromIPFS(currentItem?.image) ?? '',
     title: currentItem?.name ?? '',
     artistsNames: currentItem?.artist ?? ''
   };
@@ -283,16 +288,35 @@ export const Player = (props: PlayerProps) => {
       <div className={'flex w-full lg:justify-between'}>
         <div />
         <div className={'ml-4 lg:ml-0'}>
-          <div className={classNames('w-[calc(100vh-220px)] h-[calc(100vh-220px)] rounded-xl', {
+          <div className={classNames('w-[calc(100vh-220px)] h-[calc(100vh-220px)] rounded-xl grid items-center', {
             'border border-slate-800 grid items-center justify-center': !hasImage
           })}>
-            {hasImage &&
+            {hasImage && !isVideo &&
               <img alt={'album image'}
                    className={'object-contain h-full w-full rounded-xl'}
-                   src={fromIPFS((currentItem ?? hoverItem)!.image)} />}
+                   src={(currentItem ?? hoverItem)!.imageUrl ?? fromIPFS((currentItem ?? hoverItem)!.image)} />}
+            {isVideo &&
+              <video
+                ref={refVideo2}
+                controls={true}
+                autoPlay={true}
+                className={classNames('object-contain w-full rounded-xl', {
+                  'hidden': !isVideo || !currentItem
+                })}
+                onPause={() => {
+                  isVideo && setPlaying(false);
+                }}
+                onPlay={() => {
+                  isVideo && setPlaying(true);
+                }}
+                onEnded={() => {
+                  isVideo && handleNextSong();
+                }}
+              />}
             {!hasImage &&
               <div>
-                <div className={'font-bold text-3xl'}>Choose a TUN3!</div>
+
+                <div className={'font-bold text-3xl'}>{isVideo ? 'Choose a VID3O!' : 'Choose a TUN3!'}</div>
               </div>
             }
           </div>
@@ -302,7 +326,12 @@ export const Player = (props: PlayerProps) => {
                     className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
-                      selectPlayAssetNoHistory(asset);
+                      selectPlayAsset(asset, false);
+                    }}
+                    onTabSelect={(k) => {
+                      stop();
+                      setCurrentItem(undefined);
+                      setVideo(k === 'video');
                     }}
                     onPlaylist={setPlaylist}
                     hoveredItem={hoverItem}
@@ -333,13 +362,13 @@ export const Player = (props: PlayerProps) => {
 
       <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'
              onPause={() => {
-               setPlaying(false);
+               !isVideo && setPlaying(false);
              }}
              onPlay={() => {
-               setPlaying(true);
+               !isVideo && setPlaying(true);
              }}
              onEnded={() => {
-               handleNextSong();
+               !isVideo && handleNextSong();
              }}
       >
         <source type='audio/mpeg'></source>

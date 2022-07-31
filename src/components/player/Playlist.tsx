@@ -15,6 +15,7 @@ export const Playlist = (props: {
   hoveredItem?: ISong | null,
   selectedItem?: ISong | null,
   onPlaylist?: (list: ISong[]) => void,
+  onTabSelect?: (key: string) => void,
 }) => {
   const { items } = props;
   const ref = useRef(null);
@@ -75,6 +76,7 @@ export const Playlist = (props: {
                 setArtist(Object.keys(artists).sort()[0]);
               }
               setTab(k)
+              props.onTabSelect?.(k);
             }} />
           <PlaylistTab
             className={classNames('w-full overflow-x-auto', {
@@ -223,7 +225,7 @@ const PlaylistItem = (props: {
            return props.onItemClick?.(props.asset);
          }}
     >
-      <img src={fromIPFS(asset.image)} className={'w-12 h-12 object-contain'} />
+      <img src={asset.imageUrl ?? fromIPFS(asset.image)} className={'w-12 h-12 object-contain'} />
       <div className={'flex-1 grid'}>
         <div className={'font-bold'}>{asset.name}</div>
         <div className={'text-gray-400'}>{asset.artist}</div>

@@ -7,6 +7,7 @@ export interface IAssetInfo {
   info: {
     name: string;
     image: string;
+    imageUrl?: string;
     file?: {
       mediaType: string;
       name: string;
@@ -37,7 +38,7 @@ interface GetResponse {
 
 export abstract class WalletAssetAPI {
   static async get(wallet: string, type?: 1 | 2): Promise<GetResponse | null> {
-    let query = 'showInfo=1';
+    let query = 'showInfo=1&useServerImage=1';
     if (type != null) query += `&metadataType=${type}`
     return await GET(`wallet-asset/${wallet}?${query}`);
   }
