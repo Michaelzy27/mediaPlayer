@@ -76,8 +76,8 @@ const EXCLUDE = [
 
 export interface IPlayFunctions {
   load: (file: {
-    encrypted: boolean,
     src: string,
+    url?: string,
   }) => void,
   play: () => void,
   pause: () => void,
@@ -148,14 +148,15 @@ export const Player = (props: PlayerProps) => {
     }
     setCurrentItem(song);
 
+
     if (song.file != null) {
       const info = await AssetAPI.get(song.unit);
-      const [metadataFile] = info?.metadata.files;
-      const iv = metadataFile != null && metadataFile.iv;
+      const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
+      console.log('FILE2', file2)
 
       playFunctions?.load({
         src: song.file.src,
-        encrypted: iv != null
+        url: file2?.url,
       });
     }
 
@@ -167,12 +168,13 @@ export const Player = (props: PlayerProps) => {
 
     if (song.file != null) {
       const info = await AssetAPI.get(song.unit);
-      const [metadataFile] = info?.metadata.files;
-      const iv = metadataFile != null && metadataFile.iv;
+      const file2 = info?.info.audios?.find((i) => i.src === song.file.src);
+      console.log('FILE2', file2)
+
 
       playFunctions?.load({
         src: song.file.src,
-        encrypted: iv != null
+        url: file2?.url,
       });
     }
   };
@@ -228,19 +230,12 @@ export const Player = (props: PlayerProps) => {
       setPlayFunctions({
         load: (file) => {
           if (file == null) return;
-          console.log(file);
-          if (file.encrypted) {
-            /// load file into buffer
-            // loadAndDecrypt(file);
-            notification.error({ message: 'TODO' });
-          } else {
-            const src = fromIPFS(file.src);
-            if (src) {
-              el.onloadeddata = () => {
-                el.play();
-              };
-              el.src = src;
-            }
+          const src = file.url ?? fromIPFS(file.src);
+          if (src) {
+            el.onloadeddata = () => {
+              el.play();
+            };
+            el.src = src;
           }
         },
         play: () => {
