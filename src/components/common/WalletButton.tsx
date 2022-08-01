@@ -189,7 +189,7 @@ const SignOutButton = () => {
           'text-primary-contrast': !hover.isHover
         })}
       >
-        <div className={'text-sm'}>{shortWalletAddress(user.walletAddress)}</div>
+        <div className={'text-sm hidden lg:block'}>{shortWalletAddress(user.walletAddress)}</div>
         <div>{`${lovelaceToADAString(user.walletFunds?.lovelace)} ${ADA_SYMBOL}`}</div>
       </div>
 

@@ -37,7 +37,6 @@ export const Playlist = (props: {
 
   const artists = useMemo(() => {
     const ans = _.groupBy(items, 'artist');
-    console.log('ARTIST', ans)
     return ans;
   }, [items])
 
@@ -55,6 +54,10 @@ export const Playlist = (props: {
           <PlaylistTab
             className={'w-full'}
             tabs={[
+              // {
+              //   key: 'tunes',
+              //   label: `TUN3Z (100)`,
+              // },
               {
                 key: 'music',
                 label: `Music (${songs.length})`,
@@ -68,7 +71,7 @@ export const Playlist = (props: {
               {
                 key: 'artists',
                 label: `Artists (${Object.keys(artists).length})`,
-              }
+              },
             ]}
             selectedTab={selectedTab}
             onClick={(k) => {
@@ -153,7 +156,7 @@ const PlaylistItem = (props: {
   const el = useRef(null);
 
   const [duration, setDuration] = useState<number>(
-    videoDurationMap[props.asset.unit] || 0
+    videoDurationMap[props.asset.key] || 0
   );
 
   useEffect(() => {
@@ -182,20 +185,23 @@ const PlaylistItem = (props: {
     }
   }, [parent, el]);
 
+  const {file} = props.asset;
+
   const loadTime = () => {
     return new Promise((resolve) => {
-      if (props.asset.file?.src && !duration) {
+      if (file?.src && !duration && !file?.encrypted) {
         const video = document.createElement('video');
         video.preload = 'metadata';
 
         video.onloadedmetadata = function() {
           window.URL.revokeObjectURL(video.src);
           const duration = video.duration;
+          videoDurationMap[props.asset.key] = duration;
           setDuration(duration);
           resolve(true);
         };
 
-        video.src = fromIPFS(props.asset.file.src)!;
+        video.src = fromIPFS(file.src)!;
       }
     });
   };

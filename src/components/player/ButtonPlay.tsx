@@ -4,8 +4,6 @@ import {
   PlayCircleOutlined
 } from '@ant-design/icons';
 import { Button } from 'antd';
-import { RefObject, useCallback, useEffect, useState } from 'react';
-import { IPlayFunctions } from './Player';
 
 export interface IFile extends Record<string, any> {
   src: string;

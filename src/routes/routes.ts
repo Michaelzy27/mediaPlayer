@@ -5,13 +5,21 @@ import { HomePage } from '../components/page/HomePage';
 import { DemoPage } from '../components/page/DemoPage';
 import { MintPage } from '../components/page/MintPage';
 import { MarketplacePage } from '../components/page/MarketplacePage';
+import { VotePage } from '../components/page/VotePage';
 
-export const ROUTES = [
+export interface IRoute {
+  path: string;
+  title: string;
+  exact: boolean;
+  component: () => JSX.Element,
+}
+
+export const ROUTES : IRoute[] = [
   {
     path: '/',
     title: 'Player',
     exact: true,
-    component: HomePage
+    component: HomePage,
   },
   {
     path: '/demo/:wallet',
@@ -26,18 +34,32 @@ export const ROUTES = [
     component: DemoPage
   },
   {
+    path: '/vote',
+    title: 'Vote for us on Catalyst',
+    exact: true,
+    component: VotePage
+  },
+  {
     path: '/mint',
     title: 'Mint ur own song',
     exact: true,
-    component: MintPage,
+    component: MintPage
   },
   {
     path: '/marketplace',
     title: 'Marketplace',
     exact: true,
-    component: MarketplacePage,
+    component: MarketplacePage
   }
 ];
+export const ROUTES_MOBILE: IRoute[] = [
+  {
+    path: '/',
+    title: 'Player',
+    exact: true,
+    component: VotePage,
+  },
+]
 
 export const MENU_ITEMS = [
   {
@@ -51,13 +73,24 @@ export const MENU_ITEMS = [
     text: 'Demo'
   },
   {
-    key: 'mint',
-    path: '/mint',
-    text: 'Mint'
+    key: 'vote',
+    path: '/vote',
+    text: 'Vote'
   },
   {
-    key: 'marketplace',
-    path: '/marketplace',
-    text: 'Marketplace'
+    key: 'more',
+    text: 'More',
+    items: [
+      {
+        key: 'mint',
+        path: '/mint',
+        text: 'Mint'
+      },
+      {
+        key: 'marketplace',
+        path: '/marketplace',
+        text: 'Marketplace'
+      }
+    ]
   }
 ];

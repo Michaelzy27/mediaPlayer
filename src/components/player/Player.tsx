@@ -22,6 +22,7 @@ export interface SongInfo {
 
 interface PlayerProps {
   assets: IAssetInfo[];
+  random?: boolean,
 }
 
 export enum Media {
@@ -40,7 +41,9 @@ export interface ISong {
   file: {
     src: string;
     mediaType: string;
-  }
+    encrypted?: boolean;
+  },
+  tune?: string;           // group by this
 }
 
 const SUPPORT_MEDIA_TYPE = {
@@ -73,16 +76,13 @@ const EXCLUDE = [
   'eebf7f0deadaf8bbf24f032012f46311a0c77da84ad9ceb624e52d48'
 ];
 
-export interface IPlayFunctions {
-  load: (file: {
-    src: string,
-    url?: string,
-  }) => void,
-  play: () => void,
-  pause: () => void,
-  isPlaying: () => boolean,
-}
+const INCLUSIVE = [
+  '2f1fd2519f072324a6a7608e98d193f718112270a590e251f89788116e69646f2d686f6c642d6f6e2d7632'
+]
 
+const TUNE: { [key: string]: string } = {
+  '2f1fd2519f072324a6a7608e98d193f718112270a590e251f89788116e69646f2d686f6c642d6f6e2d7632': 'Hold On'
+};
 
 export const Player = (props: PlayerProps) => {
 
@@ -96,6 +96,7 @@ export const Player = (props: PlayerProps) => {
         && !EXCLUDE.includes(asset.unit)
         && !EXCLUDE.includes(policy);
     }).map((asset) => {
+      const tune: string | undefined = TUNE[asset.unit];
       return [
         ...asset.info.audios!.map((file) => {
           return {
@@ -106,7 +107,8 @@ export const Player = (props: PlayerProps) => {
             imageUrl: asset.info.imageUrl,
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
-            file: file
+            file: file,
+            tune: tune,
           };
         }),
         ...asset.info.videos!.map((file) => {
@@ -118,11 +120,34 @@ export const Player = (props: PlayerProps) => {
             imageUrl: asset.info.imageUrl,
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
-            file: file
+            file: file,
+            tune: tune,
           };
         })];
     }).flat() ?? [];
-    return _.uniqBy(ans, 'key');
+    let ans2 = _.uniqBy(ans, 'key');
+
+    if (props.random) {
+      const always = ans2?.filter((asset) => asset.media === Media.Video || INCLUSIVE.includes(asset.unit));
+      const ans3 = [...always];
+      if (ans2.length > 15) {
+        const indices: number[] = [];
+        while (indices.length < 10) {
+          const r = Math.floor(Math.random() * ans2.length);
+          const asset = ans2[r];
+          if (!indices.includes(r) && r < ans2.length && asset.media !== Media.Video && !INCLUSIVE.includes(asset.unit)) {
+            indices.push(r);
+            ans3.push(asset);
+          }
+        }
+        return ans3;
+      }
+    }
+    /// http://sound-rig-prod-public.s3-website-us-east-1.amazonaws.com/ipfs_v6_Raw/07706c11-4a17-484e-8ab7-ebdd01af1334
+    /// https://sound-rig-prod-public.s3-website-us-east-1.amazonaws.com/ipfs_v6_Raw/07706c11-4a17-484e-8ab7-ebdd01af1334
+    /// https://sound-rig-prod-public.s3.amazonaws.com/ipfs_v6_Raw/0418f3ed-2e43-467a-b0dc-811bfb0cbaed
+
+    return ans2;
   }, [props.assets]);
 
   if (songs.length === 0) {
@@ -161,29 +186,28 @@ export const Player = (props: PlayerProps) => {
     (isVideo ? el2 : el)?.pause();
   }, [el, el2, isVideo]);
   const stop = useCallback(() => {
-    const _ = (isVideo ? el2 : el);
-    if (_) {
-      _.pause();
-      _.currentTime = 0;
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
+    if (el2) {
+      el2.pause();
+      el2.currentTime = 0;
     }
   }, [el, el2, isVideo]);
   const load = useCallback((file: {
     src: string,
     url?: string,
   }) => {
-    console.log('LOAD', isVideo, file);
     if (file == null) return;
     const src = file.url ?? fromIPFS(file.src);
     if (src && el && !isVideo) {
       el.onloadeddata = () => {
-        console.log('LOADED');
         el.play();
       };
       el.src = src;
     } else if (el2 && isVideo && src) {
-      console.log('VIDEO', src);
       el2.onloadeddata = () => {
-        console.log('LOADED');
         el2.play();
       };
       el2.src = src;
@@ -212,32 +236,32 @@ export const Player = (props: PlayerProps) => {
       (asset) => asset.unit === currentItem?.unit
     );
 
-    console.log('NEXT', repeatMode, currentIndex, `l=${playlist.length}`);
+    // console.log('NEXT', repeatMode, currentIndex, `l=${playlist.length}`);
 
     let next = currentIndex + 1;
     if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
-      console.log('NEXT -> REPEAT ONE', next);
+      // console.log('NEXT -> REPEAT ONE', next);
       selectPlayAsset(playlist[next], true);
     } else if (isShuffle && playlist.length > 1) {
       next = currentIndex;
       while (next === currentIndex) {
         next = Math.floor(Math.random() * playlist.length);
       }
-      console.log('NEXT -> SHUFFLE', next);
+      // console.log('NEXT -> SHUFFLE', next);
       selectPlayAsset(playlist[next], true);
     } else if (next > playlist.length - 1) {
       if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
-        console.log('NEXT -> REPEAT NEXT', next);
+        // console.log('NEXT -> REPEAT NEXT', next);
         selectPlayAsset(playlist[next], true);
       } else {
         next = 0;
-        console.log('NEXT -> RETURN STOP', next);
+        // console.log('NEXT -> RETURN STOP', next);
         setCurrentItem(playlist[next]);
       }
     } else if (next >= 0) {
-      console.log('NEXT -> JUST NEXT', next);
+      // console.log('NEXT -> JUST NEXT', next);
 
       selectPlayAsset(playlist[next], true);
     }
