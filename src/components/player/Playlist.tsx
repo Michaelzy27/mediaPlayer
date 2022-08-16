@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 import { useHover } from '../../hooks/useHover';
-import { fromIPFS } from '../../utils/fromIPFS';
+import { convertToLink } from '../../utils/convertToLink';
 import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 import { ISong, Media } from './Player';
@@ -201,7 +201,7 @@ const PlaylistItem = (props: {
           resolve(true);
         };
 
-        video.src = fromIPFS(file.src)!;
+        video.src = convertToLink(file.src)!;
       }
     });
   };
@@ -231,7 +231,7 @@ const PlaylistItem = (props: {
            return props.onItemClick?.(props.asset);
          }}
     >
-      <img src={asset.imageUrl ?? fromIPFS(asset.image)} className={'w-12 h-12 object-contain'} />
+      <img src={asset.imageUrl ?? convertToLink(asset.image)} className={'w-12 h-12 object-contain'} />
       <div className={'flex-1 grid'}>
         <div className={'font-bold'}>{asset.name}</div>
         <div className={'text-gray-400'}>{asset.artist}</div>

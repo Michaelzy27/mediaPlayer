@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import 'video-react/dist/video-react.css';
 import { PlayerControl, REPEAT_MODE } from './PlayerControl';
 import { Playlist } from './Playlist';
-import { fromIPFS } from '../../utils/fromIPFS';
+import { convertToLink } from '../../utils/convertToLink';
 import classNames from 'classnames';
 import { getPolicyId } from '../../utils/cardano';
 import { Link } from 'react-router-dom';
@@ -200,7 +200,7 @@ export const Player = (props: PlayerProps) => {
     url?: string,
   }) => {
     if (file == null) return;
-    const src = file.url ?? fromIPFS(file.src);
+    const src = file.url ?? convertToLink(file.src);
     if (src && el && !isVideo) {
       el.onloadeddata = () => {
         el.play();
@@ -287,7 +287,7 @@ export const Player = (props: PlayerProps) => {
 
 
   const songInfo: SongInfo = {
-    thumbnail: currentItem?.imageUrl ?? fromIPFS(currentItem?.image) ?? '',
+    thumbnail: currentItem?.imageUrl ?? convertToLink(currentItem?.image) ?? '',
     title: currentItem?.name ?? '',
     artistsNames: currentItem?.artist ?? ''
   };
@@ -318,7 +318,7 @@ export const Player = (props: PlayerProps) => {
             {hasImage && !isVideo &&
               <img alt={'album image'}
                    className={'object-contain h-full w-full rounded-xl'}
-                   src={(currentItem ?? hoverItem)!.imageUrl ?? fromIPFS((currentItem ?? hoverItem)!.image)} />}
+                   src={(currentItem ?? hoverItem)!.imageUrl ?? convertToLink((currentItem ?? hoverItem)!.image)} />}
             {isVideo &&
               <video
                 ref={refVideo2}
