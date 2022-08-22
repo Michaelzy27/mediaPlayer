@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 import { ISong, ITune, Media } from './player-types';
 import _ from 'lodash';
+import {BsFillFileEarmarkFontFill, BsFillFileEarmarkMusicFill, BsFillFileEarmarkPlayFill} from 'react-icons/bs'
 
 export const Playlist = (props: {
   className?: string
@@ -215,15 +216,19 @@ const TuneItem = (props: {
   const h = useHover();
   const { isHover } = h;
 
+  const iconClass = 'h-6 w-6 ';
   return <div
-    className={classNames('cursor-pointer flex pl-20', {
+    className={classNames('cursor-pointer flex pl-10 py-1', {
       'bg-slate-800 ': props.selected,
       'bg-slate-800': isHover
     })}
     onClick={props.onClick}
     onMouseEnter={h.handleMouseEnter}
     onMouseLeave={h.handleMouseLeave}>
-    <div className={'font-bold'}>{song.name}</div>
+    {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass}/>}
+    {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass}/>}
+    {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass}/>}
+    <div className={'font-bold ml-2'}>{song.name}</div>
   </div>;
 };
 
