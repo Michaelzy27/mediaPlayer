@@ -4,6 +4,7 @@ export interface IAssetInfo {
   unit: string;
   quantity: string;
   metadataType: number;
+  isTun3z?: boolean;
   info: {
     name: string;
     image: string;
@@ -14,22 +15,20 @@ export interface IAssetInfo {
       src: string;
       iv: string;
     };
-    audios?: {
-      mediaType: string;
-      name?: string;
-      src: string;
-      artist?: string;
-    }[];
-    videos?: {
-      mediaType: string;
-      name?: string;
-      src: string;
-      artist?: string;
-    }[];
+    audios?: IFileInfo[];
+    videos?: IFileInfo[];
+    texts?: IFileInfo[];
     isMusic: boolean;
     isVideo: boolean;
     artist: string;
   };
+}
+
+interface IFileInfo {
+  mediaType: string;
+  name?: string;
+  src: string;
+  artist?: string;
 }
 
 interface GetResponse {

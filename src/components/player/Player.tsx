@@ -4,72 +4,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import 'video-react/dist/video-react.css';
 import { PlayerControl, REPEAT_MODE } from './PlayerControl';
 import { Playlist } from './Playlist';
-import { convertToLink } from '../../utils/convertToLink';
+import { convertToLink } from 'utils/convertToLink';
 import classNames from 'classnames';
-import { getPolicyId } from '../../utils/cardano';
+import { getPolicyId } from 'utils/cardano';
 import { Link } from 'react-router-dom';
-import { AssetAPI } from '../../api/asset';
+import { AssetAPI } from 'api/asset';
 import _ from 'lodash';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { ISong, Media, SongInfo } from './player-types';
 
 window.URL = window.URL || window.webkitURL;
-
-export interface SongInfo {
-  thumbnail: string;
-  title: string;
-  artistsNames: string;
-}
-
-interface PlayerProps {
-  assets: IAssetInfo[];
-  random?: boolean,
-}
-
-export enum Media {
-  Audio = 'Audio',
-  Video = 'Video',
-}
-
-export interface ISong {
-  key: string;
-  unit: string;
-  image: string;
-  imageUrl?: string;
-  name: string;
-  artist: string;
-  media: Media,
-  file: {
-    src: string;
-    mediaType: string;
-    encrypted?: boolean;
-  },
-  tune?: string;           // group by this
-}
-
-const SUPPORT_MEDIA_TYPE = {
-  'application/pdf': {},
-  'audio/mp3': {},
-  'audio/mpeg': {},
-  'audio/wav': {},
-  'image/gif': {},
-  'image/jpeg': {},
-  'image/jpg': {},
-  'image/png': {},
-  'model/gltf-binary': {},
-  'null': {},
-  'text/html': {},
-  'video/mp4': {}
-};
-
-const AUDIO_MEDIA_TYPE = {
-  'audio/mp3': {},
-  'audio/mpeg': {},
-  'audio/wav': {}
-};
-
-const VIDEO_MEDIA_TYPE = {
-  'video/mp4': {}
-};
 
 const EXCLUDE = [
   'af2e27f580f7f08e93190a81f72462f153026d06450924726645891b44524950',
@@ -78,13 +22,13 @@ const EXCLUDE = [
 
 const INCLUSIVE = [
   '2f1fd2519f072324a6a7608e98d193f718112270a590e251f89788116e69646f2d686f6c642d6f6e2d7632'
-]
+];
 
-const TUNE: { [key: string]: string } = {
-  '2f1fd2519f072324a6a7608e98d193f718112270a590e251f89788116e69646f2d686f6c642d6f6e2d7632': 'Hold On'
-};
 
-export const Player = (props: PlayerProps) => {
+export const Player = (props: {
+  assets: IAssetInfo[];
+  random?: boolean,
+}) => {
 
   const songs: ISong[] = useMemo(() => {
     const ans = props.assets.filter((asset) => {
@@ -96,9 +40,8 @@ export const Player = (props: PlayerProps) => {
         && !EXCLUDE.includes(asset.unit)
         && !EXCLUDE.includes(policy);
     }).map((asset) => {
-      const tune: string | undefined = TUNE[asset.unit];
-      return [
-        ...asset.info.audios!.map((file) => {
+      const ans: ISong[] = [
+        ...(asset.info.audios??[]).map((file) => {
           return {
             key: file.src,
             media: Media.Audio,
@@ -108,10 +51,10 @@ export const Player = (props: PlayerProps) => {
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
             file: file,
-            tune: tune,
+            isTun3z: asset.isTun3z ?? false
           };
         }),
-        ...asset.info.videos!.map((file) => {
+        ...(asset.info.videos??[]).map((file) => {
           return {
             key: file.src,
             media: Media.Video,
@@ -121,9 +64,36 @@ export const Player = (props: PlayerProps) => {
             name: file.name ?? asset.info.name,
             artist: file.artist ?? asset.info.artist,
             file: file,
-            tune: tune,
+            isTun3z: asset.isTun3z ?? false
           };
-        })];
+        }),
+        ...(asset.info.texts??[]).map((file) => {
+          return {
+            key: file.src,
+            media: Media.Text,
+            unit: asset.unit,
+            image: asset.info.image,
+            imageUrl: asset.info.imageUrl,
+            name: file.name ?? asset.info.name,
+            artist: file.artist ?? asset.info.artist,
+            file: file,
+            isTun3z: asset.isTun3z ?? false
+          };
+        }),
+      ];
+      if (asset.isTun3z) {
+        ans.push({
+          key: asset.unit,
+          media: Media.Tun3z,
+          unit: asset.unit,
+          image: asset.info.image,
+          imageUrl: asset.info.imageUrl,
+          name: asset.info.name,
+          artist: asset.info.artist,
+          isTun3z: true,
+        })
+      }
+      return ans;
     }).flat() ?? [];
     let ans2 = _.uniqBy(ans, 'key');
 
@@ -223,12 +193,15 @@ export const Player = (props: PlayerProps) => {
 
 
     const info = await AssetAPI.get(song.unit);
-    const file2 = (isVideo ? info?.info.videos : info?.info.audios)?.find((i) => i.src === song.file.src);
+    const src = song.file?.src;
+    if (src){
+      const file2 = (isVideo ? info?.info.videos : info?.info.audios)?.find((i) => i.src === src);
 
-    load({
-      src: song.file.src,
-      url: file2?.url
-    });
+      load({
+        src: src,
+        url: file2?.url
+      });
+    }
   }, [isVideo, currentItem, load]);
 
   const handleNextSong = useCallback(() => {
@@ -351,11 +324,11 @@ export const Player = (props: PlayerProps) => {
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
                       selectPlayAsset(asset, false);
+                      setVideo(asset.media === Media.Video);
                     }}
                     onTabSelect={(k) => {
                       stop();
                       setCurrentItem(undefined);
-                      setVideo(k === 'video');
                     }}
                     onPlaylist={setPlaylist}
                     hoveredItem={hoverItem}

@@ -1,5 +1,3 @@
-import { Player } from 'components/player/Player';
-
 // specific create page for big picture learning
 import { HomePage } from '../components/page/HomePage';
 import { DemoPage } from '../components/page/DemoPage';

@@ -4,7 +4,7 @@ import ButtonPlay, { IFile } from './ButtonPlay';
 import { Button, Popover } from 'antd';
 import { StepBackwardOutlined, StepForwardOutlined } from '@ant-design/icons';
 import Slider from './Slider';
-import { SongInfo } from './Player';
+import { SongInfo } from './player-types';
 import { TbArrowsShuffle2, TbRepeat, TbRepeatOff, TbRepeatOnce, TbVolume, TbVolumeOff } from 'react-icons/all';
 import classNames from 'classnames';
 

@@ -1,10 +1,10 @@
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHover } from '../../hooks/useHover';
 import { convertToLink } from '../../utils/convertToLink';
 import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
-import { ISong, Media } from './Player';
+import { ISong, ITune, Media } from './player-types';
 import _ from 'lodash';
 
 export const Playlist = (props: {
@@ -22,29 +22,54 @@ export const Playlist = (props: {
 
   const videos = useMemo(() => {
     return items.filter((i) => {
-        return i.media === Media.Video
-    })
-  }, [items ])
+      return i.media === Media.Video && !i.isTun3z;
+    });
+  }, [items]);
+
   const songs = useMemo(() => {
     return items.filter((i) => {
-      return i.media === Media.Audio
-    })
-  }, [items])
+      return i.media === Media.Audio && !i.isTun3z;
+    });
+  }, [items]);
 
-  const [selectedTab, setTab] = useState<string>(songs.length > 0 ? 'music' : 'video');
+
+  const tunes: ITune[] = useMemo(() => {
+    const itemsWithTune = items.filter((i) => {
+      return i.isTun3z;
+    });
+    /// group by unit
+    const groups = _.groupBy(itemsWithTune, 'unit');
+    return Object.values(groups).map((items) => {
+      const first = items.find((i) => i.media === Media.Tun3z) ?? items.find((i) => i.media === Media.Audio) ?? items[0];
+      return {
+        name: first.name,
+        artist: first.artist,
+        items: items.filter((i) => i.media !== Media.Tun3z),
+        imageUrl: first.imageUrl,
+        unit: first.unit,
+        image: first.image
+      };
+    });
+  }, [items]);
+
+
+  const [selectedTab, setTab] = useState<string>(tunes.length > 0 ? 'tunes' : songs.length > 0 ? 'music' : 'video');
   const [selectedArtist, setArtist] = useState<string | null>(null);
 
 
   const artists = useMemo(() => {
     const ans = _.groupBy(items, 'artist');
     return ans;
-  }, [items])
+  }, [items]);
 
-  const selectedItems = selectedTab === 'artists' ? artists[selectedArtist!] : selectedTab === 'video' ? videos : songs;
+  const selectedItems = selectedTab === 'artists' ? artists[selectedArtist!]
+    : selectedTab === 'video' ? videos
+      : selectedTab === 'tunes' ? []
+        : songs;
 
   useEffect(() => {
     props.onPlaylist?.(selectedItems);
-  }, [selectedTab, selectedArtist, songs])
+  }, [selectedTab, selectedArtist, songs]);
 
 
   return (
@@ -54,48 +79,50 @@ export const Playlist = (props: {
           <PlaylistTab
             className={'w-full'}
             tabs={[
-              // {
-              //   key: 'tunes',
-              //   label: `TUN3Z (100)`,
-              // },
+              {
+                key: 'tunes',
+                label: `TUN3Z (${tunes.length})`,
+                disabled: tunes.length === 0
+              },
               {
                 key: 'music',
                 label: `Music (${songs.length})`,
-                disabled: songs.length === 0,
+                disabled: songs.length === 0
               },
               {
                 key: 'video',
                 label: `Videos (${videos.length})`,
-                disabled: videos.length === 0,
+                disabled: videos.length === 0
               },
               {
                 key: 'artists',
-                label: `Artists (${Object.keys(artists).length})`,
-              },
+                label: `Artists (${Object.keys(artists).length})`
+              }
             ]}
             selectedTab={selectedTab}
             onClick={(k) => {
-              if (k === 'artists'){
+              if (k === 'artists') {
                 setArtist(Object.keys(artists).sort()[0]);
               }
-              setTab(k)
+              setTab(k);
               props.onTabSelect?.(k);
             }} />
           <PlaylistTab
             className={classNames('w-full overflow-x-auto', {
-              'hidden': selectedTab !== 'artists',
+              'hidden': selectedTab !== 'artists'
             })}
             tabs={Object.keys(artists).sort().map((key) => {
               return {
                 key,
-                label: key,
-              }
+                label: key
+              };
             })}
             selectedTab={selectedArtist}
             onClick={setArtist} />
         </div>
 
-        {selectedItems.map((i) => {
+        {/*LIST of ITEMS*/}
+        {selectedTab !== 'tunes' && selectedItems.map((i) => {
           return <PlaylistItem key={i.key} asset={i}
                                container={ref}
                                onItemClick={props.onItemClick}
@@ -107,6 +134,12 @@ export const Playlist = (props: {
                                  }
                                }}
                                selected={props.selectedItem?.key === i.key} />;
+        })}
+        {selectedTab === 'tunes' && tunes.map((i) => {
+          return <TunesList key={i.unit}
+                            tune={i}
+                            onItemClick={props.onItemClick}
+                            selected={props.selectedItem?.key ?? ''} />;
         })}
       </div>
     </div>
@@ -132,15 +165,66 @@ const PlaylistTab = (props: {
       {props.tabs.map((tab) => {
 
         const selected = props.selectedTab === tab.key;
-        return <div key={tab.key} className={classNames('rounded-md cursor-pointer px-2 py-1 transition-all hover:bg-slate-800 select-none whitespace-nowrap', {
-          'bg-slate-700 font-bold': selected,
-          'text-gray-500 pointer-events-none': tab.disabled,
-        })} onClick={() => props.onClick(tab.key)}>
+        return <div key={tab.key}
+                    className={classNames('rounded-md cursor-pointer px-2 py-1 transition-all hover:bg-slate-800 select-none whitespace-nowrap', {
+                      'bg-slate-700 font-bold': selected,
+                      'text-gray-500 pointer-events-none': tab.disabled
+                    })} onClick={() => props.onClick(tab.key)}>
           <div>{tab.label}</div>
         </div>;
       })}
     </div>
   );
+};
+
+const TunesList = (props: {
+  tune: ITune,
+  selected: string,
+  onItemHover?: (asset: ISong | null) => void,
+  onItemClick?: (asset: ISong) => void,
+}) => {
+  const { tune } = props;
+
+  return (
+    <div>
+      <div className={classNames('cursor-pointer flex gap-4 p-2')}
+      >
+        <img src={tune.imageUrl ?? convertToLink(tune.image)} className={'w-12 h-12 object-contain'} />
+        <div className={'flex-1 grid'}>
+          <div className={'font-bold'}>{tune.name}</div>
+          <div className={'text-gray-400'}>{tune.artist}</div>
+        </div>
+      </div>
+      <div>
+        {tune.items.map((item) => {
+          return <TuneItem key={item.key} song={item}
+                           onClick={() => props.onItemClick?.(item)}
+                           selected={item.key === props.selected}/>;
+        })}
+      </div>
+    </div>
+  );
+};
+
+const TuneItem = (props: {
+  song: ISong,
+  selected: boolean,
+  onClick?: () => void,
+}) => {
+  const { song } = props;
+  const h = useHover();
+  const { isHover } = h;
+
+  return <div
+    className={classNames('cursor-pointer flex pl-20', {
+      'bg-slate-800 ': props.selected,
+      'bg-slate-800': isHover
+    })}
+    onClick={props.onClick}
+    onMouseEnter={h.handleMouseEnter}
+    onMouseLeave={h.handleMouseLeave}>
+    <div className={'font-bold'}>{song.name}</div>
+  </div>;
 };
 
 const PlaylistItem = (props: {
@@ -185,7 +269,7 @@ const PlaylistItem = (props: {
     }
   }, [parent, el]);
 
-  const {file} = props.asset;
+  const { file } = props.asset;
 
   const loadTime = () => {
     return new Promise((resolve) => {
