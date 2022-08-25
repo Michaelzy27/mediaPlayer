@@ -37,7 +37,7 @@ export const VotePage = () => {
       <div className={'h-3'}/>
       <div className={'text-2xl lg:text-6xl font-bold'}>Vote for us!</div>
       {items.map((i) => {
-        return <div>
+        return <div key={i.link}>
           <div className={'text-lg md:text-xl font-bold'}>{i.name}</div>
           <a href={i.link} target={'__blank'}
              className={'text-base md:text-lg'}

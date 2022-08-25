@@ -14,20 +14,9 @@ interface IAsset {
       url?: string;
 
     };
-    audios?: {
-      mediaType: string;
-      name?: string;
-      src: string;
-      artist?: string;
-      url?: string;
-    }[];
-    videos?: {
-      mediaType: string;
-      name?: string;
-      src: string;
-      artist?: string;
-      url?: string;
-    }[];
+    audios?: IFileInfo[];
+    videos?: IFileInfo[];
+    texts?: IFileInfo[];
     isMusic: boolean;
     isVideo: boolean;
     artist: string;
@@ -35,8 +24,20 @@ interface IAsset {
   metadata: any
 }
 
+interface IFileInfo {
+  mediaType: string;
+  name?: string;
+  src: string;
+  artist?: string;
+  url?: string;
+}
+
 export abstract class AssetAPI {
   static async get(assetId: string) : Promise<IAsset | null> {
     return await GET<IAsset>(`asset/${assetId}`);
+  }
+
+  static async getText(url: string) : Promise<string | null> {
+    return await GET<string>(url);
   }
 }

@@ -21,6 +21,7 @@ export async function GET<T>(path: string): Promise<T | null> {
   const response = await axiosInstance.get(path, {
     validateStatus: (status) => status === 200 || status === 404
   });
+  if (response === undefined) return null;
   if (response.status === 404){
     return null;
   }

@@ -6,7 +6,8 @@ import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 import { ISong, ITune, Media } from './player-types';
 import _ from 'lodash';
-import {BsFillFileEarmarkFontFill, BsFillFileEarmarkMusicFill, BsFillFileEarmarkPlayFill} from 'react-icons/bs'
+import { BsFillFileEarmarkFontFill, BsFillFileEarmarkMusicFill, BsFillFileEarmarkPlayFill } from 'react-icons/bs';
+import { AssetAPI } from '../../api/asset';
 
 export const Playlist = (props: {
   className?: string
@@ -215,22 +216,105 @@ const TuneItem = (props: {
   const { song } = props;
   const h = useHover();
   const { isHover } = h;
+  const [showText, setShowText] = useState<boolean>(false);
+  const [text, setText] = useState<string | undefined>();
+
+  useEffect(() => {
+    const src = song.file?.src;
+    // AssetAPI.get(song.unit)
+    //   .then((info) => {
+    //     const file = info?.info.texts?.find((i) => i.src === src)
+    //     const url = file?.url ?? convertToLink(file?.src);
+    //     if (song.media === Media.Text && url){
+    //       /// load
+    //       AssetAPI.getText(url)
+    //         .then((res) => {
+    //           if (res && src === song.file?.src){
+    //             setText(res);
+    //           }
+    //         });
+    //     }
+    //   })
+  }, [showText, song]);
+
+
 
   const iconClass = 'h-6 w-6 ';
   return <div
-    className={classNames('cursor-pointer flex pl-10 py-1', {
+    className={classNames('cursor-pointer grid pl-10 py-1', {
       'bg-slate-800 ': props.selected,
       'bg-slate-800': isHover
     })}
-    onClick={props.onClick}
+    onClick={() => {
+      if (song.media === Media.Text){
+        setShowText(!showText);
+      }
+      else {
+        props.onClick?.()
+      }
+    }}
     onMouseEnter={h.handleMouseEnter}
-    onMouseLeave={h.handleMouseLeave}>
-    {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass}/>}
-    {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass}/>}
-    {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass}/>}
-    <div className={'font-bold ml-2'}>{song.name}</div>
+    onMouseLeave={h.handleMouseLeave}
+  >
+    <div className={'flex'}>
+      {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass}/>}
+      {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass}/>}
+      {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass}/>}
+      <div className={'font-bold ml-2'}>{song.name}</div>
+    </div>
+    {showText && <div className={'whitespace-pre-line h-40 overflow-auto'}>{TEXT}</div>}
   </div>;
 };
+
+const TEXT = `
+Hold On 
+by NIDO
+
+Look me in the eyes, 
+Under the night sky, 
+Close your eyes 
+Only got one night 
+ust put your trust in me, 
+Give me everything, 
+I need your love tonight 
+So baby please don't fight it 
+Just put your trust in me 
+I'll give you everything 
+So hold on - to me 
+
+
+Never let me go, 
+Right here in your arms 
+Is where I want to be, 
+So hold on - for me 
+
+
+Never let me go... 
+
+
+Hold on - to me 
+
+
+Just put your trust in me, 
+Give me everything, 
+I need your love tonight 
+So baby please don't fight 
+So hold on - to me, 
+Look me in the eyes, 
+Under the night skies, 
+For eternity... 
+
+
+So hold on - to me 
+
+
+Look me in the eyes... 
+
+
+Under the night skies 
+
+
+For eternity...`
 
 const PlaylistItem = (props: {
   asset: ISong
