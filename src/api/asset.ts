@@ -30,6 +30,7 @@ interface IFileInfo {
   src: string;
   artist?: string;
   url?: string;
+  text?: string;
 }
 
 export abstract class AssetAPI {
