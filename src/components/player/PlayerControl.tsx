@@ -1,8 +1,13 @@
 import { RefObject, useCallback, useEffect, useState } from 'react';
 import * as React from 'react';
-import ButtonPlay, { IFile } from './ButtonPlay';
 import { Button, Popover } from 'antd';
-import { StepBackwardOutlined, StepForwardOutlined } from '@ant-design/icons';
+import {
+  LoadingOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
+  StepBackwardOutlined,
+  StepForwardOutlined
+} from '@ant-design/icons';
 import Slider from './Slider';
 import { SongInfo } from './player-types';
 import { TbArrowsShuffle2, TbRepeat, TbRepeatOff, TbRepeatOnce, TbVolume, TbVolumeOff } from 'react-icons/all';
@@ -14,7 +19,7 @@ export enum REPEAT_MODE {
   ONE = 'ONE',
 }
 
-interface PlayerControlProps {
+export const PlayerControl = (props:{
   refVideo: RefObject<HTMLVideoElement>;
   repeatMode: REPEAT_MODE;
   isShuffle: boolean,
@@ -24,12 +29,11 @@ interface PlayerControlProps {
   onPlay: () => void;
   onPause: () => void;
   onRepeat: () => void;
-  file?: IFile;
+  file?: {src: string};
   songInfo: SongInfo;
   isPlaying: boolean;
-}
-
-export const PlayerControl = (props: PlayerControlProps) => {
+  loading: boolean;
+} ) => {
   const { refVideo, onPrevSong, onNextSong, file, songInfo } = props;
   const el = refVideo.current;
   if (file == null || el == null) {
@@ -46,7 +50,7 @@ export const PlayerControl = (props: PlayerControlProps) => {
           className='mx-2 my-0'
           icon={<StepBackwardOutlined className='text-2xl' />}
         />
-        <ButtonPlay isPlaying={props.isPlaying} onClick={() => props.isPlaying ? props.onPause() : props.onPlay()} />
+        <ButtonPlay isPlaying={props.isPlaying} onClick={() => props.isPlaying ? props.onPause() : props.onPlay()} loading={props.loading}/>
         <Button
           onClick={onNextSong}
           className='mx-2 my-0'
@@ -60,7 +64,6 @@ export const PlayerControl = (props: PlayerControlProps) => {
                          onRepeat={props.onRepeat}
                          refVideo={refVideo} />
     </div>
-    {/* Player controls end */}
   </div>;
 };
 
@@ -245,3 +248,21 @@ const VolumeSliderControl = ({ refVideo }: {
   );
 };
 
+const ButtonPlay = (props: {
+  isPlaying: boolean;
+  onClick: () => void;
+  loading: boolean;
+}) => {
+  const icon = props.loading ?
+    <LoadingOutlined className='text-2xl' /> :
+    props.isPlaying ? <PauseCircleOutlined className='text-2xl' />
+      : <PlayCircleOutlined className='text-2xl' />;
+
+  return (
+    <Button
+      icon={icon}
+      className='w-12 h-12'
+      onClick={props.onClick}
+    />
+  );
+};

@@ -24,7 +24,6 @@ const INCLUSIVE = [
   '2f1fd2519f072324a6a7608e98d193f718112270a590e251f89788116e69646f2d686f6c642d6f6e2d7632'
 ];
 
-
 export const Player = (props: {
   assets: IAssetInfo[];
   random?: boolean,
@@ -131,7 +130,6 @@ export const Player = (props: {
   }
 
   const refVideo = useRef<HTMLVideoElement>(null);
-  const refVideo2 = useRef<HTMLVideoElement>(null);
   const [currentItem, setCurrentItem] = useState<ISong | undefined>();
   const [hoverItem, setHoverItem] = useState<ISong | null>(null);
   const [isPlaying, setPlaying] = useState<boolean>(false);
@@ -140,49 +138,45 @@ export const Player = (props: {
   const [playedSongs, setPlayedSongs] = useState<ISong[]>([]);
   const [playlist, setPlaylist] = useState<ISong[]>(songs);
   const [isVideo, setVideo] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
 
   useEffect(() => {
     setPlayedSongs([]);
   }, [songs]);
 
-  const el = refVideo.current;
-  const el2 = refVideo2.current;
-
   const play = useCallback(() => {
-    (isVideo ? el2 : el)?.play();
-  }, [el, el2, isVideo]);
+    refVideo.current?.play();
+  }, [refVideo]);
+
   const pause = useCallback(() => {
-    (isVideo ? el2 : el)?.pause();
-  }, [el, el2, isVideo]);
+    refVideo.current?.pause();
+  }, [refVideo]);
+
   const stop = useCallback(() => {
-    if (el) {
-      el.pause();
+    const el = refVideo.current;
+    if (el){
+      el.pause()
       el.currentTime = 0;
     }
-    if (el2) {
-      el2.pause();
-      el2.currentTime = 0;
-    }
-  }, [el, el2, isVideo]);
+  }, [refVideo]);
+
   const load = useCallback((file: {
     src: string,
     url?: string,
   }) => {
     if (file == null) return;
     const src = file.url ?? convertToLink(file.src);
-    if (src && el && !isVideo) {
+    const el = refVideo.current;
+    if (src && el){
+      setLoading(true)
       el.onloadeddata = () => {
         el.play();
+        setLoading(false)
       };
       el.src = src;
-    } else if (el2 && isVideo && src) {
-      el2.onloadeddata = () => {
-        el2.play();
-      };
-      el2.src = src;
     }
-  }, [el, el2, isVideo]);
+  }, [refVideo]);
 
   const selectPlayAsset = useCallback(async (song: ISong, history: boolean) => {
     if (song.key === currentItem?.key) return;
@@ -241,7 +235,6 @@ export const Player = (props: {
 
   }, [currentItem, selectPlayAsset, playlist, repeatMode, isShuffle]);
 
-
   const handlePrevSong = useCallback(() => {
     if (playedSongs.length > 0) {
       const prevSong = playedSongs[0];
@@ -292,22 +285,21 @@ export const Player = (props: {
               <img alt={'album image'}
                    className={'object-contain h-full w-full rounded-xl'}
                    src={(currentItem ?? hoverItem)!.imageUrl ?? convertToLink((currentItem ?? hoverItem)!.image)} />}
-            {isVideo &&
-              <video
-                ref={refVideo2}
+            {<video
+                ref={refVideo}
                 controls={true}
                 autoPlay={true}
                 className={classNames('object-contain w-full rounded-xl', {
-                  'hidden': !isVideo || !currentItem
+                  'opacity-0 pointer-events-none': !isVideo || !currentItem
                 })}
                 onPause={() => {
-                  isVideo && setPlaying(false);
+                  setPlaying(false);
                 }}
                 onPlay={() => {
-                  isVideo && setPlaying(true);
+                  setPlaying(true);
                 }}
                 onEnded={() => {
-                  isVideo && handleNextSong();
+                  handleNextSong();
                 }}
               />}
             {!hasImage &&
@@ -339,9 +331,10 @@ export const Player = (props: {
       </div>
 
       {/* Absolute */}
-      {currentItem &&
+      {currentItem && !isVideo &&
         <PlayerControl refVideo={refVideo} onPrevSong={handlePrevSong} onNextSong={handleNextSong}
                        repeatMode={repeatMode}
+                       loading={loading}
                        isShuffle={isShuffle}
                        onRepeat={() => {
                          if (repeatMode === REPEAT_MODE.REPEAT) setRepeatMode(REPEAT_MODE.ONE);
@@ -356,20 +349,6 @@ export const Player = (props: {
                        onPause={() => pause()}
                        file={currentItem?.file} songInfo={songInfo} />
       }
-
-      <video controls ref={refVideo} className='fixed bottom-8 left-8 hidden'
-             onPause={() => {
-               !isVideo && setPlaying(false);
-             }}
-             onPlay={() => {
-               !isVideo && setPlaying(true);
-             }}
-             onEnded={() => {
-               !isVideo && handleNextSong();
-             }}
-      >
-        <source type='audio/mpeg'></source>
-      </video>
     </div>
   );
 };

@@ -97,6 +97,7 @@ const Auth = {
   signOut,
   onAuthStateChanged,
   removeOnAuthStateChanged,
+  getCurrentAuthData,
   authStateChangedLoop,
 };
 

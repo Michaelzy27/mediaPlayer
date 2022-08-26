@@ -19,7 +19,10 @@ export async function POST<T>(path: string, payload: any) : Promise<T> {
 
 export async function GET<T>(path: string): Promise<T | null> {
   const response = await axiosInstance.get(path, {
-    validateStatus: (status) => status === 200 || status === 404
+    validateStatus: (status) => status === 200 || status === 404,
+    headers: {
+      'Authorization': `Bearer ${Auth.getCurrentAuthData().jwtToken}`,
+    }
   });
   if (response === undefined) return null;
   if (response.status === 404){
@@ -36,7 +39,6 @@ axiosInstance.interceptors.request.use(
         return Promise.resolve(config);
       },
       function(err) {
-        console.log(err);
         return Promise.resolve(config);
       }
     );

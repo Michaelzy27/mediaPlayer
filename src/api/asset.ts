@@ -1,4 +1,5 @@
 import { GET } from './axios';
+import Auth, { AuthState } from '../auth/Auth';
 
 interface IAsset {
   id: string
@@ -35,7 +36,13 @@ interface IFileInfo {
 
 export abstract class AssetAPI {
   static async get(assetId: string) : Promise<IAsset | null> {
-    return await GET<IAsset>(`asset/${assetId}`);
+    const {authState} = Auth.getCurrentAuthData()
+    if (authState === AuthState.SignedIn){
+      return await GET<IAsset>(`asset/${assetId}`);
+    }
+    else {
+      return await GET<IAsset>(`public/asset/${assetId}`);
+    }
   }
 
   static async getText(url: string) : Promise<string | null> {
