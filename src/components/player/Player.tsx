@@ -180,6 +180,8 @@ export const Player = (props: {
 
   const selectPlayAsset = useCallback(async (song: ISong, history: boolean) => {
     if (song.key === currentItem?.key) return;
+    stop();
+    setLoading(true);
     if (currentItem != null && history) {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
@@ -264,6 +266,7 @@ export const Player = (props: {
   };
 
   const hasImage = currentItem || hoverItem;
+  const imageSrc = (currentItem ?? hoverItem)?.imageUrl ?? convertToLink((currentItem ?? hoverItem)?.image);
 
   useHotkeys('space', () => {
     if (isPlaying) {
@@ -281,10 +284,11 @@ export const Player = (props: {
           <div className={classNames('w-[calc(100vh-220px)] h-[calc(100vh-220px)] rounded-xl grid items-center', {
             'border border-slate-800 grid items-center justify-center': !hasImage
           })}>
-            {hasImage && !isVideo &&
+            {imageSrc && !isVideo &&
               <img alt={'album image'}
+                   key={imageSrc}
                    className={'object-contain h-full w-full rounded-xl'}
-                   src={(currentItem ?? hoverItem)!.imageUrl ?? convertToLink((currentItem ?? hoverItem)!.image)} />}
+                   src={imageSrc} />}
             {<video
                 ref={refVideo}
                 controls={true}

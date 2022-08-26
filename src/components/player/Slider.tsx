@@ -37,8 +37,6 @@ const Slider = ({
   };
 
   return (
-    // Slider Bar
-    // w-full || w-[84px]
     <div
       className="my-[-6px] cursor-pointer"
       style={{
@@ -102,7 +100,7 @@ const Slider = ({
            * Change Slider Progress -> width: 23%
            */}
           <div
-            className="top-0 left-[0%] absolute z-[1] bg-[#335eea] rounded-[15px]"
+            className="top-0 left-[0%] absolute z-[1] bg-gradient-to-r from-[#E0FB1C] to-[#17CCE2] rounded-[15px]"
             style={{
               width: `${percentSlider}%`,
               height: `${setHeight}`,

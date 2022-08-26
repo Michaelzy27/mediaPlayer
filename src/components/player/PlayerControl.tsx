@@ -72,6 +72,7 @@ const TrackInfo = ({ songInfo }: { songInfo: SongInfo }) => {
   return (
     <div className='flex items-center justify-center'>
       <img
+        key={songInfo.thumbnail}
         src={songInfo.thumbnail}
         alt={songInfo.title}
         className='h-[46px] rounded-[5px]'
