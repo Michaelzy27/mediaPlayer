@@ -6,6 +6,9 @@ import { Layout } from 'antd';
 import { AppHeader } from './components/layout/AppHeader';
 import { IRoute, ROUTES, ROUTES_MOBILE } from './routes/routes';
 
+const DISCORD = 'https://discord.gg/C2tjMcY7'
+const TWITTER = 'https://twitter.com/SoundRigNFT'
+
 
 const RouteComponentWithTitle = (props: {
   title: string;
@@ -58,8 +61,8 @@ export const App = () => {
             <Routes>{ROUTES_MOBILE.map(createRoute)}</Routes>
           </Layout.Content>
           <Layout.Footer>
-            <div className={'bg-slate-800 text-center py-1'}>
-              © 2022 SoundRig
+            <div className={'bg-slate-800 text-center py-1 whitespace-pre'}>
+              <span> © 2022 SoundRig  •  <a href={DISCORD} target={'__blank'}>Discord</a>  •  <a href={TWITTER} target={'__blank'}>Twitter</a></span>
             </div>
           </Layout.Footer>
         </Layout>
