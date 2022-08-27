@@ -316,6 +316,8 @@ export const Player = (props: {
         </div>
         <div>
           <Playlist items={songs} onItemHover={handleItemHover}
+                    playing={isPlaying}
+                    loading={loading}
                     className={classNames('lg:relative lg:mt-0 lg:w-[500px] lg:h-[calc(100vh-220px)] ',
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {

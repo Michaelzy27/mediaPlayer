@@ -257,7 +257,7 @@ const ButtonPlay = (props: {
   const icon = props.loading ?
     <LoadingOutlined className='text-2xl' /> :
     props.isPlaying ? <PauseCircleOutlined className='text-2xl' />
-      : <PlayCircleOutlined className='text-2xl' />;
+      : <PlayCircleOutlined className='text-2xl'/>;
 
   return (
     <Button

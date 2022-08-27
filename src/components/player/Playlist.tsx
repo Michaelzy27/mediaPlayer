@@ -6,8 +6,18 @@ import classNames from 'classnames';
 import { formatTime } from '../../utils/formatTime';
 import { ISong, ITune, Media } from './player-types';
 import _ from 'lodash';
-import { BsFillFileEarmarkFontFill, BsFillFileEarmarkMusicFill, BsFillFileEarmarkPlayFill } from 'react-icons/bs';
+import {
+  BsFillFileEarmarkFontFill,
+  BsFillFileEarmarkMusicFill,
+  BsFillFileEarmarkPlayFill,
+  BsPause,
+  BsPauseFill,
+  BsPlayFill
+} from 'react-icons/bs';
 import { AssetAPI } from '../../api/asset';
+import { LoadingOutlined } from '@ant-design/icons';
+import './playing.less'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 export const Playlist = (props: {
   className?: string
@@ -16,6 +26,8 @@ export const Playlist = (props: {
   onItemClick?: (asset: ISong) => void,
   hoveredItem?: ISong | null,
   selectedItem?: ISong | null,
+  playing: boolean,
+  loading: boolean,
   onPlaylist?: (list: ISong[]) => void,
   onTabSelect?: (key: string) => void,
 }) => {
@@ -135,6 +147,8 @@ export const Playlist = (props: {
                                    props?.onItemHover?.(null);
                                  }
                                }}
+                               playing={props.playing}
+                               loading={props.loading}
                                selected={props.selectedItem?.key === i.key} />;
         })}
         {selectedTab === 'tunes' && tunes.map((i) => {
@@ -201,7 +215,7 @@ const TunesList = (props: {
         {tune.items.map((item) => {
           return <TuneItem key={item.key} song={item}
                            onClick={() => props.onItemClick?.(item)}
-                           selected={item.key === props.selected}/>;
+                           selected={item.key === props.selected} />;
         })}
       </div>
     </div>
@@ -223,14 +237,13 @@ const TuneItem = (props: {
     const src = song.file?.src;
     AssetAPI.get(song.unit)
       .then((info) => {
-        const file = info?.info.texts?.find((i) => i.src === src)
+        const file = info?.info.texts?.find((i) => i.src === src);
         const text = file?.text;
-        if (song.media === Media.Text && text){
+        if (song.media === Media.Text && text) {
           setText(text);
         }
-      })
+      });
   }, [showText, song]);
-
 
 
   const iconClass = 'h-6 w-6 ';
@@ -240,20 +253,19 @@ const TuneItem = (props: {
       'bg-slate-800': isHover
     })}
     onClick={() => {
-      if (song.media === Media.Text){
+      if (song.media === Media.Text) {
         setShowText(!showText);
-      }
-      else {
-        props.onClick?.()
+      } else {
+        props.onClick?.();
       }
     }}
     onMouseEnter={h.handleMouseEnter}
     onMouseLeave={h.handleMouseLeave}
   >
     <div className={'flex'}>
-      {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass}/>}
-      {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass}/>}
-      {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass}/>}
+      {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass} />}
+      {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass} />}
+      {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass} />}
       <div className={'font-bold ml-2'}>{song.name}</div>
     </div>
     {showText && <div className={'whitespace-pre-line h-40 overflow-auto'}>{text}</div>}
@@ -266,6 +278,8 @@ const PlaylistItem = (props: {
   onItemHover?: (asset: ISong | null) => void,
   onItemClick?: (asset: ISong) => void,
   selected?: boolean,
+  playing?: boolean,
+  loading: boolean,
 }) => {
   const { asset } = props;
   const h = useHover();
@@ -348,7 +362,19 @@ const PlaylistItem = (props: {
            return props.onItemClick?.(props.asset);
          }}
     >
-      <img src={asset.imageUrl ?? convertToLink(asset.image)} className={'w-12 h-12 object-contain'} />
+
+
+      <div className={'w-12 h-12 grid items-center justify-items-center'}>
+        <img src={asset.imageUrl ?? convertToLink(asset.image)}
+             className={classNames('w-12 h-12 object-contain col-start-1 row-start-1  duration-300 transition-all', {
+               'opacity-10': props.selected
+             })} />
+        {props.selected && (props.loading ?
+          <LoadingAnimation className='h-8 w-8 col-start-1 row-start-1' /> : props.playing ?
+            <PlayingAnimation className={'row-start-1 col-start-1 w-[80%] h-[60%]'}/>
+            // <BsPlayFill className='h-8 w-8 opacity-100 col-start-1 row-start-1' />
+            : <BsPause className='h-8 w-8 opacity-100 col-start-1 row-start-1' />)}
+      </div>
       <div className={'flex-1 grid'}>
         <div className={'font-bold'}>{asset.name}</div>
         <div className={'text-gray-400'}>{asset.artist}</div>
@@ -360,3 +386,22 @@ const PlaylistItem = (props: {
     </div>
   );
 };
+
+const LoadingAnimation = (props: {
+  className?: string
+}) => {
+  return <AiOutlineLoading3Quarters className={classNames('animate-spin', props.className)}/>
+}
+
+const PlayingAnimation = (props: {
+  className?: string,
+}) => {
+  return <div className={classNames('playing-animation-container w-full h-full', props.className)}>
+    <div className={'bar'}/>
+    <div className={'bar'}/>
+    <div className={'bar'}/>
+    <div className={'bar'}/>
+    <div className={'bar'}/>
+    <div className={'bar'}/>
+  </div>
+}
