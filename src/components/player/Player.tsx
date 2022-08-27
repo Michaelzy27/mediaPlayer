@@ -171,8 +171,10 @@ export const Player = (props: {
     if (src && el){
       setLoading(true)
       el.onloadeddata = () => {
-        el.play();
-        setLoading(false)
+        if (el.src === src){
+          el.play();
+          setLoading(false)
+        }
       };
       el.src = src;
     }
