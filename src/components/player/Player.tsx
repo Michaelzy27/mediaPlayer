@@ -180,7 +180,7 @@ export const Player = (props: {
     }
   }, [refVideo]);
 
-  const selectPlayAsset = useCallback(async (song: ISong, history: boolean) => {
+  const selectPlayAsset = useCallback(async (song: ISong, history: boolean, isVideo: boolean) => {
     if (song.key === currentItem?.key) return;
     stop();
     setLoading(true);
@@ -200,7 +200,7 @@ export const Player = (props: {
         url: file2?.url
       });
     }
-  }, [isVideo, currentItem, load]);
+  }, [currentItem, load]);
 
   const handleNextSong = useCallback(() => {
     const currentIndex = playlist.findIndex(
@@ -213,19 +213,19 @@ export const Player = (props: {
     if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
       // console.log('NEXT -> REPEAT ONE', next);
-      selectPlayAsset(playlist[next], true);
+      selectPlayAsset(playlist[next], true, isVideo);
     } else if (isShuffle && playlist.length > 1) {
       next = currentIndex;
       while (next === currentIndex) {
         next = Math.floor(Math.random() * playlist.length);
       }
       // console.log('NEXT -> SHUFFLE', next);
-      selectPlayAsset(playlist[next], true);
+      selectPlayAsset(playlist[next], true, isVideo);
     } else if (next > playlist.length - 1) {
       if (repeatMode === REPEAT_MODE.REPEAT) {
         next = 0;
         // console.log('NEXT -> REPEAT NEXT', next);
-        selectPlayAsset(playlist[next], true);
+        selectPlayAsset(playlist[next], true, isVideo);
       } else {
         next = 0;
         // console.log('NEXT -> RETURN STOP', next);
@@ -234,16 +234,16 @@ export const Player = (props: {
     } else if (next >= 0) {
       // console.log('NEXT -> JUST NEXT', next);
 
-      selectPlayAsset(playlist[next], true);
+      selectPlayAsset(playlist[next], true, isVideo);
     }
 
-  }, [currentItem, selectPlayAsset, playlist, repeatMode, isShuffle]);
+  }, [isVideo, currentItem, selectPlayAsset, playlist, repeatMode, isShuffle]);
 
   const handlePrevSong = useCallback(() => {
     if (playedSongs.length > 0) {
       const prevSong = playedSongs[0];
       setPlayedSongs(playedSongs.slice(1));
-      selectPlayAsset(prevSong, false);
+      selectPlayAsset(prevSong, false, isVideo);
 
       return;
     }
@@ -251,9 +251,9 @@ export const Player = (props: {
       (asset) => asset.unit === currentItem?.unit
     );
     if (currentIndex > 0) {
-      selectPlayAsset(songs[currentIndex - 1], false);
+      selectPlayAsset(songs[currentIndex - 1], false, isVideo);
     }
-  }, [currentItem, selectPlayAsset, songs]);
+  }, [currentItem, selectPlayAsset, songs, isVideo]);
 
 
   const songInfo: SongInfo = {
@@ -324,7 +324,7 @@ export const Player = (props: {
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
                       setVideo(asset.media === Media.Video);
-                      selectPlayAsset(asset, false);
+                      selectPlayAsset(asset, false, asset.media === Media.Video);
                     }}
                     onTabSelect={(k) => {
                       stop();
