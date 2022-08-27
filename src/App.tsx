@@ -5,6 +5,11 @@ import { Route, Routes } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader } from './components/layout/AppHeader';
 import { IRoute, ROUTES, ROUTES_MOBILE } from './routes/routes';
+import ReactGA from 'react-ga4';
+
+ReactGA.initialize('G-DKMHBHRGQ6', {
+
+})
 
 const DISCORD = 'https://discord.gg/C2tjMcY7'
 const TWITTER = 'https://twitter.com/SoundRigNFT'

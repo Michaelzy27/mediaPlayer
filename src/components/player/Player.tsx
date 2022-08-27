@@ -12,6 +12,7 @@ import { AssetAPI } from 'api/asset';
 import _ from 'lodash';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ISong, Media, SongInfo } from './player-types';
+import ReactGA from 'react-ga4';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -188,6 +189,11 @@ export const Player = (props: {
       setPlayedSongs([currentItem, ...playedSongs]);
     }
     setCurrentItem(song);
+
+    ReactGA.event({
+      action: 'play',
+      category: isVideo ? 'video' : 'music'
+    })
 
 
     const info = await AssetAPI.get(song.unit);
