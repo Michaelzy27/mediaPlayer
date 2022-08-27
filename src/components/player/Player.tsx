@@ -29,7 +29,6 @@ export const Player = (props: {
   assets: IAssetInfo[];
   random?: boolean,
 }) => {
-
   const songs: ISong[] = useMemo(() => {
     const ans = props.assets.filter((asset) => {
       if (asset.unit === 'lovelace') return false;
@@ -41,7 +40,7 @@ export const Player = (props: {
         && !EXCLUDE.includes(policy);
     }).map((asset) => {
       const ans: ISong[] = [
-        ...(asset.info.audios??[]).map((file) => {
+        ...(asset.info.audios ?? []).map((file) => {
           return {
             key: file.src,
             media: Media.Audio,
@@ -54,7 +53,7 @@ export const Player = (props: {
             isTun3z: asset.isTun3z ?? false
           };
         }),
-        ...(asset.info.videos??[]).map((file) => {
+        ...(asset.info.videos ?? []).map((file) => {
           return {
             key: file.src,
             media: Media.Video,
@@ -67,7 +66,7 @@ export const Player = (props: {
             isTun3z: asset.isTun3z ?? false
           };
         }),
-        ...(asset.info.texts??[]).map((file) => {
+        ...(asset.info.texts ?? []).map((file) => {
           return {
             key: file.src,
             media: Media.Text,
@@ -79,7 +78,7 @@ export const Player = (props: {
             file: file,
             isTun3z: asset.isTun3z ?? false
           };
-        }),
+        })
       ];
       if (asset.isTun3z) {
         ans.push({
@@ -90,8 +89,8 @@ export const Player = (props: {
           imageUrl: asset.info.imageUrl,
           name: asset.info.name,
           artist: asset.info.artist,
-          isTun3z: true,
-        })
+          isTun3z: true
+        });
       }
       return ans;
     }).flat() ?? [];
@@ -146,6 +145,24 @@ export const Player = (props: {
     setPlayedSongs([]);
   }, [songs]);
 
+  useEffect(() => {
+    const t = setInterval(() => {
+      if (currentItem && isPlaying && !loading){
+        console.log('event', currentItem?.name, isPlaying, loading);
+        ReactGA.event({
+          action: 'playing',
+          category: isVideo ? 'video' : 'music',
+          label: currentItem.name,
+          value: 10,
+        });
+      }
+    }, 10000);
+    return () => {
+      clearInterval(t);
+    };
+  }, [currentItem, isPlaying, loading, isVideo]);
+
+
   const play = useCallback(() => {
     refVideo.current?.play();
   }, [refVideo]);
@@ -156,8 +173,8 @@ export const Player = (props: {
 
   const stop = useCallback(() => {
     const el = refVideo.current;
-    if (el){
-      el.pause()
+    if (el) {
+      el.pause();
       el.currentTime = 0;
     }
   }, [refVideo]);
@@ -169,12 +186,12 @@ export const Player = (props: {
     if (file == null) return;
     const src = file.url ?? convertToLink(file.src);
     const el = refVideo.current;
-    if (src && el){
-      setLoading(true)
+    if (src && el) {
+      setLoading(true);
       el.onloadeddata = () => {
-        if (el.src === src){
+        if (el.src === src) {
           el.play();
-          setLoading(false)
+          setLoading(false);
         }
       };
       el.src = src;
@@ -192,13 +209,14 @@ export const Player = (props: {
 
     ReactGA.event({
       action: 'play',
-      category: isVideo ? 'video' : 'music'
-    })
+      category: isVideo ? 'video' : 'music',
+      label: song.name
+    });
 
 
     const info = await AssetAPI.get(song.unit);
     const src = song.file?.src;
-    if (src){
+    if (src) {
       const file2 = (isVideo ? info?.info.videos : info?.info.audios)?.find((i) => i.src === src);
 
       load({
@@ -298,22 +316,34 @@ export const Player = (props: {
                    className={'object-contain h-full w-full rounded-xl'}
                    src={imageSrc} />}
             {<video
-                ref={refVideo}
-                controls={true}
-                autoPlay={true}
-                className={classNames('object-contain w-full rounded-xl', {
-                  'opacity-0 pointer-events-none': !isVideo || !currentItem
-                })}
-                onPause={() => {
-                  setPlaying(false);
-                }}
-                onPlay={() => {
-                  setPlaying(true);
-                }}
-                onEnded={() => {
-                  handleNextSong();
-                }}
-              />}
+              ref={refVideo}
+              controls={true}
+              autoPlay={true}
+              className={classNames('object-contain w-full rounded-xl', {
+                'opacity-0 pointer-events-none': !isVideo || !currentItem
+              })}
+              // onSeekingCapture={() => {
+              //   console.log('SeekingCapture')
+              // }}
+              // onSeeking={() => {
+              //   console.log('Seeking')
+              // }}
+              onPlaying={() => {
+                setLoading(false);
+              }}
+              onWaiting={(e) => {
+                setLoading(true);
+              }}
+              onPause={() => {
+                setPlaying(false);
+              }}
+              onPlay={() => {
+                setPlaying(true);
+              }}
+              onEnded={() => {
+                handleNextSong();
+              }}
+            />}
             {!hasImage &&
               <div>
 
