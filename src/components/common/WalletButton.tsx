@@ -5,7 +5,7 @@ import useUser from '../../hooks/useUser';
 import { signOut } from '../../utils/auth';
 import { useHover } from '../../hooks/useHover';
 import classNames from 'classnames';
-import { ADA_SYMBOL } from '../../utils/constants';
+import { ADA_SYMBOL } from 'utils/constants';
 import { lovelaceToADAString, shortWalletAddress } from '../../utils/string';
 import { UserAPI } from '../../api/user';
 

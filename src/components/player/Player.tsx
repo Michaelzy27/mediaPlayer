@@ -13,6 +13,7 @@ import _ from 'lodash';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { ISong, Media, SongInfo } from './player-types';
 import ReactGA from 'react-ga4';
+import { TrackAPI } from 'api/track';
 
 window.URL = window.URL || window.webkitURL;
 
@@ -207,16 +208,19 @@ export const Player = (props: {
     }
     setCurrentItem(song);
 
-    ReactGA.event({
-      action: 'play',
-      category: isVideo ? 'video' : 'music',
-      label: song.name
-    });
+
 
 
     const info = await AssetAPI.get(song.unit);
     const src = song.file?.src;
     if (src) {
+      ReactGA.event({
+        action: 'play',
+        category: isVideo ? 'video' : 'music',
+        label: song.name
+      });
+      TrackAPI.track(src);
+
       const file2 = (isVideo ? info?.info.videos : info?.info.audios)?.find((i) => i.src === src);
 
       load({

@@ -2,12 +2,13 @@ import { Player } from '../player/Player';
 import { useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { IAssetInfo, WalletAssetAPI } from '../../api/wallet-asset';
+import { DEMO_WALLET } from 'utils/constants';
 
 
 export const DemoPage = () => {
   let { wallet } = useParams<{ wallet: string }>();
   const isDemo = wallet == null;
-  wallet ??= 'addr1qxy6uuykhqde8hhdz3tf3wv93qg7ttyjtdk9vtwf30y80sf9pv8yrsxqv0azl2eld95p5zth5gzuejvd9kskndmrhu8slwv3r5';
+  wallet ??= DEMO_WALLET;
 
   const [assets, setAssets] = useState<IAssetInfo[] | null>(null);
 

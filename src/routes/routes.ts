@@ -31,12 +31,12 @@ export const ROUTES : IRoute[] = [
     exact: true,
     component: DemoPage
   },
-  {
-    path: '/vote',
-    title: 'Vote for us on Catalyst',
-    exact: true,
-    component: VotePage
-  },
+  // {
+  //   path: '/vote',
+  //   title: 'Vote for us on Catalyst',
+  //   exact: true,
+  //   component: VotePage
+  // },
   {
     path: '/mint',
     title: 'Mint ur own song',
@@ -70,11 +70,11 @@ export const MENU_ITEMS = [
     path: '/demo',
     text: 'Demo'
   },
-  {
-    key: 'vote',
-    path: '/vote',
-    text: 'Vote'
-  },
+  // {
+  //   key: 'vote',
+  //   path: '/vote',
+  //   text: 'Vote'
+  // },
   {
     key: 'more',
     text: 'More',
