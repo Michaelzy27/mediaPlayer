@@ -13,13 +13,13 @@ export const AppHeader = () => {
   return (
     <div className={'flex'}>
       <div className={'pl-2 min-w-[160px] lg:min-w-[260px]'}>
-        <Link to='/' aria-label='Home'>
+        <a href='www.soundrig.io' aria-label='Home'>
           <img
             src={`/images/${logoSrc}`}
             alt='sound-rig logo'
             className='app-logo h-16 object-contain'
           />
-        </Link>
+        </a>
       </div>
       <div className={'flex-1  justify-center hidden md:flex'}>
         <Menu
