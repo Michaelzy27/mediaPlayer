@@ -13,7 +13,7 @@ export const AppHeader = () => {
   return (
     <div className={'flex'}>
       <div className={'pl-2 min-w-[160px] lg:min-w-[260px]'}>
-        <a href='www.soundrig.io' aria-label='Home'>
+        <a href="https://www.soundrig.io" aria-label='Home'>
           <img
             src={`/images/${logoSrc}`}
             alt='sound-rig logo'
