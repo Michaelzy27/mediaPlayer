@@ -196,6 +196,7 @@ export const Player = (props: {
         }
       };
       el.src = src;
+      console.log(src);
     }
   }, [refVideo]);
 

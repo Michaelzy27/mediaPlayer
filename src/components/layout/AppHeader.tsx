@@ -8,7 +8,7 @@ import { WalletButton } from '../common/WalletButton';
 export const AppHeader = () => {
   const { navMenuKey } = useRouteParams();
 
-  const logoSrc = 'SoundRig-logo-2.png';
+  const logoSrc = 'SRHorizontalWebsiteCompressed.png';
 
   return (
     <div className={'flex'}>
