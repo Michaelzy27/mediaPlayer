@@ -5,7 +5,7 @@ const ipfsPrefix2 = 'ipfs://ipfs/';
 const arweaveURL = 'https://snaznabndfe3.arweave.net/';
 const arPrefix = 'ar://';
 
-export const convertToLink = (src: string | undefined) => {
+export const convertToLink = (src: string | undefined | false) => {
   if (typeof src === 'string') {
     if (src.startsWith('ipfs:')) {
       let a = src.replace(ipfsPrefix2, '')

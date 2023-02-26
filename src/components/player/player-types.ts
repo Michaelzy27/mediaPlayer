@@ -13,6 +13,7 @@ export enum Media {
   Audio = 'Audio',
   Video = 'Video',
   Text = 'Text',
+  Image = 'Image',
   Tun3z = 'Tun3z',
 }
 
@@ -39,6 +40,9 @@ export interface ISong {
     mediaType: string;
     encrypted?: boolean;
   },
+}
+export interface IImage {
+  src: string
 }
 
 const SUPPORT_MEDIA_TYPE = {

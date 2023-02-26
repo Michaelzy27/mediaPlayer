@@ -16,12 +16,11 @@ export const DemoPage = () => {
     if (wallet != null) {
       const wallet_ = wallet;
       Promise.all([
-        WalletAssetAPI.get(wallet_, 1),
-        WalletAssetAPI.get(wallet_, 2)
+        WalletAssetAPI.get(wallet_),
       ])
-        .then(async ([audio, videos]) => {
+        .then(async ([audio]) => {
           if (wallet_ === wallet) {
-            const assets = [...(audio?.assets ?? []), ...(videos?.assets ?? [])];
+            const assets = [...(audio?.assets ?? [])];
             if (assets.length > 0) {
               setAssets(assets);
             } else {

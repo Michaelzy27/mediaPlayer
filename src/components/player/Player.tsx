@@ -79,6 +79,19 @@ export const Player = (props: {
             file: file,
             isTun3z: asset.isTun3z ?? false
           };
+        }),
+        ...(asset.info.images ?? []).map((file) => {
+          return {
+            key: file.src,
+            media: Media.Image,
+            unit: asset.unit,
+            image: asset.info.image,
+            imageUrl: asset.info.imageUrl,
+            name: file.name ?? asset.info.name,
+            artist: file.artist ?? asset.info.artist,
+            file: file,
+            isTun3z: asset.isTun3z ?? false
+          };
         })
       ];
       if (asset.isTun3z) {
@@ -365,7 +378,9 @@ export const Player = (props: {
                       'absolute right-0 border rounded-xl mr-4 bg-black w-[400px] h-[400px] -mt-8')}
                     onItemClick={(asset) => {
                       setVideo(asset.media === Media.Video);
-                      selectPlayAsset(asset, false, asset.media === Media.Video);
+                      if (asset.media === Media.Audio || asset.media === Media.Video){
+                        selectPlayAsset(asset, false, asset.media === Media.Video);
+                      }
                     }}
                     onTabSelect={(k) => {
                       stop();

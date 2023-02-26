@@ -18,6 +18,7 @@ export interface IAssetInfo {
     audios?: IFileInfo[];
     videos?: IFileInfo[];
     texts?: IFileInfo[];
+    images?: IFileInfo[];
     isMusic: boolean;
     isVideo: boolean;
     artist: string;
@@ -36,9 +37,8 @@ interface GetResponse {
 }
 
 export abstract class WalletAssetAPI {
-  static async get(wallet: string, type?: 1 | 2): Promise<GetResponse | null> {
-    let query = 'showInfo=1&useServerImage=1';
-    if (type != null) query += `&metadataType=${type}`
+  static async get(wallet: string): Promise<GetResponse | null> {
+    let query = ['showInfo=1', 'useServerImage=1', 'isMusic=1' , 'isVideo=1'].join('&');
     return await GET(`wallet-asset/${wallet}?${query}`);
   }
 

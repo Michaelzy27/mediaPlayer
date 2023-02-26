@@ -8,15 +8,13 @@ import { ISong, ITune, Media } from './player-types';
 import _ from 'lodash';
 import {
   BsFillFileEarmarkFontFill,
+  BsFillFileEarmarkImageFill,
   BsFillFileEarmarkMusicFill,
   BsFillFileEarmarkPlayFill,
-  BsPause,
-  BsPauseFill,
-  BsPlayFill
+  BsPause
 } from 'react-icons/bs';
 import { AssetAPI } from '../../api/asset';
-import { LoadingOutlined } from '@ant-design/icons';
-import './playing.less'
+import './playing.less';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 export const Playlist = (props: {
@@ -231,16 +229,24 @@ const TuneItem = (props: {
   const h = useHover();
   const { isHover } = h;
   const [showText, setShowText] = useState<boolean>(false);
+  const [showImage, setShowImage] = useState<boolean>(false);
+
   const [text, setText] = useState<string | undefined>();
+  const [image, setImage] = useState<string | undefined>();
 
   useEffect(() => {
     const src = song.file?.src;
     AssetAPI.get(song.unit)
       .then((info) => {
-        const file = info?.info.texts?.find((i) => i.src === src);
-        const text = file?.text;
+        const textFile = info?.info.texts?.find((i) => i.src === src);
+        const text = textFile?.text;
         if (song.media === Media.Text && text) {
           setText(text);
+        }
+
+        const imageFile = info?.info.images?.find((i) => i.src === src);
+        if (song.media === Media.Image && imageFile) {
+          setImage(imageFile.url);
         }
       });
   }, [showText, song]);
@@ -255,6 +261,8 @@ const TuneItem = (props: {
     onClick={() => {
       if (song.media === Media.Text) {
         setShowText(!showText);
+      } else if (song.media === Media.Image){
+        setShowImage(!showImage);
       } else {
         props.onClick?.();
       }
@@ -266,9 +274,11 @@ const TuneItem = (props: {
       {song.media === Media.Audio && <BsFillFileEarmarkMusicFill className={iconClass} />}
       {song.media === Media.Video && <BsFillFileEarmarkPlayFill className={iconClass} />}
       {song.media === Media.Text && <BsFillFileEarmarkFontFill className={iconClass} />}
+      {song.media === Media.Image && <BsFillFileEarmarkImageFill className={iconClass} />}
       <div className={'font-bold ml-2'}>{song.name}</div>
     </div>
     {showText && <div className={'whitespace-pre-line h-40 overflow-auto'}>{text}</div>}
+    {showImage && <img className={'whitespace-pre-line h-40 overflow-auto'} src={image}></img>}
   </div>;
 };
 
