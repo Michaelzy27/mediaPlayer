@@ -246,12 +246,14 @@ export const Player = (props: {
 
   const handleNextSong = useCallback(() => {
     const currentIndex = playlist.findIndex(
-      (asset) => asset.unit === currentItem?.unit
+      (asset) => asset.key === currentItem?.key
     );
 
-    // console.log('NEXT', repeatMode, currentIndex, `l=${playlist.length}`);
 
     let next = currentIndex + 1;
+
+    console.log('NEXT', repeatMode, currentIndex, next, `l=${playlist.length}`);
+
     if (repeatMode === REPEAT_MODE.ONE) {
       next = currentIndex;
       // console.log('NEXT -> REPEAT ONE', next);

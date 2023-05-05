@@ -74,9 +74,11 @@ export const Playlist = (props: {
     return ans;
   }, [items]);
 
-  const selectedItems = selectedTab === 'artists' ? artists[selectedArtist!]
+  const selectedItems: ISong[] = selectedTab === 'artists' ? artists[selectedArtist!]
     : selectedTab === 'video' ? videos
-      : selectedTab === 'tunes' ? []
+      : selectedTab === 'tunes' ? tunes.map((tune) => tune.items)
+          .flat()
+          .filter((i) => i.media === Media.Audio || i.media === Media.Video)
         : songs;
 
   useEffect(() => {
