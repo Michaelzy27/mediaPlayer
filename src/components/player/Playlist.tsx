@@ -34,13 +34,13 @@ export const Playlist = (props: {
 
   const videos = useMemo(() => {
     return items.filter((i) => {
-      return i.media === Media.Video && !i.isTun3z;
+      return i.media === Media.Video;
     });
   }, [items]);
 
   const songs = useMemo(() => {
     return items.filter((i) => {
-      return i.media === Media.Audio && !i.isTun3z;
+      return i.media === Media.Audio;
     });
   }, [items]);
 
