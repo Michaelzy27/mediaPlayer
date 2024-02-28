@@ -1,0 +1,359 @@
+{
+  _08ff9bd809cd8a9a8ebe26e042a6af7afacfc6b2b58efdaebfa694d0: {
+    _0002: {
+      cover_art_version: "V1",
+      distributor: "SoundRig",
+      files: [
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Ben Elferink",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmQDzjYkxzLuggQNFFUuix5N8mcxbhekKFBUayJavnhbDA",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Ben (Intro)",
+          producer: "Awesomeisjayell",
+          song_duration: "PT1M25S",
+          song_title: "Ben (Intro)",
+          src: "ipfs://QmZek5nCGT4ntMaLu4C9F1VFt4WzdFYEGWX4CnR4FBzWPt",
+          track_number: "1"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Ben (Intro) Lyrics",
+          src: "ipfs://QmQDzjYkxzLuggQNFFUuix5N8mcxbhekKFBUayJavnhbDA"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmQh6yiYbyYsijmLFrWQeuztPoKmEk6D87fmSJHZQbPbFa",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Welcome To The Club",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M10S",
+          song_title: "Welcome To The Club",
+          src: "ipfs://QmP5yBbuogoU6Ey6udGzmQzvKT6xDJvLqRyh2q9ZCBwe66",
+          track_number: "2"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Welcome To The Club Lyrics",
+          src: "ipfs://QmQh6yiYbyYsijmLFrWQeuztPoKmEk6D87fmSJHZQbPbFa"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmVagWXpm9skpavdRGVjHji38doVcmoTEPBkZuqLqQktMs",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "FoxVerse",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M30S",
+          song_title: "FoxVerse",
+          src: "ipfs://QmTY3A8tLBADiccyoRbvsRfE1dGurE24Tf3gkJttqY6hNv",
+          track_number: "3"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "FoxVerse Lyrics",
+          src: "ipfs://QmVagWXpm9skpavdRGVjHji38doVcmoTEPBkZuqLqQktMs"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmcN1LKjoy5nVKB2a38K5M63fjZLJCFumUcYJt9gPV23tz",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Riding Around Town",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M21S",
+          song_title: "FoxVerse",
+          src: "ipfs://QmdJLSHwwrDbqSDDTWiu63sf1Ac2QhQPqYQtvhbc79rTS8",
+          track_number: "4"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Riding Around Town Lyrics",
+          src: "ipfs://QmcN1LKjoy5nVKB2a38K5M63fjZLJCFumUcYJt9gPV23tz"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          featured_artist: "Awesomeisjayell",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmRuqF4QPEVJiWDJqsES5ewjo2e9v8xpFroy1b5dcZUQyc",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Motorcycle Club",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M47S",
+          song_title: "Motorcycle Club",
+          src: "ipfs://QmSxfreogmA8LDuKjUqWGud3BDZtYH4FRHCFcgaB3SsygL",
+          track_number: "5"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Motorcycle Club Lyrics",
+          src: "ipfs://QmRuqF4QPEVJiWDJqsES5ewjo2e9v8xpFroy1b5dcZUQyc"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          featured_artist: "Awesomeisjayell",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmWRh3rztFNLU6sij2ARnTPeEBfGXQwmZ5GpHTmkkmJCW7",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "New Wave",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M30S",
+          song_title: "New Wave",
+          src: "ipfs://QmRGWXJpdHL7jMrSRHYyuhai24FNk8zWYT7VTuYvdMh1jK",
+          track_number: "6"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "New Wave Lyrics",
+          src: "ipfs://QmWRh3rztFNLU6sij2ARnTPeEBfGXQwmZ5GpHTmkkmJCW7"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          featured_artist: "Awesomeisjayell",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmeZCCyNndDMHhoYeFp95UDQ95xBGESWYNhoGTYmpAdSap",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Moving Melodies (Interlude)",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M30S",
+          song_title: "Moving Melodies (Interlude)",
+          src: "ipfs://Qme4qV3H8p16LuGRwy5uhpsuizo74BKiHhJa68ooAzdkQw",
+          track_number: "7"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Moving Melodies (Interlude) Lyrics",
+          src: "ipfs://QmeZCCyNndDMHhoYeFp95UDQ95xBGESWYNhoGTYmpAdSap"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmZnc1gRwcxQAPtbg57sKNpXCrrxQYdGG8HTCHFzhHBVtE",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Foxy Miami",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M26S",
+          song_title: "Foxy Miami",
+          src: "ipfs://QmSwSNxYbzxGnJWtWxVt3BRXDK7PGwiw3oKTEx3SRUKe5S",
+          track_number: "8"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Foxy Miami Lyrics",
+          src: "ipfs://QmZnc1gRwcxQAPtbg57sKNpXCrrxQYdGG8HTCHFzhHBVtE"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          featured_artist: "Awesomeisjayell",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmSfZQcH2eiJyP5tExxbSUWpQXC6NCMWGggPHtRWGQqY6D",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "Out The Cage",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M48S",
+          song_title: "Out The Cage",
+          src: "ipfs://QmcUySjFaEubGpCvFHeEu84PrkeLBFE5HhhJcxW4jgGVmD",
+          track_number: "9"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "Out The Cage Lyrics",
+          src: "ipfs://QmSfZQcH2eiJyP5tExxbSUWpQXC6NCMWGggPHtRWGQqY6D"
+        },
+        {
+          album_title: "Live From The Club",
+          artists: [
+            "Bad Fox 4042"
+          ],
+          contributing_artists: [
+            "Bad Fox 4042",
+            "Awesomeisjayell"
+          ],
+          copyright: "℗ Bad Fox 4042",
+          country_of_origin: "United States",
+          encrypted: "true",
+          genres: [
+            "Hip-Hop"
+          ],
+          lyrics: "ipfs://QmYXWuDca2McW6Kom66YA59QhBWXzYzchK7tfNhuzSz7Yw",
+          master_engineer: "Awesomeisjayell",
+          mediaType: "audio/mpeg",
+          mix_engineer: "Awesomeisjayell",
+          name: "No Chains",
+          producer: "Awesomeisjayell",
+          song_duration: "PT2M59S",
+          song_title: "No Chains",
+          src: "ipfs://QmQa85o8RvDgmxVQz9yfKEMWABHNLX46X9RQFCQQYyhb1D",
+          track_number: "10"
+        },
+        {
+          encrypted: "true",
+          mediaType: "text/plain",
+          name: "No Chains Lyrics",
+          src: "ipfs://QmYXWuDca2McW6Kom66YA59QhBWXzYzchK7tfNhuzSz7Yw"
+        },
+        {
+          encrypted: "true",
+          mediaType: "image/gif",
+          name: "Live From The Club GIF",
+          src: "ipfs://Qme1nATSTXSk16mLfKAvUSnsU5ErNa12keVdaDFfPDyJ65"
+        },
+        {
+          encrypted: "true",
+          mediaType: "video/mp4",
+          name: "Live From The Club Sessions",
+          src: "ipfs://QmPVVzdHgzebWnyyJjJCuSYwNBiUBqMNW3MSKCm8a4BqYg"
+        }
+      ],
+      image: "ipfs://QmZNKWWdYh7jB4Nj6uYcHmBPN8Wdzj5SBdFKBu3Xa7dZ12",
+      links: {
+        "Awesomeisjayell Twitter": "https://twitter.com/awesomeisjayell",
+        "Bad Fox 4042 Twitter": "https://twitter.com/BadFox4042",
+        "Bad Fox MC Twitter": "https://twitter.com/BadFoxMC",
+        "Sound Rig": "https://www.soundrig.io"
+      },
+      mediaType: "image/png",
+      music_metadata_version: "v1",
+      name: "0002",
+      release_date: "",
+      release_type: "Multiple"
+    }
+  },
+  version: "1.0"
+}

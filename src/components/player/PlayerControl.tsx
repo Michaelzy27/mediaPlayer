@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import Slider from './Slider';
 import { SongInfo } from './player-types';
-import { TbArrowsShuffle2, TbRepeat, TbRepeatOff, TbRepeatOnce, TbVolume, TbVolumeOff } from 'react-icons/all';
+import { TbArrowsShuffle2, TbRepeat, TbRepeatOff, TbRepeatOnce, TbVolume, TbVolumeOff } from 'react-icons/tb';
 import classNames from 'classnames';
 
 export enum REPEAT_MODE {

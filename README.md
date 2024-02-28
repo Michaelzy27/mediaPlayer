@@ -1,13 +1,23 @@
-# README
+# sound-rig-frontend
 
-Create a `.env` file under the repository root folder and put your preferred PORT in it
+This is the frontend for the sound-rig project.
 
+## Installation
+
+```bash
+pnpm install
 ```
-PORT=4000
+
+## Development
+
+http://localhost:5173
+
+```bash
+pnpm dev
 ```
 
-_Note_: Adding the below line to `.env` file would make `yarn build` process create a build directory with the `homepage` value as indicated in `PUBLIC_URL`. Do NOT do this in development environment
+## Deployment
 
-```
-PUBLIC_URL=
+```bash
+./deploy.sh
 ```
